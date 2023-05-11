@@ -3,7 +3,9 @@ from utils import Parser
 from types import SimpleNamespace
 import json
 from models import CNN
-from models import ToyModel, ECTModel
+#from models import ToyModel, ECTPointsModel
+from models import ECTCNNModel
+
 from datasets import CustomDataLoader
 from pretty_simple_namespace import pprint
 import torch
@@ -11,14 +13,17 @@ import torch
 parser = Parser()
 config = parser.parse()
 
-model = ECTModel(config.model)
+model = ECTCNNModel(config.model)
 loader = CustomDataLoader(config.dataset)
+
+
 
 # info = loader.info()
 # batch = info.batch
 
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
 model = model.to(device)
 # batch = batch.to(device)
 # pred = model(batch)
@@ -28,11 +33,11 @@ model = model.to(device)
 #
 
 loss_fn = torch.nn.CrossEntropyLoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
+optimizer = torch.optim.Adam(model.parameters(), lr=0.00005)
 
 print("Starting training...")
 losses = []
-for epoch in range(2000):
+for epoch in range(500):
     for idx, batch in enumerate(loader):
         batch = batch.to(device)
         optimizer.zero_grad()
@@ -40,9 +45,9 @@ for epoch in range(2000):
         loss = torch.sqrt(loss_fn(pred, batch.y))
         loss.backward()
         optimizer.step()
-    if epoch % 10 == 1:
+    if epoch % 10 == 0:
         print(f"Epoch {epoch} | Train Loss {loss}")
-    
+   
 config.dataset.dataset_params.train=False
 loader = CustomDataLoader(config.dataset)
 

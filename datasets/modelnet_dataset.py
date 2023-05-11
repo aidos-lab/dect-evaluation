@@ -26,6 +26,7 @@ class CenterTransform(object):
 
 class GNN_ModelNet100(BaseDataset):
     def __init__(self,config):
+        config.pre_transform = None
         pprint(config)        
         config.pre_transform = transforms.Compose([torch_geometric.transforms.SamplePoints(100),
                                                    ModelNetTransform(),

@@ -5,7 +5,7 @@ init:
 	touch ./data/.gitkeep
 
 run:
-	python main.py -c ./config/shapenet_ect_config.json
+	python main.py -c ./config/shapenet_ectcnn_config.json
 
 clean:
 	rm -r **/processed
