@@ -9,6 +9,7 @@ import inspect
 import torch
 import torch_geometric
 import torchvision.transforms as transforms
+from types import SimpleNamespace
 
 
 class BaseDataset(torch_geometric.data.Dataset):
@@ -27,5 +28,4 @@ class BaseDataset(torch_geometric.data.Dataset):
 
     def get(self, idx):
         return self.dataset.__getitem__(idx)
-
 

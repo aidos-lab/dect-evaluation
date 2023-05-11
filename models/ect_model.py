@@ -6,6 +6,8 @@ import torch.nn as nn
 import torchvision
 import torch_geometric
 
+from pretty_simple_namespace import pprint
+
 
 
 
@@ -18,20 +20,13 @@ class GEctLayer(nn.Module):
     def __init__(self,config = None):
         super(GEctLayer, self).__init__()
         self.config = config
-        self.device = "cpu"
+        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         if config:
             self.num_thetas = config.num_thetas
             self.bump_steps = config.bump_steps # Sampling density in ect curve
             self.num_features = config.num_features
             self.R = config.R
             self.scale = config.scale
-        else:
-            self.num_thetas = 50
-            self.bump_steps = 30 # Sampling density in ect curve
-            self.num_features = 3
-            self.R = 3
-            self.scale = 200
-
         self.v = torch.nn.Parameter(torch.rand(size=(self.num_thetas,self.num_features)))
         self.lin = torch.linspace(-self.R,self.R,self.bump_steps).view(-1,1,1).to(self.device)
     def bump(self,pts,labels=None,ng=1):
@@ -45,8 +40,8 @@ class GEctLayer(nn.Module):
     def forward(self,data):
         nh = data.x@self.v.T
         node_pairs = torch.stack([nh,self.R*torch.ones(nh.shape).to(self.device)])
-        edge_pairs = torch.stack([nh[data.edge_index].max(dim=0)[0],self.R*torch.ones(data.edge_index.shape[1],self.num_thetas).to(self.device)])
-        ect = self.bump(node_pairs,data.batch,ng=data.num_graphs) - self.bump(edge_pairs,data.batch[data.edge_index[0,:]],ng=data.num_graphs) / 2
+        #edge_pairs = torch.stack([nh[data.edge_index].max(dim=0)[0],self.R*torch.ones(data.edge_index.shape[1],self.num_thetas).to(self.device)])
+        ect = self.bump(node_pairs,data.batch,ng=data.num_graphs) #- self.bump(edge_pairs,data.batch[data.edge_index[0,:]],ng=data.num_graphs) / 2
         return ect.reshape(-1,self.num_thetas*self.bump_steps)
 
 
@@ -55,9 +50,25 @@ class ToyModel(torch.nn.Module):
         super().__init__()
         self.ectlayer = GEctLayer(config) 
         geotorch.sphere(self.ectlayer,"v")
-        self.linear = torch.nn.Linear(1500, 10)
+        self.linear = torch.nn.Linear(config.num_thetas*config.bump_steps, 10)
     def forward(self, x):
         x = self.ectlayer(x)
         x = self.linear(x)
         return x
+
+class ECTModel(torch.nn.Module):
+    def __init__(self,config):
+        super().__init__()
+        pprint(config)
+        self.ectlayer = GEctLayer(config) 
+        geotorch.sphere(self.ectlayer,"v")
+        self.linear = torch.nn.Linear(config.num_thetas*config.bump_steps, 10)
+    def forward(self, x):
+        x = self.ectlayer(x)
+        x = torch.nn.functional.normalize(x,dim=1)
+        x = self.linear(x) # print("linear",x.max())
+        return x
+
+
+
 

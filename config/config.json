@@ -1,0 +1,13 @@
+{
+  "dataset": {
+    "name": "GNN_MNIST",
+    "dataset_params":{
+      "root":"./data",
+      "train": "True"
+    },
+    "dataloader_params": {
+      "batch_size": 100
+    }
+  },
+  "model": {}
+}

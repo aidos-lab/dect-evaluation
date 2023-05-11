@@ -49,8 +49,19 @@ class CustomDataLoader():
         return len(self.dataset)
 
     def __iter__(self):
-        print("ITER")
         """Return a batch of data.
         """
         for data in self.dataloader:
             yield data
+
+    def info(self):
+        self.testloader = torch_geometric.loader.DataLoader(self.dataset, **vars(self.configuration.dataloader_params))
+        info = SimpleNamespace()
+        for batch in self.testloader:
+            break
+        info.batch = batch
+        return info
+
+
+
+
