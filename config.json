@@ -1,0 +1,12 @@
+{
+  "dataset": {
+    "name": "GNN_MNIST",
+    "dataset_params":{
+      "root":"./data"
+    },
+    "dataloader_params": {
+      "batch_size": 4
+    }
+  },
+  "model": {}
+}
