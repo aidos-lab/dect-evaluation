@@ -5,6 +5,7 @@ import json
 from models import CNN
 #from models import ToyModel, ECTPointsModel
 from models import ECTCNNModel
+#from models import ECTPointsLinearModel
 
 from datasets import CustomDataLoader
 from pretty_simple_namespace import pprint
@@ -32,8 +33,9 @@ model = model.to(device)
 # print(pred.shape)
 #
 
+
 loss_fn = torch.nn.CrossEntropyLoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=0.00005)
+optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
 print("Starting training...")
 losses = []

@@ -8,9 +8,6 @@ import torch_geometric
 
 from pretty_simple_namespace import pprint
 
-
-
-
 #  ╭──────────────────────────────────────────────────────────╮
 #  │ Define Model                                             │
 #  ╰──────────────────────────────────────────────────────────╯
@@ -99,6 +96,22 @@ class ECTPointsModel(torch.nn.Module):
         x = self.linear(x) # print("linear",x.max())
         return x
 
+class ECTPointsLinearModel(torch.nn.Module):
+    def __init__(self,config):
+        super().__init__()
+        pprint(config)
+        self.ectlayer = GEctPointsLayer(config) 
+        geotorch.sphere(self.ectlayer,"v")
+        self.linear = torch.nn.Linear(config.num_thetas*config.bump_steps, config.hidden)
+        self.linear2 = torch.nn.Linear(config.hidden, config.output)
+    def forward(self, x):
+        x = self.ectlayer(x) / 100
+        x = self.linear(x)
+        x = self.linear2(x)
+        return x
+
+
+
 class ECTCNNModel(torch.nn.Module):
     def __init__(self,config):
         super().__init__()
@@ -121,14 +134,16 @@ class ECTCNNModel(torch.nn.Module):
             nn.ReLU(),                      
             nn.MaxPool2d(2),                
         )
+        
+        num_features_before_fcnn = functools.reduce(operator.mul, list(self.feature_extractor(torch.rand(1, *input_dim)).shape))
         # fully connected layer, output 10 classes
-        self.out = nn.Linear(72000, 10)
+        self.out = nn.Linear(800, 10)
 
     def forward(self, x):
         x = self.ectlayer(x) / 100
         x = x.unsqueeze(1)
         x = self.conv1(x)
-        #x = self.conv2(x)
+        x = self.conv2(x)
         # flatten the output of conv2 to (batch_size, 32 * 7 * 7)
         x = x.view(x.size(0), -1)       
         output = self.out(x)

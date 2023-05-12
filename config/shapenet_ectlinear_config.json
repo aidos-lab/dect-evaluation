@@ -10,10 +10,12 @@
     }
   },
   "model": {
-    "bump_steps" : 20, 
-    "num_thetas" : 30,
+    "bump_steps" :18, 
+    "num_thetas" : 10,
     "num_features" : 3,
     "R" : 1.5,
-    "scale" : 2000
+    "scale" : 2000,
+    "hidden": 1000,
+    "output": 10
   }
 }
