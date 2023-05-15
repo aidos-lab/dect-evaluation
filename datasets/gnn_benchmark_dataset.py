@@ -28,10 +28,10 @@ class GNN_MNIST():
         pre_transform = transforms.Compose([ThresholdTransform()])
         self.dataset = GNNBenchmarkDataset(**vars(config)|{"pre_transform":pre_transform})
 
-    def len(self):
+    def __len__(self):
         return len(self.dataset)
 
-    def get(self, idx):
+    def __getitem__(self, idx):
         return self.dataset.__getitem__(idx)
 
 

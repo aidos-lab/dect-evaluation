@@ -16,20 +16,26 @@ logger.addHandler(fh)
 from utils import Parser
 import json
 from models import ECTCNNModel
+from models import ECTPointsLinearModel
 
 from datasets import CustomDataLoader
 import torch
 
 parser = Parser()
 config = parser.parse()
+logger.info(config)
 
-model = ECTCNNModel(config.model)
+
+def count_parameters(model):
+    return sum(p.numel() for p in model.parameters() if p.requires_grad)
+
+model = ECTPointsLinearModel(config.model)
 loader = CustomDataLoader(config.dataset)
 
+logger.info(f"Number of params:{count_parameters(model)}")
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 model = model.to(device)
-
 
 loss_fn = torch.nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
@@ -46,7 +52,7 @@ for epoch in range(500):
         optimizer.step()
     if epoch % 10 == 0:
         logger.info(f"Epoch {epoch} | Train Loss {loss}")
-   
+  
 config.dataset.dataset_params.train=False
 loader = CustomDataLoader(config.dataset)
 
@@ -59,10 +65,6 @@ for batch in loader:
         total += batch.y.shape[0]
 acc = correct / total
 logger.info(f"Accuracy {acc}")
-
-
-
-
 
 
 

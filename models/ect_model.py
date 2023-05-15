@@ -44,6 +44,10 @@ class GEctLayer(nn.Module):
         #edge_pairs = torch.stack([nh[data.edge_index].max(dim=0)[0],self.R*torch.ones(data.edge_index.shape[1],self.num_thetas).to(self.device)])
         ect = self.bump(node_pairs,data.batch,ng=data.num_graphs) #- self.bump(edge_pairs,data.batch[data.edge_index[0,:]],ng=data.num_graphs) / 2
         return ect#.reshape(-1,self.num_thetas*self.bump_steps)
+    
+    def extra_repr(self):
+        print(vars(self.config))
+        return ", ".join([f"{str(key)}={str(value)}" for key,value in vars(self.config).items()])
 
 
 class GEctPointsLayer(nn.Module):
@@ -73,6 +77,10 @@ class GEctPointsLayer(nn.Module):
         node_pairs = torch.stack([nh,self.R*torch.ones(nh.shape).to(self.device)])
         ect = self.bump(node_pairs,data.batch,ng=data.num_graphs) 
         return ect.reshape(-1,self.num_thetas*self.bump_steps)
+
+    def extra_repr(self):
+        print(vars(self.config))
+        return ", ".join([f"{str(key)}={str(value)}" for key,value in vars(self.config).items()])
 
 class ToyModel(torch.nn.Module):
     def __init__(self,config):

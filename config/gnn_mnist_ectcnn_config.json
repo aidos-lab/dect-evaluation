@@ -1,20 +1,20 @@
 {
   "dataset": {
-    "name": "GNN_ModelNet100",
+    "name": "GNN_MNIST",
     "dataset_params":{
       "root":"./data/ModelNet",
-      "train":"True"
+      "train":"True",
+      "name":"MNIST"
     },
     "dataloader_params": {
       "batch_size": 100
     }
   },
   "model": {
-    "bump_steps" :20, 
+    "bump_steps" : 20, 
     "num_thetas" : 30,
     "num_features" : 3,
-    "R" : 3,
-    "scale" : 200,
-    "output" : 10
+    "R" : 1.5,
+    "scale" : 200
   }
 }

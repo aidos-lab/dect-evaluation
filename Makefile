@@ -1,11 +1,15 @@
 SHELL=/bin/zsh
 
 init:
-	mkdir ./data
-	touch ./data/.gitkeep
+	pip install poetry
+	poetry config virtualenvs.in-project true 
+	poetry install 
+	poetry shell
+
+activate:
 
 run:
-	python main.py -c ./config/shapenet_ectcnn_config.json
+	python main.py -c ./config/gnn_mnist_ectlinear_config.json
 
 clean:
 	rm -r **/processed
