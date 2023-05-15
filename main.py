@@ -1,14 +1,23 @@
-import argparse
+import logging
+import time
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+timestr = time.strftime("%Y%m%d-%H%M%S")
+fh = logging.FileHandler(filename=f"./logs/test-{timestr}.logs",mode="a")
+fh.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+ch.setFormatter(formatter)
+fh.setFormatter(formatter)
+logger.addHandler(ch)
+logger.addHandler(fh)
+
 from utils import Parser
-from types import SimpleNamespace
 import json
-from models import CNN
-#from models import ToyModel, ECTPointsModel
 from models import ECTCNNModel
-#from models import ECTPointsLinearModel
 
 from datasets import CustomDataLoader
-from pretty_simple_namespace import pprint
 import torch
 
 parser = Parser()
@@ -18,26 +27,14 @@ model = ECTCNNModel(config.model)
 loader = CustomDataLoader(config.dataset)
 
 
-
-# info = loader.info()
-# batch = info.batch
-
-
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-
 model = model.to(device)
-# batch = batch.to(device)
-# pred = model(batch)
-
-# print(pred)
-# print(pred.shape)
-#
 
 
 loss_fn = torch.nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
-print("Starting training...")
+logger.info("Starting training...")
 losses = []
 for epoch in range(500):
     for idx, batch in enumerate(loader):
@@ -48,7 +45,7 @@ for epoch in range(500):
         loss.backward()
         optimizer.step()
     if epoch % 10 == 0:
-        print(f"Epoch {epoch} | Train Loss {loss}")
+        logger.info(f"Epoch {epoch} | Train Loss {loss}")
    
 config.dataset.dataset_params.train=False
 loader = CustomDataLoader(config.dataset)
@@ -61,7 +58,7 @@ for batch in loader:
         correct += (pred.max(axis=1)[1] == batch.y).float().sum()
         total += batch.y.shape[0]
 acc = correct / total
-print(f"Accuracy {acc}")
+logger.info(f"Accuracy {acc}")
 
 
 

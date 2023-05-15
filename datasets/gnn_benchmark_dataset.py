@@ -10,6 +10,8 @@ from types import SimpleNamespace
 #  │ Transforms                                               │
 #  ╰──────────────────────────────────────────────────────────╯
 
+
+
 class ThresholdTransform(object):
   def __call__(self, data):
     x = torch.hstack([data.pos,data.x]) 
@@ -21,12 +23,16 @@ class ThresholdTransform(object):
 #  │ Datasets                                                 │
 #  ╰──────────────────────────────────────────────────────────╯
 
-class GNN_MNIST(BaseDataset):
+class GNN_MNIST():
     def __init__(self,config):
-        config.pre_transform = transforms.Compose([ThresholdTransform()])
-        config.name = "MNIST"
-        super().__init__(dataset=GNNBenchmarkDataset,config=config)
+        pre_transform = transforms.Compose([ThresholdTransform()])
+        self.dataset = GNNBenchmarkDataset(**vars(config)|{"pre_transform":pre_transform})
 
+    def len(self):
+        return len(self.dataset)
+
+    def get(self, idx):
+        return self.dataset.__getitem__(idx)
 
 
 

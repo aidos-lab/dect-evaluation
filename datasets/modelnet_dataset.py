@@ -24,13 +24,17 @@ class CenterTransform(object):
 #  │ Datasets                                                 │
 #  ╰──────────────────────────────────────────────────────────╯
 
-class GNN_ModelNet100(BaseDataset):
+class GNN_ModelNet100():
     def __init__(self,config):
-        config.pre_transform = None
-        pprint(config)        
-        config.pre_transform = transforms.Compose([torch_geometric.transforms.SamplePoints(100),
+        pre_transform = transforms.Compose([torch_geometric.transforms.SamplePoints(100),
                                                    ModelNetTransform(),
                                                    CenterTransform()])
-        super().__init__(dataset=ModelNet,config=config)
+        print(vars(config))
+        self.dataset = ModelNet(**vars(config)|{"pre_transform":pre_transform})
 
+    def __len__(self):
+        return len(self.dataset)
+
+    def __getitem__(self, idx):
+        return self.dataset.__getitem__(idx)
 

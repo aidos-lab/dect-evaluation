@@ -5,6 +5,8 @@ import torch
 import torch.nn as nn
 import torchvision
 import torch_geometric
+import functools
+import operator
 
 from pretty_simple_namespace import pprint
 
@@ -128,22 +130,18 @@ class ECTCNNModel(torch.nn.Module):
             ),                              
             nn.ReLU(),                      
             nn.MaxPool2d(kernel_size=2),    
-        )
-        self.conv2 = nn.Sequential(         
-            nn.Conv2d(16, 32, 5, 1, 2),     
-            nn.ReLU(),                      
-            nn.MaxPool2d(2),                
+            # nn.Conv2d(16, 32, 5, 1, 2),     
+            # nn.ReLU(),                      
+            # nn.MaxPool2d(2),                
         )
         
-        num_features_before_fcnn = functools.reduce(operator.mul, list(self.feature_extractor(torch.rand(1, *input_dim)).shape))
-        # fully connected layer, output 10 classes
-        self.out = nn.Linear(800, 10)
+        num_features = functools.reduce(operator.mul, list(self.conv1(torch.rand(1, config.bump_steps,config.num_thetas)).shape))
+        self.out = nn.Linear(num_features, 10)
 
     def forward(self, x):
         x = self.ectlayer(x) / 100
         x = x.unsqueeze(1)
         x = self.conv1(x)
-        x = self.conv2(x)
         # flatten the output of conv2 to (batch_size, 32 * 7 * 7)
         x = x.view(x.size(0), -1)       
         output = self.out(x)
