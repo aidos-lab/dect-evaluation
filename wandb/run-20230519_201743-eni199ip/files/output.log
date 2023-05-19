@@ -1,0 +1,35 @@
+Traceback (most recent call last):
+  File "/home/larbs/projects/desct/main.py", line 75, in <module>
+    main()
+  File "/home/larbs/projects/desct/main.py", line 44, in main
+    model = load_model(
+            ^^^^^^^^^^^
+  File "/home/larbs/projects/desct/models/__init__.py", line 30, in load_model
+    return model(config)
+           ^^^^^^^^^^^^^
+  File "/home/larbs/projects/desct/models/ect_model.py", line 77, in __init__
+    self.out = nn.Linear(num_features, config.output)
+                                       ^^^^^^^^^^^^^
+  File "/home/larbs/.local/lib/python3.11/site-packages/omegaconf/dictconfig.py", line 355, in __getattr__
+    self._format_and_raise(
+  File "/home/larbs/.local/lib/python3.11/site-packages/omegaconf/base.py", line 231, in _format_and_raise
+    format_and_raise(
+  File "/home/larbs/.local/lib/python3.11/site-packages/omegaconf/_utils.py", line 899, in format_and_raise
+    _raise(ex, cause)
+  File "/home/larbs/.local/lib/python3.11/site-packages/omegaconf/_utils.py", line 797, in _raise
+    raise ex.with_traceback(sys.exc_info()[2])  # set env var OC_CAUSE=1 for full trace
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/larbs/.local/lib/python3.11/site-packages/omegaconf/dictconfig.py", line 351, in __getattr__
+    return self._get_impl(
+           ^^^^^^^^^^^^^^^
+  File "/home/larbs/.local/lib/python3.11/site-packages/omegaconf/dictconfig.py", line 442, in _get_impl
+    node = self._get_child(
+           ^^^^^^^^^^^^^^^^
+  File "/home/larbs/.local/lib/python3.11/site-packages/omegaconf/basecontainer.py", line 73, in _get_child
+    child = self._get_node(
+            ^^^^^^^^^^^^^^^
+  File "/home/larbs/.local/lib/python3.11/site-packages/omegaconf/dictconfig.py", line 480, in _get_node
+    raise ConfigKeyError(f"Missing key {key!s}")
+omegaconf.errors.ConfigAttributeError: Missing key output
+    full_key: model.config.output
+    object_type=dict

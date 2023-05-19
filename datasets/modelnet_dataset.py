@@ -1,10 +1,10 @@
-from datasets.base_dataset import BaseDataset
 import torch
 from torch_geometric.datasets import ModelNet
 import torchvision.transforms as transforms
 import torch_geometric
 from types import SimpleNamespace
-from pretty_simple_namespace import pprint
+from datasets.base_dataset import DataModule
+from torch.utils.data import random_split
 #  ╭──────────────────────────────────────────────────────────╮
 #  │ Transforms                                               │
 #  ╰──────────────────────────────────────────────────────────╯
@@ -24,17 +24,39 @@ class CenterTransform(object):
 #  │ Datasets                                                 │
 #  ╰──────────────────────────────────────────────────────────╯
 
-class GNN_ModelNet100():
+class ModelNetDataModule(DataModule):
     def __init__(self,config):
-        pre_transform = transforms.Compose([torch_geometric.transforms.SamplePoints(100),
+        super().__init__(config.root,config.batch_size,config.num_workers)
+        self.config = config
+        self.pre_transform = transforms.Compose([torch_geometric.transforms.SamplePoints(self.config.samplepoints),
                                                    ModelNetTransform(),
                                                    CenterTransform()])
-        print(vars(config))
-        self.dataset = ModelNet(**vars(config)|{"pre_transform":pre_transform})
+        self.prepare_data()
+        self.setup()
+    
+    def prepare_data(self):
+        ModelNet(
+                root = self.config.root,
+                pre_transform=self.pre_transform,
+                train = True
+                )
+        ModelNet(
+                root = self.config.root,
+                pre_transform=self.pre_transform,
+                train = False
+                )
 
-    def __len__(self):
-        return len(self.dataset)
+    def setup(self):
+        entire_ds = ModelNet(
+                root = self.config.root,
+                pre_transform=self.pre_transform,
+                train = True
+                )
+        self.train_ds, self.val_ds = random_split(entire_ds, [int(0.8*len(entire_ds)), len(entire_ds)-int(0.8*len(entire_ds))])
+        self.test_ds = ModelNet(
+                root = self.config.root,
+                pre_transform=self.pre_transform,
+                train = False
+                )
 
-    def __getitem__(self, idx):
-        return self.dataset.__getitem__(idx)
 

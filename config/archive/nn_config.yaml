@@ -1,0 +1,20 @@
+model:
+  name: NN
+  config:
+    input_size : 784
+    num_classes : 10
+    learning_rate : 0.001
+
+data:
+  name: MnistDataModule
+  config:
+    data_dir: ./data
+    num_workers : 4
+    batch_size : 64
+
+trainer:
+  accelerator : "gpu"
+  devices : 1
+  precision : 16
+  num_epochs : 1
+

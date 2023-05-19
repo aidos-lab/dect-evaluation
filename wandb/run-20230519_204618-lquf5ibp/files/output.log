@@ -1,0 +1,22 @@
+
+Downloading http://vision.princeton.edu/projects/2014/3DShapeNets/ModelNet10.zip
+Extracting data/ModelNet10.zip
+Processing...
+Done!
+Traceback (most recent call last):
+  File "/home/larbs/projects/desct/main.py", line 75, in <module>
+    main()
+  File "/home/larbs/projects/desct/main.py", line 40, in main
+    dm = load_datamodule(
+         ^^^^^^^^^^^^^^^^
+  File "/home/larbs/projects/desct/datasets/__init__.py", line 41, in load_datamodule
+    return dm(config)
+           ^^^^^^^^^^
+  File "/home/larbs/projects/desct/datasets/modelnet_dataset.py", line 35, in __init__
+    self.setup()
+  File "/home/larbs/projects/desct/datasets/modelnet_dataset.py", line 55, in setup
+    self.train_ds, self.val_ds = random_split(entire_ds, [int(0.8*len(entire_ds)), int(0.2*len(entire_ds))])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/larbs/.local/lib/python3.11/site-packages/torch/utils/data/dataset.py", line 353, in random_split
+    raise ValueError("Sum of input lengths does not equal the length of the input dataset!")
+ValueError: Sum of input lengths does not equal the length of the input dataset!

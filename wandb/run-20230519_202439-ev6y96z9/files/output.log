@@ -1,0 +1,23 @@
+Traceback (most recent call last):
+  File "/home/larbs/projects/desct/main.py", line 75, in <module>
+    main()
+  File "/home/larbs/projects/desct/main.py", line 44, in main
+    model = load_model(
+            ^^^^^^^^^^^
+  File "/home/larbs/projects/desct/models/__init__.py", line 30, in load_model
+    return model(config)
+           ^^^^^^^^^^^^^
+  File "/home/larbs/projects/desct/models/ect_model.py", line 61, in __init__
+    self.ectlayer = GEctLayer(config)
+                   ^^^^^^^^^^^^^^^^^
+  File "/home/larbs/projects/desct/models/layers/layers.py", line 16, in __init__
+    geotorch.sphere(self,"v")
+  File "/home/larbs/.local/lib/python3.11/site-packages/geotorch/constraints.py", line 121, in sphere
+    return _register_manifold(module, tensor_name, cls, radius)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/larbs/.local/lib/python3.11/site-packages/geotorch/constraints.py", line 20, in _register_manifold
+    tensor = getattr(module, tensor_name)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/larbs/.local/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1614, in __getattr__
+    raise AttributeError("'{}' object has no attribute '{}'".format(
+AttributeError: 'GEctLayer' object has no attribute 'v'

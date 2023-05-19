@@ -1,0 +1,58 @@
+Using 16bit Automatic Mixed Precision (AMP)
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+  | Name     | Type               | Params
+------------------------------------------------
+0 | loss_fn  | CrossEntropyLoss   | 0
+1 | accuracy | MulticlassAccuracy | 0
+2 | f1_score | MulticlassF1Score  | 0
+3 | ectlayer | GEctLayer          | 90
+4 | conv1    | Sequential         | 416
+5 | out      | Linear             | 24.0 K
+------------------------------------------------
+24.5 K    Trainable params
+0         Non-trainable params
+24.5 K    Total params
+0.098     Total estimated model params size (MB)
+Starting to train!
+
+
+
+
+
+Epoch 1: 100%|███████████████████████████████████████████████| 550/550 [00:05<00:00, 92.12it/s, v_num=izyu, train_loss=2.280]
+
+
+
+
+
+
+
+
+
+
+Epoch 4:  95%|████████████████████████████████████████████▊  | 525/550 [00:06<00:00, 83.96it/s, v_num=izyu, train_loss=2.170]
+Epoch 4: 100%|███████████████████████████████████████████████| 550/550 [00:07<00:00, 77.88it/s, v_num=izyu, train_loss=2.150]Training is done.
+Epoch 4: 100%|███████████████████████████████████████████████| 550/550 [00:07<00:00, 77.78it/s, v_num=izyu, train_loss=2.150]
+Validation DataLoader 0: 100%|██████████████████████████████████████████████████████████████| 50/50 [00:00<00:00, 137.83it/s]
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Runningstage.validating metric      DataLoader 0
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+        val_loss            2.1542487144470215
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+Testing DataLoader 0: 100%|███████████████████████████████████████████████████████████████| 100/100 [00:00<00:00, 129.42it/s]
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Runningstage.testing metric      DataLoader 0
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+        test_loss           2.1456706523895264
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Traceback (most recent call last):
+  File "/home/larbs/projects/desct/main.py", line 53, in <module>
+    with open('path/to/output', 'w') as stream:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'path/to/output'

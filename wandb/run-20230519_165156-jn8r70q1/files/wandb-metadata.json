@@ -1,0 +1,145 @@
+{
+    "os": "Linux-6.3.2-arch1-1-x86_64-with-glibc2.37",
+    "python": "3.11.3",
+    "heartbeatAt": "2023-05-19T14:51:57.544613",
+    "startedAt": "2023-05-19T14:51:56.486289",
+    "docker": null,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "/home/larbs/projects/desct/main.py",
+    "codePath": "main.py",
+    "git": {
+        "remote": "git@github.com:aidos-lab/DESCT.git",
+        "commit": "bbb630287d398eedd360b445f1daedede957d6ce"
+    },
+    "email": "ernstroell@gmail.com",
+    "root": "/home/larbs/projects/desct",
+    "host": "arch",
+    "username": "larbs",
+    "executable": "/usr/bin/python",
+    "cpu_count": 14,
+    "cpu_count_logical": 20,
+    "cpu_freq": {
+        "current": 1879.1925500000002,
+        "min": 400.0,
+        "max": 4180.0
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 453.201,
+            "min": 400.0,
+            "max": 4600.0
+        },
+        {
+            "current": 607.251,
+            "min": 400.0,
+            "max": 4600.0
+        },
+        {
+            "current": 561.313,
+            "min": 400.0,
+            "max": 4600.0
+        },
+        {
+            "current": 1080.693,
+            "min": 400.0,
+            "max": 4600.0
+        },
+        {
+            "current": 896.904,
+            "min": 400.0,
+            "max": 4700.0
+        },
+        {
+            "current": 2700.0,
+            "min": 400.0,
+            "max": 4700.0
+        },
+        {
+            "current": 400.0,
+            "min": 400.0,
+            "max": 4700.0
+        },
+        {
+            "current": 2700.0,
+            "min": 400.0,
+            "max": 4700.0
+        },
+        {
+            "current": 679.276,
+            "min": 400.0,
+            "max": 4600.0
+        },
+        {
+            "current": 2700.0,
+            "min": 400.0,
+            "max": 4600.0
+        },
+        {
+            "current": 883.585,
+            "min": 400.0,
+            "max": 4600.0
+        },
+        {
+            "current": 2700.0,
+            "min": 400.0,
+            "max": 4600.0
+        },
+        {
+            "current": 2700.0,
+            "min": 400.0,
+            "max": 3500.0
+        },
+        {
+            "current": 2700.0,
+            "min": 400.0,
+            "max": 3500.0
+        },
+        {
+            "current": 615.349,
+            "min": 400.0,
+            "max": 3500.0
+        },
+        {
+            "current": 2700.0,
+            "min": 400.0,
+            "max": 3500.0
+        },
+        {
+            "current": 529.07,
+            "min": 400.0,
+            "max": 3500.0
+        },
+        {
+            "current": 664.699,
+            "min": 400.0,
+            "max": 3500.0
+        },
+        {
+            "current": 2700.0,
+            "min": 400.0,
+            "max": 3500.0
+        },
+        {
+            "current": 2700.0,
+            "min": 400.0,
+            "max": 3500.0
+        }
+    ],
+    "disk": {
+        "total": 95.56354522705078,
+        "used": 86.67893981933594
+    },
+    "gpu": "NVIDIA GeForce RTX 3070 Ti Laptop GPU",
+    "gpu_count": 1,
+    "gpu_devices": [
+        {
+            "name": "NVIDIA GeForce RTX 3070 Ti Laptop GPU",
+            "memory_total": 8589934592
+        }
+    ],
+    "memory": {
+        "total": 15.326492309570312
+    }
+}

@@ -1,0 +1,27 @@
+2023-05-19 20:19:31,868 - INFO - epoch 0 | train loss 1.5128989219665527
+2023-05-19 20:19:32,347 - INFO - Accuracy 0.14839999377727509
+2023-05-19 20:19:35,233 - INFO - Accuracy 0.1550000011920929
+         1523272 function calls (1518960 primitive calls) in 6.660 seconds
+   Ordered by: internal time
+   List reduced from 1218 to 20 due to restriction <20>
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+      430    2.089    0.005    2.089    0.005 {method 'run_backward' of 'torch._C._EngineBase' objects}
+       64    0.998    0.016    0.999    0.016 {built-in method posix.fork}
+     2474    0.312    0.000    0.312    0.000 {method 'to' of 'torch._C._TensorBase' objects}
+     5431    0.311    0.000    0.320    0.000 {built-in method torch.tensor}
+      490    0.270    0.001    0.342    0.001 /home/larbs/projects/desct/models/layers/layers.py:29(forward)
+    33320    0.268    0.000    0.268    0.000 {built-in method posix.read}
+       36    0.258    0.007    0.258    0.007 {built-in method torch._C.get_storage_from_record}
+     5390    0.223    0.000    0.223    0.000 {method 'recvmsg' of '_socket.socket' objects}
+      491    0.217    0.000    0.217    0.000 {built-in method torch.conv2d}
+      554    0.150    0.000    0.150    0.000 {method 'poll' of 'select.poll' objects}
+      874    0.130    0.000    0.130    0.000 {method 'acquire' of '_thread.lock' objects}
+      490    0.095    0.000    0.426    0.001 /home/larbs/.local/lib/python3.11/site-packages/torch_geometric/data/storage.py:180(apply)
+        1    0.038    0.038    6.660    6.660 /home/larbs/projects/desct/main.py:38(main)
+      490    0.032    0.000    1.235    0.003 {built-in method _pickle.loads}
+    33320    0.029    0.000    0.304    0.000 /usr/lib/python3.11/multiprocessing/connection.py:373(_recv)
+      196    0.028    0.000    0.028    0.000 {built-in method posix.pipe}
+     5390    0.028    0.000    0.028    0.000 {built-in method _new_shared_fd_cpu}
+      490    0.028    0.000    0.049    0.000 /home/larbs/projects/desct/models/layers/layers.py:24(bump)
+    21560    0.024    0.000    0.024    0.000 {built-in method posix.write}
+        4    0.022    0.005    0.022    0.005 {built-in method torch.randperm}

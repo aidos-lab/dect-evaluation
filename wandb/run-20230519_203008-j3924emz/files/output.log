@@ -1,0 +1,27 @@
+2023-05-19 20:30:15,775 - INFO - epoch 0 | train loss 1.5120357275009155
+2023-05-19 20:30:16,264 - INFO - Accuracy 0.18400000035762787
+2023-05-19 20:30:16,912 - INFO - Accuracy 0.19569998979568481
+         884075 function calls (879955 primitive calls) in 4.248 seconds
+   Ordered by: internal time
+   List reduced from 1269 to 20 due to restriction <20>
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+       48    0.769    0.016    0.770    0.016 {built-in method posix.fork}
+     1401    0.518    0.000    0.518    0.000 {method 'to' of 'torch._C._TensorBase' objects}
+     3067    0.351    0.000    0.360    0.000 {built-in method torch.tensor}
+       36    0.300    0.008    0.300    0.008 {built-in method torch._C.get_storage_from_record}
+      215    0.267    0.001    0.267    0.001 {method 'run_backward' of 'torch._C._EngineBase' objects}
+      275    0.264    0.001    0.268    0.001 /home/larbs/.local/lib/python3.11/site-packages/geotorch/sphere.py:134(frame)
+     3025    0.223    0.000    0.223    0.000 {method 'recvmsg' of '_socket.socket' objects}
+      276    0.210    0.001    0.210    0.001 {built-in method torch.conv2d}
+    18700    0.184    0.000    0.184    0.000 {built-in method posix.read}
+      323    0.138    0.000    0.139    0.000 {method 'poll' of 'select.poll' objects}
+      563    0.076    0.000    0.076    0.000 {method 'acquire' of '_thread.lock' objects}
+      147    0.057    0.000    0.057    0.000 {built-in method posix.pipe}
+      275    0.053    0.000    0.581    0.002 /home/larbs/.local/lib/python3.11/site-packages/torch_geometric/data/storage.py:180(apply)
+        1    0.020    0.020    4.248    4.248 /home/larbs/projects/desct/main.py:38(main)
+      275    0.019    0.000    0.851    0.003 {built-in method _pickle.loads}
+    18700    0.017    0.000    0.205    0.000 /usr/lib/python3.11/multiprocessing/connection.py:373(_recv)
+     3025    0.017    0.000    0.017    0.000 {built-in method _new_shared_fd_cpu}
+    12100    0.014    0.000    0.014    0.000 {built-in method posix.write}
+      275    0.013    0.000    0.024    0.000 /home/larbs/projects/desct/models/layers/layers.py:25(bump)
+     9350    0.013    0.000    0.236    0.000 /usr/lib/python3.11/multiprocessing/connection.py:207(recv_bytes)

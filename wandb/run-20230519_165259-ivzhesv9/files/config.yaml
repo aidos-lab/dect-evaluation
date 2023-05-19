@@ -1,0 +1,38 @@
+wandb_version: 1
+
+_wandb:
+  desc: null
+  value:
+    python_version: 3.11.3
+    cli_version: 0.15.3
+    framework: lightning
+    is_jupyter_run: false
+    is_kaggle_kernel: false
+    start_time: 1684507979.874899
+    t:
+      1:
+      - 1
+      - 9
+      - 41
+      - 51
+      - 55
+      - 77
+      2:
+      - 1
+      - 9
+      - 41
+      - 51
+      - 55
+      - 77
+      3:
+      - 7
+      - 13
+      - 23
+      4: 3.11.3
+      5: 0.15.3
+      8:
+      - 5
+    m:
+    - 1: trainer/global_step
+      6:
+      - 3

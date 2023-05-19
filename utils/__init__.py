@@ -58,3 +58,8 @@ class Parser(argparse.ArgumentParser):
 #     """Stack all iterables of torch tensors in a list (i.e. [[(tensor), (tensor)], [(tensor), (tensor)]])
 #     """
 #     return [torch.stack(s, dim) for s in list]
+
+
+
+def count_parameters(model):
+    return sum(p.numel() for p in model.parameters() if p.requires_grad)

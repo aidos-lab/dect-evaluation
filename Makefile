@@ -9,7 +9,7 @@ init:
 activate:
 
 run:
-	python main.py -c ./config/gnn_mnist_ectlinear_config.json
+	python main.py 
 
 clean:
 	rm -r **/processed

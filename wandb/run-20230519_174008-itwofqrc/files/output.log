@@ -1,0 +1,44 @@
+Using 16bit Automatic Mixed Precision (AMP)
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+  | Name     | Type               | Params
+------------------------------------------------
+0 | loss_fn  | CrossEntropyLoss   | 0
+1 | accuracy | MulticlassAccuracy | 0
+2 | f1_score | MulticlassF1Score  | 0
+3 | ectlayer | GEctLayer          | 90
+4 | conv1    | Sequential         | 416
+5 | out      | Linear             | 24.0 K
+------------------------------------------------
+24.5 K    Trainable params
+0         Non-trainable params
+24.5 K    Total params
+0.098     Total estimated model params size (MB)
+Starting to train!
+
+
+Epoch 0: 100%|█████████████████████████████████████████████████████████████████| 550/550 [00:06<00:00, 84.14it/s, v_num=fqrc]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Epoch 4: 100%|███████████████████████████████████████████████| 550/550 [00:07<00:00, 73.10it/s, v_num=fqrc, train_loss=2.130]
+
+
+Epoch 5:  53%|████████████████████████▊                      | 290/550 [00:03<00:03, 73.00it/s, v_num=fqrc, train_loss=2.100]
+/home/larbs/.local/lib/python3.11/site-packages/pytorch_lightning/trainer/call.py:54: UserWarning: Detected KeyboardInterrupt, attempting graceful shutdown...
+
+Epoch 5:  61%|████████████████████████████▍                  | 333/550 [00:04<00:02, 73.56it/s, v_num=fqrc, train_loss=2.100]<pstats.Stats object at 0x7f97e7b9a290>

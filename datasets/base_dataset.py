@@ -1,31 +1,45 @@
-"""This module implements an abstract base class (ABC) 'BaseDataset' for datasets. Also
-    includes some transformation functions.
-"""
 from abc import ABC, abstractmethod
-import cv2
-import numpy as np
-import torch.utils.data as data
-import inspect
-import torch
-import torch_geometric
-import torchvision.transforms as transforms
-from types import SimpleNamespace
+from torch_geometric.loader import DataLoader
+
+class DataModule():
+    def __init__(self, root, batch_size, num_workers):
+        super().__init__()
+        self.data_dir = root
+        self.batch_size = batch_size
+        self.num_workers = num_workers
+
+    @abstractmethod
+    def prepare_data(self):
+        pass
+
+    @abstractmethod    
+    def setup(self, stage):
+        pass
 
 
-class BaseDataset(torch_geometric.data.Dataset):
-    def __init__(self,dataset=None, config=None):
-        super(BaseDataset,self).__init__()
-        self.config = config
-        if dataset:
-            self.dataset = dataset(**vars(config))
-        else:
-            pass
-        #print("Detected custom dataset, please implement __len__ and __getitem__")
+    def train_dataloader(self):
+        return DataLoader(
+            self.train_ds,
+            batch_size=self.batch_size,
+            num_workers=self.num_workers,
+            shuffle=True,
+        )
 
-    def len(self):
-        #return self.dataset.len()
-        return len(self.dataset)
+    def val_dataloader(self):
+        return DataLoader(
+            self.val_ds,
+            batch_size=self.batch_size,
+            num_workers=self.num_workers,
+            shuffle=False,
+        )
 
-    def get(self, idx):
-        return self.dataset.__getitem__(idx)
+    def test_dataloader(self):
+        return DataLoader(
+            self.test_ds,
+            batch_size=self.batch_size,
+            num_workers=self.num_workers,
+            shuffle=False,
+        )
+
+
 

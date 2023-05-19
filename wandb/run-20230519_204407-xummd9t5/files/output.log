@@ -1,0 +1,14 @@
+
+ShapeNet10
+Traceback (most recent call last):
+  File "/home/larbs/projects/desct/main.py", line 75, in <module>
+    main()
+  File "/home/larbs/projects/desct/main.py", line 40, in main
+    dm = load_datamodule(
+         ^^^^^^^^^^^^^^^^
+  File "/home/larbs/projects/desct/datasets/__init__.py", line 40, in load_datamodule
+    dm = get_datamodule(name)
+         ^^^^^^^^^^^^^^^^^^^^
+  File "/home/larbs/projects/desct/datasets/__init__.py", line 33, in get_datamodule
+    raise AttributeError()
+AttributeError

@@ -1,0 +1,51 @@
+tensor([[-0.2579,  0.2706,  0.3739],
+        [-0.3144,  0.1033, -0.2859],
+        [-0.0602, -0.2807, -0.2735],
+        [ 0.0165, -0.0061,  0.0697],
+        [-0.4493, -0.2866, -0.2427],
+        [ 0.0683, -0.3891,  0.4092],
+        [ 0.4697,  0.4521,  0.3110],
+        [ 0.4641, -0.0411,  0.0989],
+        [ 0.3475, -0.2423, -0.0728],
+        [ 0.3961,  0.0347,  0.0118],
+        [-0.0468, -0.1225,  0.1331],
+        [-0.2793,  0.3362, -0.4597],
+        [ 0.3091,  0.2931,  0.2063],
+        [-0.0084,  0.1754,  0.4008],
+        [ 0.1713,  0.2980,  0.4668],
+        [-0.0573,  0.2721,  0.3900],
+        [ 0.0636,  0.4333, -0.1823],
+        [-0.3865, -0.2815,  0.4172],
+        [-0.3604,  0.0382, -0.1477],
+        [-0.3917,  0.0544, -0.4525],
+        [-0.0562,  0.4090,  0.3228],
+        [-0.1759,  0.0755, -0.2826],
+        [-0.0739,  0.0321,  0.0290],
+        [ 0.4648, -0.2573, -0.2622],
+        [-0.3350,  0.4334,  0.2995],
+        [ 0.0690, -0.2453, -0.3732],
+        [ 0.3704,  0.2444, -0.3374],
+        [-0.2078, -0.0300, -0.2260],
+        [ 0.3560,  0.3269,  0.0744],
+        [-0.3479, -0.1480, -0.1289]], device='cuda:0',
+       grad_fn=<ToCopyBackward0>)
+{'_metadata': ContainerMetadata(ref_type=typing.Any, object_type=<class 'dict'>, optional=True, key='config', flags={}, flags_root=False, resolver_cache=defaultdict(<class 'dict'>, {}), key_type=typing.Any, element_type=typing.Any), '_parent': {'name': 'ECTCNNModel', 'config': {'bump_steps': 20, 'num_thetas': 30, 'num_features': 3, 'R': 1.5, 'scale': 200, 'num_classes': 10}}, '_flags_cache': {'struct': None}, '_content': {'bump_steps': 20, 'num_thetas': 30, 'num_features': 3, 'R': 1.5, 'scale': 200, 'num_classes': 10}}
+Traceback (most recent call last):
+  File "/home/larbs/projects/desct/main.py", line 75, in <module>
+    main()
+  File "/home/larbs/projects/desct/main.py", line 44, in main
+    model = load_model(
+            ^^^^^^^^^^^
+  File "/home/larbs/projects/desct/models/__init__.py", line 30, in load_model
+    return model(config)
+           ^^^^^^^^^^^^^
+  File "/home/larbs/projects/desct/models/ect_model.py", line 63, in __init__
+    geotorch.sphere(self.ectlayer,"v")
+  File "/home/larbs/.local/lib/python3.11/site-packages/geotorch/constraints.py", line 121, in sphere
+    return _register_manifold(module, tensor_name, cls, radius)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/larbs/.local/lib/python3.11/site-packages/geotorch/constraints.py", line 31, in _register_manifold
+    P.register_parametrization(module, tensor_name, M, unsafe=True)
+  File "/home/larbs/.local/lib/python3.11/site-packages/geotorch/parametrize.py", line 570, in register_parametrization
+    raise ValueError(
+ValueError: Module 'GEctLayer(_metadata=ContainerMetadata(ref_type=typing.Any, object_type=<class 'dict'>, optional=True, key='config', flags={}, flags_root=False, resolver_cache=defaultdict(<class 'dict'>, {}), key_type=typing.Any, element_type=typing.Any), _parent={'name': 'ECTCNNModel', 'config': {'bump_steps': 20, 'num_thetas': 30, 'num_features': 3, 'R': 1.5, 'scale': 200, 'num_classes': 10}}, _flags_cache={'struct': None}, _content={'bump_steps': 20, 'num_thetas': 30, 'num_features': 3, 'R': 1.5, 'scale': 200, 'num_classes': 10})' does not have a parameter, a buffer, or a parametrized element with name 'v'
