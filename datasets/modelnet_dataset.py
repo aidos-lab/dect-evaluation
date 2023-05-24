@@ -1,10 +1,8 @@
-import torch
 from torch_geometric.datasets import ModelNet
-import torchvision.transforms as transforms
-import torch_geometric
-from types import SimpleNamespace
+from torch_geometric import transforms
 from datasets.base_dataset import DataModule
 from torch.utils.data import random_split
+
 #  ╭──────────────────────────────────────────────────────────╮
 #  │ Transforms                                               │
 #  ╰──────────────────────────────────────────────────────────╯
@@ -28,11 +26,9 @@ class ModelNetPointsDataModule(DataModule):
     def __init__(self,config):
         super().__init__(config.root,config.batch_size,config.num_workers)
         self.config = config
-        self.pre_transform = transforms.Compose([torch_geometric.transforms.SamplePoints(self.config.samplepoints),
+        self.pre_transform = transforms.Compose([transforms.SamplePoints(self.config.samplepoints),
                                                    ModelNetTransform(),
                                                    CenterTransform()])
-        self.prepare_data()
-        self.setup()
     
     def prepare_data(self):
         ModelNet(
@@ -52,7 +48,7 @@ class ModelNetPointsDataModule(DataModule):
                 pre_transform=self.pre_transform,
                 train = True
                 )
-        self.train_ds, self.val_ds = random_split(entire_ds, [int(0.8*len(entire_ds)), len(entire_ds)-int(0.8*len(entire_ds))])
+        self.train_ds, self.val_ds = random_split(entire_ds, [int(0.8*len(entire_ds)), len(entire_ds)-int(0.8*len(entire_ds))]) # type: ignore
         self.test_ds = ModelNet(
                 root = self.config.root,
                 pre_transform=self.pre_transform,
@@ -86,7 +82,7 @@ class ModelNetMeshDataModule(DataModule):
                 pre_transform=self.pre_transform,
                 train = True
                 )
-        self.train_ds, self.val_ds = random_split(entire_ds, [int(0.8*len(entire_ds)), len(entire_ds)-int(0.8*len(entire_ds))])
+        self.train_ds, self.val_ds = random_split(entire_ds, [int(0.8*len(entire_ds)), len(entire_ds)-int(0.8*len(entire_ds))]) # type: ignore
         self.test_ds = ModelNet(
                 root = self.config.root,
                 pre_transform=self.pre_transform,

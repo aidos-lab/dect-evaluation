@@ -23,7 +23,7 @@ def compute_acc(model, loader, loss_fn):
     return loss, acc
 
 
-def train_model(config):
+def train_model(run, config):
     dm = load_datamodule(
         name=config.data.name,
         config=config.data.config
@@ -44,18 +44,19 @@ def train_model(config):
             loss = torch.sqrt(loss_fn(pred, batch.y))
             loss.backward()
             optimizer.step()
-        wandb.log({"epoch": epoch, "train_loss": loss.item()})
+        run.log({"epoch": epoch, "train_loss": loss.item()})
         if epoch % 10 == 0:
             log_msg(f"epoch {epoch} | train loss {loss.item():.2f}")
             loss, acc = compute_acc(model, dm.val_dataloader(), loss_fn)
             log_msg(f"Accuracy {acc:.2f}")
-            wandb.log({"epoch": epoch, "val_loss":loss.item()})
-            wandb.log({"epoch": epoch, "val_acc":acc})
+            run.log({"epoch": epoch, "val_loss":loss.item()})
+            run.log({"epoch": epoch, "val_acc":acc})
 
     loss,acc = compute_acc(model,dm.test_dataloader(),loss_fn)
     log_msg(f"Accuracy {acc:.2f}")
-    wandb.log({"thetas": config.model.config.num_thetas, "test_acc": acc})  # type: ignore
-    wandb.log({"test_loss": loss})  # type: ignore
+    run.log({"thetas": config.model.config.num_thetas, "test_acc": acc})  # type: ignore
+    run.log({"test_loss": loss})  # type: ignore
+    return run
 
 
 def main():
@@ -67,8 +68,17 @@ def main():
             config.model.name,
             config.data.name
                 ]
-        wandb.init(project="desct", name=experiment,tags=tags)
-        train_model(config)
+        run = wandb.init(
+                project="desct-test", 
+                name=experiment,
+                tags=tags,
+                reinit=True,
+                config=OmegaConf.to_container(config, resolve=True)
+                )
+        run = train_model(run, config)
+        run.join()
+
+        
 
 if __name__ == "__main__":
     main()

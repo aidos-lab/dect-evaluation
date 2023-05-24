@@ -1,11 +1,8 @@
 from datasets.base_dataset import DataModule
 import torch
 import numpy as np
-from vedo import *
 import open3d as o3d
 import torch
-import trimesh
-import uuid
 import pandas as pd
 import torch_geometric
 import os
