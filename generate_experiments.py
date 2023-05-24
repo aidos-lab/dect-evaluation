@@ -4,72 +4,51 @@ from omegaconf import OmegaConf
 import itertools
 import glob
 
+from dataclasses import dataclass
+from typing import Protocol
+
 """
 This script creates all the configurations in the config folder. 
 It allows for better reproducebility. The script takes 
 NOTE: Gets ran every time make run is called.
 """
 
-data_base_str = """
-data:
-  name: GNNBenchmarkDataModule
-  config:
-    name: MNIST
-    root: ./data
-    split: train
-    batch_size: 4
-    num_workers: 4
-"""
-
-model_base_str = """
-model:
-  name: ECTCNNModel
-  config:
-    bump_steps : 20
-    num_thetas : 30
-    num_features : 3
-    R : 1.5
-    scale : 500
-    num_classes: 10
-"""
-
-defaults_base_str = """
-trainer:
-  lr: 0.001
-  num_epochs : 200
-"""
-
-
-def cnn_theta_bump_step_sweep(data_base_str,model_base_str,defaults_base_str):
-    experiment_folder = 'cnn_theta_bumpstep_sweep'
-    data_base = OmegaConf.create(data_base_str)
-    model_base = OmegaConf.create(model_base_str)
-    defaults_base = OmegaConf.create(defaults_base_str)
-
-    files = glob.glob(f"./config/{experiment_folder}/*")
+def clean_folder(path):
+    files = glob.glob(path)
     for f in files:
         os.remove(f)
 
-    bump_steps_sweep = [i for i in range(5,20,5)]
-    num_thetas_sweep = [i for i in range(5,50,5)]
 
-    for idx, (num_thetas, bump_steps) in enumerate(itertools.product(num_thetas_sweep,bump_steps_sweep)): 
+
+def cnn_theta_sweep():
+    experiment_folder = "cnn_theta_sweep"
+    data_base = OmegaConf.load("./config/gnn_benchmark_data_base.yaml") 
+    model_base = OmegaConf.load("./config/ect_model_base.yaml")
+    trainer_base = OmegaConf.load("./config/trainer_base.yaml")  
+    
+    clean_folder(f"./config/{experiment_folder}/*")
+
+    #bump_steps_sweep = [i for i in range(5,20,5)]
+    num_thetas_sweep = [i for i in range(5,55,5)]
+
+    # Set base parameters for the 
+
+    for idx, num_thetas in enumerate(num_thetas_sweep): 
         model_base.model.config.num_thetas = num_thetas
-        model_base.model.config.bump_steps = bump_steps
-        conf = OmegaConf.merge(data_base,model_base,defaults_base)
+        model_base.model.config.bump_steps = 20
+        conf = OmegaConf.merge(data_base,model_base,trainer_base)
         with open(f"./config/{experiment_folder}/{idx}.yaml","w") as f:
             OmegaConf.save(conf,f)
 
 
-def linear_theta_bump_step_sweep(data_base_str,model_base_str,defaults_base_str):
+def linear_theta_sweep():
     experiment_folder = "linear_theta_bumpstep_sweep"
-    data_base = OmegaConf.create(data_base_str)
-    model_base = OmegaConf.create(model_base_str)
-    defaults_base = OmegaConf.create(defaults_base_str)
+    
+    data_base = OmegaConf.load("./config/gnn_benchmark_data_base.yaml") 
+    model_base = OmegaConf.load("./config/linear_model_base.yaml")
+    trainer_base = OmegaConf.load("./config/trainer_base.yaml")  
 
-    files = glob.glob(f"./config/{experiment_folder}/*")
-    for f in files:
-        os.remove(f)
+    clean_folder(f"./config/{experiment_folder}/*")
 
     bump_steps_sweep = [i for i in range(5,20,5)]
     num_thetas_sweep = [i for i in range(5,50,5)]
@@ -79,34 +58,33 @@ def linear_theta_bump_step_sweep(data_base_str,model_base_str,defaults_base_str)
         model_base.model.config.hidden = 10 
         model_base.model.config.num_thetas = num_thetas
         model_base.model.config.bump_steps = bump_steps
-        conf = OmegaConf.merge(data_base,model_base,defaults_base)
+        conf = OmegaConf.merge(data_base,model_base,trainer_base)
         with open(f"./config/{experiment_folder}/{idx}.yaml","w") as f:
             OmegaConf.save(conf,f)
 
 
 
-def model_net_mesh(data_base_str,model_base_str,defaults_base_str):
+def model_net_mesh():
     experiment_folder = "modelnet_mesh"
-    data_base = OmegaConf.create(data_base_str)
-    model_base = OmegaConf.create(model_base_str)
-    defaults_base = OmegaConf.create(defaults_base_str)
+    data_base = OmegaConf.load("./config/gnn_benchmark_data_base.yaml") 
+    model_base = OmegaConf.load("./config/ect_model_base.yaml")
+    trainer_base = OmegaConf.load("./config/trainer_base.yaml")  
 
-    files = glob.glob(f"./config/{experiment_folder}/*")
-    for f in files:
-        os.remove(f)
+    clean_folder(f"./config/{experiment_folder}/*")
+    
     data_base.data.name = "ModelNetMeshDataModule"
     model_base.model.name = "ECTPointsLinearModel"
     model_base.model.config.hidden = 10 
     model_base.model.config.num_thetas = 40
     model_base.model.config.bump_steps = 40
-    defaults_base.trainer.num_epochs=100
-    defaults_base.trainer.lr = 0.01
+    trainer_base.trainer.num_epochs=100
+    trainer_base.trainer.lr = 0.01
     
-    conf = OmegaConf.merge(data_base,model_base,defaults_base)
+    conf = OmegaConf.merge(data_base,model_base,trainer_base)
     with open(f"./config/{experiment_folder}/linear_modelnet.yaml","w") as f:
         OmegaConf.save(conf,f)
 
 
-cnn_theta_bump_step_sweep(data_base_str,model_base_str,defaults_base_str)
-linear_theta_bump_step_sweep(data_base_str,model_base_str,defaults_base_str)
-model_net_mesh(data_base_str,model_base_str,defaults_base_str)
+cnn_theta_sweep()
+""" linear_theta_sweep() """
+""" model_net_mesh() """

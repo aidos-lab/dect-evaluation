@@ -3,13 +3,13 @@ data:
   config:
     name: MNIST
     root: ./data
+    batch_size: 256
+    num_workers: 16
     split: train
-    batch_size: 4
-    num_workers: 4
 model:
   name: ECTCNNModel
   config:
-    bump_steps: 5
+    bump_steps: 20
     num_thetas: 25
     num_features: 3
     R: 1.5

@@ -1,0 +1,9 @@
+model:
+  name: ECTCNNModel
+  config:
+    bump_steps : 20
+    num_thetas : 30
+    num_features : 3
+    R : 1.5
+    scale : 500
+    num_classes: 10

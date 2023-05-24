@@ -1,0 +1,3 @@
+trainer:
+  lr: 0.001
+  num_epochs : 200

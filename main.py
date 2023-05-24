@@ -46,20 +46,20 @@ def train_model(config):
             optimizer.step()
         wandb.log({"epoch": epoch, "train_loss": loss.item()})
         if epoch % 10 == 0:
-            log_msg(f"epoch {epoch} | train loss {loss.item()}")
+            log_msg(f"epoch {epoch} | train loss {loss.item():.2f}")
             loss, acc = compute_acc(model, dm.val_dataloader(), loss_fn)
-            log_msg(f"Accuracy {acc}")
+            log_msg(f"Accuracy {acc:.2f}")
             wandb.log({"epoch": epoch, "val_loss":loss.item()})
             wandb.log({"epoch": epoch, "val_acc":acc})
 
     loss,acc = compute_acc(model,dm.test_dataloader(),loss_fn)
-    log_msg(f"Accuracy {acc}")
+    log_msg(f"Accuracy {acc:.2f}")
     wandb.log({"thetas": config.model.config.num_thetas, "test_acc": acc})  # type: ignore
     wandb.log({"test_loss": loss})  # type: ignore
 
 
 def main():
-    experiment = 'modelnet_mesh'
+    experiment = 'cnn_theta_sweep'
     files = glob.glob(f"./config/{experiment}/*")
     for file in files:
         config = OmegaConf.load(file)
@@ -67,7 +67,7 @@ def main():
             config.model.name,
             config.data.name
                 ]
-        wandb.init(project="desct_test", name=experiment,tags=tags)
+        wandb.init(project="desct", name=experiment,tags=tags)
         train_model(config)
 
 if __name__ == "__main__":
