@@ -1,14 +1,18 @@
 SHELL=/bin/zsh
 
 init:
-	pip install poetry
-	poetry config virtualenvs.in-project true 
-	poetry install 
-	poetry shell
+	mkdir -p .venv
+	python3.10 -m venv .venv
+	pip install -r requirements.txt
 
-activate:
+
+bla:
+	source .venv/bin/activate;
+	pip install -r requirements.txt
+
 
 run:
+	python generate_experiments.py
 	python main.py 
 
 clean:

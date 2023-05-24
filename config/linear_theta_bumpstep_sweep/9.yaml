@@ -1,0 +1,21 @@
+data:
+  name: GNNBenchmarkDataModule
+  config:
+    name: MNIST
+    root: ./data
+    split: train
+    batch_size: 4
+    num_workers: 4
+model:
+  name: ECTPointsLinearModel
+  config:
+    bump_steps: 5
+    num_thetas: 20
+    num_features: 3
+    R: 1.5
+    scale: 500
+    num_classes: 10
+    hidden: 10
+trainer:
+  lr: 0.001
+  num_epochs: 200

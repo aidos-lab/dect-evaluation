@@ -1,0 +1,21 @@
+data:
+  name: ModelNetMeshDataModule
+  config:
+    name: MNIST
+    root: ./data
+    split: train
+    batch_size: 4
+    num_workers: 4
+model:
+  name: ECTPointsLinearModel
+  config:
+    bump_steps: 40
+    num_thetas: 40
+    num_features: 3
+    R: 1.5
+    scale: 500
+    num_classes: 10
+    hidden: 10
+trainer:
+  lr: 0.01
+  num_epochs: 100

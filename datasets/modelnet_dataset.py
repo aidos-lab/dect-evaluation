@@ -24,7 +24,7 @@ class CenterTransform(object):
 #  │ Datasets                                                 │
 #  ╰──────────────────────────────────────────────────────────╯
 
-class ModelNetDataModule(DataModule):
+class ModelNetPointsDataModule(DataModule):
     def __init__(self,config):
         super().__init__(config.root,config.batch_size,config.num_workers)
         self.config = config
@@ -59,4 +59,37 @@ class ModelNetDataModule(DataModule):
                 train = False
                 )
 
+class ModelNetMeshDataModule(DataModule):
+    def __init__(self,config):
+        super().__init__(config.root,config.batch_size,config.num_workers)
+        self.config = config
+        self.pre_transform = transforms.Compose([ModelNetTransform(),
+                                                   CenterTransform()])
+        self.prepare_data()
+        self.setup()
+    
+    def prepare_data(self):
+        ModelNet(
+                root = self.config.root,
+                pre_transform=self.pre_transform,
+                train = True
+                )
+        ModelNet(
+                root = self.config.root,
+                pre_transform=self.pre_transform,
+                train = False
+                )
+
+    def setup(self):
+        entire_ds = ModelNet(
+                root = self.config.root,
+                pre_transform=self.pre_transform,
+                train = True
+                )
+        self.train_ds, self.val_ds = random_split(entire_ds, [int(0.8*len(entire_ds)), len(entire_ds)-int(0.8*len(entire_ds))])
+        self.test_ds = ModelNet(
+                root = self.config.root,
+                pre_transform=self.pre_transform,
+                train = False
+                )
 
