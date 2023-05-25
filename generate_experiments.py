@@ -1,11 +1,10 @@
 import os 
-import yaml
 from omegaconf import OmegaConf
 import itertools
-import glob
+import shutil
 
+from typing import Any
 from dataclasses import dataclass
-from typing import Protocol
 
 """
 This script creates all the configurations in the config folder. 
@@ -13,78 +12,225 @@ It allows for better reproducebility. The script takes
 NOTE: Gets ran every time make run is called.
 """
 
-def clean_folder(path):
-    files = glob.glob(path)
-    for f in files:
-        os.remove(f)
+
+@dataclass(frozen=True)
+class Config:
+    data: Any
+    model: Any
+    trainer: Any
+
+#  ╭──────────────────────────────────────────────────────────╮
+#  │ Data Configurations                                      │
+#  ╰──────────────────────────────────────────────────────────╯
+
+@dataclass
+class DataModuleConfig:
+  name: str
+  config: Any
+
+@dataclass
+class GNNBenchmarkConfig:
+    name: str = "MNIST"
+    root: str = "./data"
+    batch_size: int = 256
+    num_workers: int = 16
+    split: str = "train"
+
+@dataclass
+class ModelnetConfig:
+    root: str = "./data/Manifold"
+    batch_size: int = 64
+    num_workers: int = 16
+    samplepoints: int = 100
+
+@dataclass
+class ManifoldConfig:
+    root: str = "./data"
+    batch_size: int = 256
+    num_workers: int = 16
+    samplepoints: int = 100
+    num_samples: int = 25
 
 
+#  ╭──────────────────────────────────────────────────────────╮
+#  │ Model Configurations                                     │
+#  ╰──────────────────────────────────────────────────────────╯
 
-def cnn_theta_sweep():
-    experiment_folder = "cnn_theta_sweep"
-    data_base = OmegaConf.load("./config/gnn_benchmark_data_base.yaml") 
-    model_base = OmegaConf.load("./config/ect_model_base.yaml")
-    trainer_base = OmegaConf.load("./config/trainer_base.yaml")  
+@dataclass
+class ModelConfig:
+  name: str
+  config: Any
+
+@dataclass
+class ECTLinearModelConfig:
+    num_thetas : int
+    hidden: int
+    bump_steps : int 
+    R : float = 1.5
+    scale : int = 500
+    num_features : int = 3
+    num_classes: int = 10
+
+@dataclass
+class ECTCNNModelConfig:
+    num_thetas : int
+    bump_steps : int 
+    R : float = 1.5
+    scale : int = 500
+    num_features : int = 3
+    num_classes: int = 10
+
+#  ╭──────────────────────────────────────────────────────────╮
+#  │ Trainer configurations                                   │
+#  ╰──────────────────────────────────────────────────────────╯
+
+@dataclass
+class TrainerConfig:
+    lr: float = 0.001
+    num_epochs: int = 200
+
+#  ╭──────────────────────────────────────────────────────────╮
+#  │ Helper methods                                           │
+#  ╰──────────────────────────────────────────────────────────╯
+
+def create_experiment_folder(path):
+    shutil.rmtree(path,ignore_errors=True)
+    os.makedirs(path)
+
+def save_config(cfg,path):
+    c = OmegaConf.create(cfg)
+    with open(path,"w") as f:
+        OmegaConf.save(c,f)
+
+
+#  ╭──────────────────────────────────────────────────────────╮
+#  │ Experiments                                              │
+#  ╰──────────────────────────────────────────────────────────╯
+
+def theta_sweep():
+    """
+    This experiment trains two models with varying number of angles used. 
+    The configs are stored in separate folders so the two experiments
+    can be ran independently (it takes a while).
+    """
+
+    linear_experiment = "./experiment/linear_theta_sweep"
+    create_experiment_folder(linear_experiment)
     
-    clean_folder(f"./config/{experiment_folder}/*")
+    cnn_experiment = "./experiment/cnn_theta_sweep"
+    create_experiment_folder(cnn_experiment)
 
-    #bump_steps_sweep = [i for i in range(5,20,5)]
-    num_thetas_sweep = [i for i in range(5,55,5)]
+    # Create data config
+    data = DataModuleConfig(
+            name="GNNBenchmarkDataModule",
+            config=GNNBenchmarkConfig())
 
-    # Set base parameters for the 
+    # Create Trainer Config
+    trainer = TrainerConfig()
 
-    for idx, num_thetas in enumerate(num_thetas_sweep): 
-        model_base.model.config.num_thetas = num_thetas
-        model_base.model.config.bump_steps = 20
-        conf = OmegaConf.merge(data_base,model_base,trainer_base)
-        with open(f"./config/{experiment_folder}/{idx}.yaml","w") as f:
-            OmegaConf.save(conf,f)
+    for idx, num_thetas in enumerate(range(5,55,5)): 
+        linear_model = ModelConfig(
+                name="ECTLinearModel",
+                config = ECTLinearModelConfig(bump_steps=20, hidden=10, num_thetas=num_thetas))
+
+        cnn_model = ModelConfig(
+                name="ECTCNNModel",
+                config = ECTCNNModelConfig(bump_steps=20, num_thetas=num_thetas))
+
+        linear_config = Config(data,linear_model,trainer)
+        cnn_config = Config(data,cnn_model,trainer)
+
+        save_config(linear_config,os.path.join(linear_experiment,f"{idx}.yaml"))
+        save_config(cnn_config,os.path.join(cnn_experiment,f"{idx}.yaml"))
 
 
-def linear_theta_sweep():
-    experiment_folder = "linear_theta_bumpstep_sweep"
+def modelnet_classification():
+    """
+    This experiment trains multiple models on the ModelNet pointcloud and 
+    evaluates them.
+    Models used:
+        - ECTLinear
+        - ECTCNN
+    Number of points sampled from the meshes: 
+        - 100 
+        - 1000 
+        - 5000
+    """
+    experiment = "./experiment/modelnet_points100_classification"
+    create_experiment_folder(experiment)
+
+    # Create Trainer Config
+    trainer = TrainerConfig(lr=0.0001)
+
+    # Create linear model config
+    linear_model = ModelConfig(
+            name="ECTLinearModel",
+            config = ECTLinearModelConfig(bump_steps=20, hidden=10, num_thetas=30))
+
+    # Create CNN model config
+    cnn_model = ModelConfig(
+        name="ECTCNNModel",
+        config = ECTCNNModelConfig(bump_steps=20, num_thetas=30))
+
+    for samplepoints in [100,1000,5000]: 
+        # Create data config
+        data = DataModuleConfig(
+            name="ModelNetPointsDataModule",
+            config=ModelnetConfig(samplepoints=samplepoints,root=f"./data/modelnet{samplepoints}"))
+        
+        linear_config = Config(data,linear_model,trainer)
+        cnn_config = Config(data,cnn_model,trainer)
+        
+        save_config(linear_config,os.path.join(experiment,f"linear_{samplepoints}.yaml"))
+        save_config(cnn_config,os.path.join(experiment,f"cnn_{samplepoints}.yaml"))
+
+
+def torus_vs_spheres_vs_mobius():
+    """
+    This experiment trains a ect cnn and linear model to distinguish 
+    three classes, a noisy torus,sphere and mobius strip.
+    Models used:
+        - ECTLinear
+        - ECTCNN
+    """
+    experiment = "./experiment/manifold_classification"
+    create_experiment_folder(experiment)
+
+    # Create Trainer Config
+    trainer = TrainerConfig()
+
+    # Create linear model config
+    linear_model = ModelConfig(
+            name="ECTLinearModel",
+            config = ECTLinearModelConfig(bump_steps=20, hidden=10, num_thetas=30))
+
+    # Create CNN model config
+    cnn_model = ModelConfig(
+        name="ECTCNNModel",
+        config = ECTCNNModelConfig(bump_steps=20, num_thetas=30))
+
+    # Create Data config
+    data = DataModuleConfig(
+        name="ManifoldDataModule",
+        config=ManifoldConfig())
     
-    data_base = OmegaConf.load("./config/gnn_benchmark_data_base.yaml") 
-    model_base = OmegaConf.load("./config/linear_model_base.yaml")
-    trainer_base = OmegaConf.load("./config/trainer_base.yaml")  
-
-    clean_folder(f"./config/{experiment_folder}/*")
-
-    bump_steps_sweep = [i for i in range(5,20,5)]
-    num_thetas_sweep = [i for i in range(5,50,5)]
-
-    for idx, (num_thetas, bump_steps) in enumerate(itertools.product(num_thetas_sweep,bump_steps_sweep)): 
-        model_base.model.name = "ECTPointsLinearModel"
-        model_base.model.config.hidden = 10 
-        model_base.model.config.num_thetas = num_thetas
-        model_base.model.config.bump_steps = bump_steps
-        conf = OmegaConf.merge(data_base,model_base,trainer_base)
-        with open(f"./config/{experiment_folder}/{idx}.yaml","w") as f:
-            OmegaConf.save(conf,f)
-
-
-
-def model_net_mesh():
-    experiment_folder = "modelnet_mesh"
-    data_base = OmegaConf.load("./config/gnn_benchmark_data_base.yaml") 
-    model_base = OmegaConf.load("./config/ect_model_base.yaml")
-    trainer_base = OmegaConf.load("./config/trainer_base.yaml")  
-
-    clean_folder(f"./config/{experiment_folder}/*")
+    linear_config = Config(data,linear_model,trainer)
+    cnn_config = Config(data,cnn_model,trainer)
     
-    data_base.data.name = "ModelNetMeshDataModule"
-    model_base.model.name = "ECTPointsLinearModel"
-    model_base.model.config.hidden = 10 
-    model_base.model.config.num_thetas = 40
-    model_base.model.config.bump_steps = 40
-    trainer_base.trainer.num_epochs=100
-    trainer_base.trainer.lr = 0.01
-    
-    conf = OmegaConf.merge(data_base,model_base,trainer_base)
-    with open(f"./config/{experiment_folder}/linear_modelnet.yaml","w") as f:
-        OmegaConf.save(conf,f)
+    save_config(linear_config,os.path.join(experiment,f"linear.yaml"))
+    save_config(cnn_config,os.path.join(experiment,f"cnn.yaml"))
+
+if __name__ == "__main__":
+    theta_sweep()
+    modelnet_classification()
+    torus_vs_spheres_vs_mobius()
 
 
-cnn_theta_sweep()
+
+
+
+
+
+#cnn_theta_sweep()
 """ linear_theta_sweep() """
 """ model_net_mesh() """

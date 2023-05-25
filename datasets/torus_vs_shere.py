@@ -23,6 +23,9 @@ class ManifoldDataModule(DataModule):
         self.test_ds = ManifoldDataset(self.config,split="test",pre_transform=pre_transform)
         self.val_ds = ManifoldDataset(self.config,split="val",pre_transform=pre_transform)
 
+    def setup(self):
+        pass
+
 
 
 class ManifoldDataset(Dataset):

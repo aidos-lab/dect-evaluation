@@ -23,7 +23,7 @@ def compute_acc(model, loader, loss_fn):
     return loss, acc
 
 
-def train_model(run, config):
+def train_model(config,run=None):
     dm = load_datamodule(
         name=config.data.name,
         config=config.data.config
@@ -44,52 +44,59 @@ def train_model(run, config):
             loss = torch.sqrt(loss_fn(pred, batch.y))
             loss.backward()
             optimizer.step()
-        run.log({"epoch": epoch, "train_loss": loss.item()})
+        if run:
+            run.log({"epoch": epoch, "train_loss": loss.item()})
         if epoch % 10 == 0:
             log_msg(f"epoch {epoch} | train loss {loss.item():.2f}")
             loss, acc = compute_acc(model, dm.val_dataloader(), loss_fn)
             log_msg(f"Accuracy {acc:.2f}")
-            run.log({"epoch": epoch, "val_loss":loss.item()})
-            run.log({"epoch": epoch, "val_acc":acc})
+            if run:
+                run.log({"epoch": epoch, "val_loss":loss.item()})
+                run.log({"epoch": epoch, "val_acc":acc})
 
     loss,acc = compute_acc(model,dm.test_dataloader(),loss_fn)
     log_msg(f"Accuracy {acc:.2f}")
-    run.log({"thetas": config.model.config.num_thetas, "test_acc": acc})  # type: ignore
-    run.log({"test_loss": loss})  # type: ignore
+    if run:
+        run.log({"thetas": config.model.config.num_thetas, "test_acc": acc})  # type: ignore
+        run.log({"test_loss": loss})  # type: ignore
     return run
 
 
-def main():
-    experiment = 'cnn_theta_sweep'
-    files = glob.glob(f"./config/{experiment}/*")
+def run_experiment(experiment,dev=False):
+    files = glob.glob(f"./experiment/{experiment}/*")
     for file in files:
         config = OmegaConf.load(file)
+        if dev:
+            config.trainer.num_epochs=1
         tags = [
             config.model.name,
             config.data.name
                 ]
-        run = wandb.init(
-                project="desct-test", 
-                name=experiment,
-                tags=tags,
-                reinit=True,
-                config=OmegaConf.to_container(config, resolve=True)
-                )
-        run = train_model(run, config)
-        run.join()
+        if not dev:
+            run = wandb.init(
+                    project="desct-test" if dev else "desc", 
+                    name=experiment,
+                    tags=tags,
+                    reinit=True,
+                    config=OmegaConf.to_container(config, resolve=True) # type: ignore
+                    )
+            run = train_model(config,run)
+            run.join() # type: ignore
+        else:
+            run = train_model(config,run=None)
 
         
 
 if __name__ == "__main__":
-    main()
-#     with cProfile.Profile() as profile:
-#         main()
-#
-# stats = pstats.Stats(profile)
-# stats.sort_stats(pstats.SortKey.TIME)
-# stats.dump_stats("results.prof")
-# stats.print_stats(20)
-
+    experiments = [
+            "modelnet_points100_classification",
+            "manifold_classification",
+            "cnn_theta_sweep",
+            "linear_theta_sweep",
+            ]
+    for experiment in experiments: 
+        print("Running experiment", experiment)
+        run_experiment(experiment)
 
 
 

@@ -13,7 +13,7 @@ from models.layers.layers import GEctLayer, GEctPointsLayer
 #  ╰──────────────────────────────────────────────────────────╯
 
 
-class ECTPointsLinearModel(BaseModel):
+class ECTLinearModel(BaseModel):
     def __init__(self,config):
         super().__init__(config)
         self.ectlayer = GEctPointsLayer(config) 

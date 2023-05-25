@@ -29,6 +29,8 @@ class ModelNetPointsDataModule(DataModule):
         self.pre_transform = transforms.Compose([transforms.SamplePoints(self.config.samplepoints),
                                                    ModelNetTransform(),
                                                    CenterTransform()])
+        self.prepare_data()
+        self.setup()
     
     def prepare_data(self):
         ModelNet(
