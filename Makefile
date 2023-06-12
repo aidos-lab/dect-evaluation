@@ -15,6 +15,10 @@ run:
 	python generate_experiments.py
 	python main.py 
 
+test_main:
+	python generate_experiments.py
+	python test_main.py 
+
 clean:
 	rm -r **/processed
 

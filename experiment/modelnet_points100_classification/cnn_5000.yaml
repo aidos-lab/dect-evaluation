@@ -2,14 +2,17 @@ data:
   name: ModelNetPointsDataModule
   config:
     root: ./data/modelnet5000
-    batch_size: 64
-    num_workers: 16
+    batch_size: 128
+    num_workers: 0
     samplepoints: 5000
+    pin_memory: true
+    name: '10'
 model:
-  name: ECTCNNModel
+  name: ECTCNNPointsModel
   config:
     num_thetas: 30
     bump_steps: 20
+    batch_size: 128
     R: 1.5
     scale: 500
     num_features: 3

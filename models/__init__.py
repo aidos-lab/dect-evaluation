@@ -26,6 +26,7 @@ for py in [f[:-3] for f in os.listdir(path) if f.endswith('.py') and f != '__ini
 def load_model(name,config):
     model = locate(f'models.{name}')
     if not model:
+        print(f"Tried to load model {name}")
         raise AttributeError()
     return model(config)
 

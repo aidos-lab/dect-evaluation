@@ -13,15 +13,17 @@ import shutil
 
 class ManifoldDataModule(DataModule):
     def __init__(self,config):
-        super().__init__(config.root,config.batch_size,config.num_workers)
         self.config = config
         self.prepare_data()
+        super().__init__(config.root,config.batch_size,config.num_workers,config.pin_memory)
 
     def prepare_data(self):
         pre_transform = FaceToEdge() 
         self.train_ds = ManifoldDataset(self.config,split="train",pre_transform=pre_transform)
         self.test_ds = ManifoldDataset(self.config,split="test",pre_transform=pre_transform)
         self.val_ds = ManifoldDataset(self.config,split="val",pre_transform=pre_transform)
+        self.entire_ds = ManifoldDataset(self.config,split="train",pre_transform=pre_transform)
+
 
     def setup(self):
         pass

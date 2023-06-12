@@ -1,0 +1,21 @@
+data:
+  name: TUDataModule
+  config:
+    name: Letter-high
+    root: ./data
+    batch_size: 64
+    num_workers: 0
+    pin_memory: true
+model:
+  name: ECTCNNEdgesModel
+  config:
+    num_thetas: 32
+    bump_steps: 32
+    batch_size: 128
+    R: 1.5
+    scale: 500
+    num_features: 2
+    num_classes: 15
+trainer:
+  lr: 0.0001
+  num_epochs: 700

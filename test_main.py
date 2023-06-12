@@ -1,13 +1,5 @@
-import wandb
-from logs import log_msg
-import glob
-from datasets import load_datamodule
-from models import load_model
-from omegaconf import OmegaConf
 import torch
 import os
-torch.cuda.empty_cache()
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 """
 This is an almost copy of the main program and runs ALL experiments in the experiment 
@@ -21,10 +13,19 @@ from main import run_experiment
 def test_all_experiments():
     experiments = os.listdir("./experiment")
     experiments = [
+            "modelnet_simple",
+            ]
+    experiments = [
+            "gnnmnist_classification"
             "modelnet_points100_classification",
-            "manifold_classification",
             "cnn_theta_sweep",
             "linear_theta_sweep",
+            "modelnet_simple",
+            "manifold_classification",
+            "modelnet40_simple",
+            ]
+    experiments = [
+            "gnnmnist_classification"
             ]
     for experiment in experiments: 
         print("Running experiment", experiment)
@@ -33,6 +34,14 @@ def test_all_experiments():
 
 if __name__ == "__main__":
     test_all_experiments()
+    """ import cProfile """
+    """ cProfile.run("test_all_experiments()","stats.prof",sort="cumtime") """
+    """"""
+    """ import pstats """
+    """ stats = pstats.Stats("stats.prof") """
+    """ stats.sort_stats("cumtime").print_stats(30) """
+
+
 
     #    test_all_experiments()
 #     with cProfile.Profile() as profile:

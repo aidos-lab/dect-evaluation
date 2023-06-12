@@ -4,19 +4,20 @@ data:
     name: MNIST
     root: ./data
     batch_size: 128
-    num_workers: 0
+    num_workers: 12
     split: train
     pin_memory: true
 model:
-  name: ECTCNNPointsModel
+  name: ECTLinearPointsModel
   config:
-    num_thetas: 25
-    bump_steps: 20
+    num_thetas: 32
+    hidden: 10
+    bump_steps: 32
     batch_size: 128
     R: 1.5
     scale: 500
     num_features: 3
     num_classes: 10
 trainer:
-  lr: 0.001
+  lr: 0.0001
   num_epochs: 200

@@ -2,15 +2,17 @@ data:
   name: ManifoldDataModule
   config:
     root: ./data
-    batch_size: 256
-    num_workers: 16
+    batch_size: 128
+    num_workers: 0
     samplepoints: 100
     num_samples: 25
+    pin_memory: true
 model:
-  name: ECTCNNModel
+  name: ECTCNNPointsModel
   config:
     num_thetas: 30
     bump_steps: 20
+    batch_size: 128
     R: 1.5
     scale: 500
     num_features: 3

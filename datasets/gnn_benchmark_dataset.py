@@ -1,17 +1,11 @@
 from datasets.base_dataset import DataModule
 import torch
-from torchvision.datasets import MNIST
 import torchvision.transforms as transforms
-from types import SimpleNamespace
-from torch.utils.data import random_split
 import torch
-from torchvision.datasets import MNIST
 from torch_geometric.datasets import GNNBenchmarkDataset
 import torchvision.transforms as transforms
 import torch_geometric
-from types import SimpleNamespace
-from logs import log_msg
-from omegaconf import OmegaConf
+
 #  ╭──────────────────────────────────────────────────────────╮
 #  │ Transforms                                               │
 #  ╰──────────────────────────────────────────────────────────╯
@@ -30,10 +24,8 @@ class ThresholdTransform(object):
 
 class GNNBenchmarkDataModule(DataModule):
     def __init__(self,config):
-        super().__init__(config.root,config.batch_size,config.num_workers)
         self.config = config
-        self.prepare_data()
-        self.setup()
+        super().__init__(config.root,config.batch_size,config.num_workers)
 
     
     def prepare_data(self):

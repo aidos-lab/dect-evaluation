@@ -1,23 +1,22 @@
 data:
   name: ModelNetPointsDataModule
   config:
-    root: ./data/modelnet1000
-    batch_size: 128
+    root: ./data/modelnet401000
+    batch_size: 64
     num_workers: 0
     samplepoints: 1000
     pin_memory: true
-    name: '10'
+    name: '40'
 model:
-  name: ECTLinearPointsModel
+  name: ECTCNNPointsModel
   config:
-    num_thetas: 30
-    hidden: 10
-    bump_steps: 20
+    num_thetas: 32
+    bump_steps: 32
     batch_size: 128
     R: 1.5
     scale: 500
     num_features: 3
-    num_classes: 10
+    num_classes: 40
 trainer:
   lr: 0.0001
-  num_epochs: 200
+  num_epochs: 100

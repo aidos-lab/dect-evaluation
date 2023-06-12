@@ -2,7 +2,6 @@ from datasets.base_dataset import DataModule
 import torch
 from torchvision.datasets import MNIST
 import torchvision.transforms as transforms
-from types import SimpleNamespace
 from torch.utils.data import random_split
 #  ╭──────────────────────────────────────────────────────────╮
 #  │ Transforms                                               │
