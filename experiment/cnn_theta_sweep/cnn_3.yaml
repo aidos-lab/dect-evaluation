@@ -1,22 +1,23 @@
 data:
-  name: TUDataModule
+  name: GNNBenchmarkDataModule
   config:
-    name: Letter-high
+    name: MNIST
     root: ./data
-    batch_size: 64
-    num_workers: 0
+    batch_size: 128
+    num_workers: 4
+    split: train
     pin_memory: true
 model:
   name: ECTCNNPointsModel
   config:
-    num_thetas: 32
+    num_thetas: 20
     bump_steps: 32
     batch_size: 128
     R: 1.1
     scale: 500
-    num_features: 2
-    num_classes: 15
+    num_features: 3
+    num_classes: 10
     hidden: 100
 trainer:
-  lr: 0.0001
+  lr: 0.001
   num_epochs: 100

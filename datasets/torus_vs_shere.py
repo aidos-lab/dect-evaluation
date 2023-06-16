@@ -10,20 +10,47 @@ import torch
 from torch_geometric.data import Dataset
 from torch_geometric.transforms import FaceToEdge
 import shutil
+import torchvision.transforms as transforms
+
+
+class CenterTransform(object):
+  def __call__(self, data):
+    data.x -= data.x.mean()
+    data.x /= data.x.pow(2).sum(axis=1).sqrt().max()
+    return data
+
+
+
 
 class ManifoldDataModule(DataModule):
     def __init__(self,config):
         self.config = config
-        self.prepare_data()
+        self.transform =transforms.Compose([
+            FaceToEdge(),
+            CenterTransform()
+            ]) 
         super().__init__(config.root,config.batch_size,config.num_workers,config.pin_memory)
 
     def prepare_data(self):
-        pre_transform = FaceToEdge() 
-        self.train_ds = ManifoldDataset(self.config,split="train",pre_transform=pre_transform)
-        self.test_ds = ManifoldDataset(self.config,split="test",pre_transform=pre_transform)
-        self.val_ds = ManifoldDataset(self.config,split="val",pre_transform=pre_transform)
-        self.entire_ds = ManifoldDataset(self.config,split="train",pre_transform=pre_transform)
-
+        self.train_ds = ManifoldDataset(
+                self.config,
+                split="train",
+                pre_transform=self.transform
+                )
+        self.test_ds = ManifoldDataset(
+                self.config,split="test",
+                pre_transform=self.transform
+                )
+        self.val_ds = ManifoldDataset(
+                self.config,
+                split="val",
+                pre_transform=self.transform
+                )
+        self.entire_ds = ManifoldDataset(
+                self.config,
+                split="train",
+                pre_transform=self.transform
+                )
 
     def setup(self):
         pass
@@ -63,7 +90,7 @@ class ManifoldDataset(Dataset):
         data = torch_geometric.io.read_ply(file_name)
         data.x = data.pos
         data.pos = None
-        data.y = torch.tensor(y)
+        data.y = torch.tensor([y])
         return data
 
     def len(self):

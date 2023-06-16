@@ -12,21 +12,6 @@ from main import run_experiment
 
 def test_all_experiments():
     experiments = os.listdir("./experiment")
-    experiments = [
-            "modelnet_simple",
-            ]
-    experiments = [
-            "gnnmnist_classification"
-            "modelnet_points100_classification",
-            "cnn_theta_sweep",
-            "linear_theta_sweep",
-            "modelnet_simple",
-            "manifold_classification",
-            "modelnet40_simple",
-            ]
-    experiments = [
-            "gnnmnist_classification"
-            ]
     for experiment in experiments: 
         print("Running experiment", experiment)
         run_experiment(experiment,dev=True)
@@ -34,16 +19,8 @@ def test_all_experiments():
 
 if __name__ == "__main__":
     test_all_experiments()
-    """ import cProfile """
-    """ cProfile.run("test_all_experiments()","stats.prof",sort="cumtime") """
-    """"""
-    """ import pstats """
-    """ stats = pstats.Stats("stats.prof") """
-    """ stats.sort_stats("cumtime").print_stats(30) """
 
 
-
-    #    test_all_experiments()
 #     with cProfile.Profile() as profile:
 #         main()
 #

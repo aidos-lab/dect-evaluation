@@ -1,10 +1,11 @@
 data:
-  name: TUDataModule
+  name: GNNBenchmarkDataModule
   config:
-    name: Letter-high
+    name: CIFAR10
     root: ./data
-    batch_size: 64
-    num_workers: 0
+    batch_size: 256
+    num_workers: 12
+    split: train
     pin_memory: true
 model:
   name: ECTCNNEdgesModel
@@ -14,9 +15,9 @@ model:
     batch_size: 128
     R: 1.1
     scale: 500
-    num_features: 2
-    num_classes: 15
+    num_features: 5
+    num_classes: 10
     hidden: 100
 trainer:
-  lr: 0.0001
+  lr: 0.001
   num_epochs: 100

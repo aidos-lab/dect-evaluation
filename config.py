@@ -38,7 +38,7 @@ class TUDataConfig:
 
 @dataclass
 class ModelnetConfig:
-    root: str = "./data/Manifold"
+    root: str = "./data"
     batch_size: int = 128
     num_workers: int = 0
     samplepoints: int = 100
@@ -47,7 +47,7 @@ class ModelnetConfig:
 
 @dataclass
 class ManifoldConfig:
-    root: str = "./data"
+    root: str = "./data/Manifold"
     batch_size: int = 128
     num_workers: int = 0
     samplepoints: int = 100
@@ -70,20 +70,21 @@ class ECTLinearModelConfig:
     hidden: int
     bump_steps : int 
     batch_size: int = 128
-    R : float = 1.5
+    R : float = 1.2
     scale : int = 500
     num_features : int = 3
-    num_classes: int = 10
+    num_classes: int = 100
 
 @dataclass
 class ECTCNNModelConfig:
     num_thetas : int
     bump_steps : int 
     batch_size: int = 128
-    R : float = 1.5
+    R : float = 1.1
     scale : int = 500
     num_features : int = 3
     num_classes: int = 10
+    hidden: int = 100
 
 #  ╭──────────────────────────────────────────────────────────╮
 #  │ Trainer configurations                                   │

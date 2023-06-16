@@ -1,13 +1,14 @@
 data:
-  name: TUDataModule
+  name: ModelNetPointsDataModule
   config:
-    name: Letter-high
-    root: ./data
+    root: ./data/modelnet5000
     batch_size: 64
     num_workers: 0
+    samplepoints: 5000
     pin_memory: true
+    name: '10'
 model:
-  name: ECTLinearEdgesModel
+  name: ECTLinearPointsModel
   config:
     num_thetas: 32
     hidden: 100
@@ -15,8 +16,8 @@ model:
     batch_size: 128
     R: 1.2
     scale: 500
-    num_features: 2
-    num_classes: 15
+    num_features: 3
+    num_classes: 10
 trainer:
   lr: 0.0001
   num_epochs: 100

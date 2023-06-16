@@ -6,15 +6,13 @@ from models import load_model
 from omegaconf import OmegaConf
 import torch
 import time
+import os
 torch.cuda.empty_cache()
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 from sklearn.metrics import confusion_matrix
 
-def compute_confusion(model, loader, loss_fn):
-    correct = 0
-    total = 0
-    loss = 0
+def compute_confusion(model, loader):
     y_true = []
     y_pred = []
     with torch.no_grad():
@@ -68,12 +66,13 @@ def train_model(config,run=None):
 
 
     start = time.time() 
+    loss = torch.empty(0)
     for epoch in range(config.trainer.num_epochs):
         for batch in dm.train_dataloader():
             batch_gpu, y_gpu = batch.to(device), batch.y.to(device)
             optimizer.zero_grad(set_to_none=True)
             pred = model(batch_gpu)
-            loss = torch.sqrt(loss_fn(pred, y_gpu))
+            loss = loss_fn(pred, y_gpu)
             loss.backward()
             optimizer.step()
         if run:
@@ -88,7 +87,7 @@ def train_model(config,run=None):
             start = time.time()
 
     loss,acc = compute_acc(model,dm.test_dataloader(),loss_fn)
-    cfm = compute_confusion(model,dm.test_dataloader(),loss_fn)
+    cfm = compute_confusion(model,dm.test_dataloader())
     log_msg(f"Test accuracy {acc:.2f}")
     print(cfm)
     if run:
@@ -104,15 +103,13 @@ def run_experiment(experiment,dev=False):
         config = OmegaConf.load(file)
         log_msg(f"\n{OmegaConf.to_yaml(config, resolve=True)}") # type: ignore
 
-        if dev:
-            config.trainer.num_epochs=1
         tags = [
             config.model.name,
             config.data.name
                 ]
         if not dev:
             run = wandb.init(
-                    project="desct-test" if dev else "desc", 
+                    project="desct-test" if dev else "desct-final", 
                     name=experiment,
                     tags=tags,
                     reinit=True,
@@ -126,20 +123,9 @@ def run_experiment(experiment,dev=False):
         
 
 if __name__ == "__main__":
-    experiments = [
-            "modelnet_points100_classification",
-            "manifold_classification",
-            "cnn_theta_sweep",
-            "linear_theta_sweep",
-            "gnnmnist_classification"
-            "letter_high_classification"
-            ]
-    experiments = [
-            "gnnmnist_classification"
-            ]
+    experiments = os.listdir("./experiment")
     for experiment in experiments: 
         print("Running experiment", experiment)
         run_experiment(experiment)
-
 
 
