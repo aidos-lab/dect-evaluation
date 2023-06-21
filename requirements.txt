@@ -47,3 +47,10 @@ triton==2.0.0
 typing_extensions==4.6.0
 urllib3==2.0.2
 yarl==1.9.2
+
+geotorch~=0.3.0
+torchvision~=0.15.2
+wandb~=0.15.4
+omegaconf~=2.3.0
+open3d~=0.17.0
+pandas~=2.0.2

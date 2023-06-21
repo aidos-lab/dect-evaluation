@@ -124,8 +124,9 @@ def run_experiment(experiment,dev=False):
 
 if __name__ == "__main__":
     experiments = os.listdir("./experiment")
+    experiments = ['letter_high_classification']
     for experiment in experiments: 
         print("Running experiment", experiment)
-        run_experiment(experiment)
+        run_experiment(experiment,dev=True)
 
 
