@@ -1,22 +1,23 @@
+meta:
+  name: desct-test-new
+  project: desct
+  tags: []
 data:
-  name: TUDataModule
-  config:
-    name: Letter-high
-    root: ./data
-    batch_size: 64
-    num_workers: 0
-    pin_memory: true
+  module: datasets.tu
+  root: ./data
+  num_workers: 0
+  batch_size: 64
+  pin_memory: true
+  name: Letter-high
 model:
-  name: ECTCNNEdgesModel
-  config:
-    num_thetas: 32
-    bump_steps: 32
-    batch_size: 128
-    R: 1.1
-    scale: 500
-    num_features: 2
-    num_classes: 15
-    hidden: 100
+  module: models.ect_cnn_edges
+  num_features: 2
+  bump_steps: 32
+  num_thetas: 32
+  num_classes: 15
+  hidden: 100
+  R: 1.1
+  scale: 200.0
 trainer:
   lr: 0.0001
   num_epochs: 100

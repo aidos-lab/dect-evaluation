@@ -28,7 +28,6 @@ class EctPointsLayer(nn.Module):
         self.num_thetas = config.num_thetas
         self.bump_steps = config.bump_steps  # Sampling density in ect curve
         self.num_features = config.num_features
-        self.batch_size = config.batch_size
         self.R = config.R
         self.scale = torch.tensor(config.scale, device=self.device)
         self.lin = (

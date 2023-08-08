@@ -63,3 +63,7 @@ class Parser(argparse.ArgumentParser):
 
 def count_parameters(model):
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
+
+
+def listdir(d):
+    return [os.path.join(d, f) for f in os.listdir(d)]

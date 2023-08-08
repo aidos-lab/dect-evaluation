@@ -1,7 +1,10 @@
 import os
 from omegaconf import OmegaConf
 import shutil
-from config import *
+from datasets.tu import TUDataModuleConfig
+from models.base_model import ModelConfig
+
+from config import Config, TrainerConfig, Meta
 
 """
 This script creates all the configurations in the config folder. 
@@ -40,6 +43,9 @@ def tu_letter_high_classification() -> None:
     experiment = "./experiment/letter_high_classification"
     create_experiment_folder(experiment)
 
+    # Create meta data
+    meta = Meta("desct-test-new")
+
     # Create Trainer Config
     trainer = TrainerConfig(lr=0.0001, num_epochs=100)
 
@@ -51,61 +57,59 @@ def tu_letter_high_classification() -> None:
     num_classes = 15
 
     # Create CNN model config
-    cnn_pointsmodel = ModelConfig(
-        name="ECTCNNPointsModel",
-        config=ECTCNNModelConfig(
-            num_features=num_features,
-            bump_steps=bump_steps,
-            num_thetas=num_thetas,
-            num_classes=num_classes,
-        ),
+    ect_cnn_points = ModelConfig(
+        module="models.ect_cnn_points",
+        num_features=num_features,
+        bump_steps=bump_steps,
+        num_thetas=num_thetas,
+        num_classes=num_classes,
+        hidden=100,
     )
 
     # Create CNN Edges model config
-    cnn_edgesmodel = ModelConfig(
-        name="ECTCNNEdgesModel",
-        config=ECTCNNModelConfig(
-            num_features=num_features,
-            bump_steps=bump_steps,
-            num_thetas=num_thetas,
-            num_classes=num_classes,
-        ),
+    ect_cnn_edges = ModelConfig(
+        module="models.ect_cnn_edges",
+        num_features=num_features,
+        bump_steps=bump_steps,
+        num_thetas=num_thetas,
+        num_classes=num_classes,
+        hidden=100,
     )
 
     # Create linear points model config
-    linear_pointsmodel = ModelConfig(
-        name="ECTLinearPointsModel",
-        config=ECTLinearModelConfig(
-            num_features=num_features,
-            bump_steps=bump_steps,
-            num_thetas=num_thetas,
-            num_classes=num_classes,
-            hidden=100,
-        ),
+    ect_linear_points = ModelConfig(
+        module="models.ect_linear_points",
+        num_features=num_features,
+        bump_steps=bump_steps,
+        num_thetas=num_thetas,
+        num_classes=num_classes,
+        hidden=100,
     )
 
     # Create linear edges model config
-    linear_edgesmodel = ModelConfig(
-        name="ECTLinearEdgesModel",
-        config=ECTLinearModelConfig(
-            num_features=num_features,
-            bump_steps=bump_steps,
-            num_thetas=num_thetas,
-            num_classes=num_classes,
-            hidden=100,
-        ),
+    ect_linear_edges = ModelConfig(
+        module="models.ect_linear_edges",
+        num_features=num_features,
+        bump_steps=bump_steps,
+        num_thetas=num_thetas,
+        num_classes=num_classes,
+        hidden=100,
     )
 
     # Create the dataset config.
-    data = DataModuleConfig(
-        name="TUDataModule",
-        config=TUDataConfig(name="Letter-high", num_workers=0, batch_size=64),
+    data = TUDataModuleConfig(
+        module="datasets.tu",
+        root="./data",
+        name="Letter-high",
+        num_workers=0,
+        batch_size=64,
+        pin_memory=True,
     )
 
-    cnn_points_config = Config(data, cnn_pointsmodel, trainer)
-    cnn_edges_config = Config(data, cnn_edgesmodel, trainer)
-    linear_points_config = Config(data, linear_pointsmodel, trainer)
-    linear_edges_config = Config(data, linear_edgesmodel, trainer)
+    cnn_points_config = Config(meta, data, ect_cnn_points, trainer)
+    cnn_edges_config = Config(meta, data, ect_cnn_edges, trainer)
+    linear_points_config = Config(meta, data, ect_linear_points, trainer)
+    linear_edges_config = Config(meta, data, ect_linear_edges, trainer)
 
     save_config(cnn_points_config, os.path.join(experiment, f"cnn_points_config.yaml"))
     save_config(cnn_edges_config, os.path.join(experiment, f"cnn_edges_config.yaml"))
@@ -559,9 +563,9 @@ def theta_sweep():
 
 if __name__ == "__main__":
     tu_letter_high_classification()
-    gnn_mnist_classification()
-    gnn_cifar10_classification()
-    gnn_modelnet10_classification()
-    gnn_modelnet40_classification()
-    manifold_classification()
-    theta_sweep()
+    """ gnn_mnist_classification() """
+    """ gnn_cifar10_classification() """
+    """ gnn_modelnet10_classification() """
+    """ gnn_modelnet40_classification() """
+    """ manifold_classification() """
+    """ theta_sweep() """
