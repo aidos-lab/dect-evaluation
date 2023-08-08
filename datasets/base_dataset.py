@@ -6,6 +6,7 @@ import torch
 from typing import Protocol
 from dataclasses import dataclass
 
+
 @dataclass
 class DataModuleConfig(Protocol):
     module: str
@@ -13,7 +14,6 @@ class DataModuleConfig(Protocol):
     num_workers: int = 0
     batch_size: int = 64
     pin_memory: bool = True
-
 
 
 class DataModule(ABC):

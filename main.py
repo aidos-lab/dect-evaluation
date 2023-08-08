@@ -93,7 +93,7 @@ class Experiment:
         self.logger.log(
             f"Test accuracy {acc:.2f},\n Confusion Matrix:\n {cfm}.",
             params={
-                "thetas": self.config.model.config.num_thetas,
+                "thetas": self.config.model.num_thetas,
                 "test_acc": acc,
                 "test_loss": loss,
             },
