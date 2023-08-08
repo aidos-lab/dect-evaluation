@@ -7,4 +7,3 @@ class BaseModel(nn.Module):
         super().__init__()
         self.config = config
         self.loss_fn = nn.CrossEntropyLoss()
-

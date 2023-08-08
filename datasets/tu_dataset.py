@@ -1,5 +1,6 @@
 from datasets.base_dataset import DataModule
-#from base_dataset import DataModule
+
+# from base_dataset import DataModule
 from torch_geometric.datasets import TUDataset
 from dataclasses import dataclass
 from torch.utils.data import random_split
@@ -28,35 +29,27 @@ in the config file or overwrite them in the class definition.
 """ extra_config = {"name":"Letter-high"} """
 
 
-
-
 class TUDataModule(DataModule):
     """
     This datamodule loads the base TUDatasets without transforming.
     See below how to add a transform the easiest way.
     """
-    def __init__(self,config):
-        self.config = config
-        super().__init__(config.root,config.batch_size,config.num_workers)
 
-    
+    def __init__(self, config):
+        self.config = config
+        super().__init__(config.root, config.batch_size, config.num_workers)
+
     def prepare_data(self):
-        TUDataset(
-                name = self.config.name,
-                root = self.config.root,
-                use_node_attr = True
-                )
+        TUDataset(name=self.config.name, root=self.config.root, use_node_attr=True)
 
     def setup(self):
         print("le")
         entire_ds = TUDataset(
-                name = self.config.name,
-                root = self.config.root,
-                use_node_attr = True
-                )
+            name=self.config.name, root=self.config.root, use_node_attr=True
+        )
         print(entire_ds[0])
-        inter_ds, self.test_ds = random_split(entire_ds, [int(0.8*len(entire_ds)), len(entire_ds)-int(0.8*len(entire_ds))]) # type: ignore
-        self.train_ds, self.val_ds = random_split(inter_ds, [int(0.8*len(inter_ds)), len(inter_ds)-int(0.8*len(inter_ds))]) # type: ignore
+        inter_ds, self.test_ds = random_split(entire_ds, [int(0.8 * len(entire_ds)), len(entire_ds) - int(0.8 * len(entire_ds))])  # type: ignore
+        self.train_ds, self.val_ds = random_split(inter_ds, [int(0.8 * len(inter_ds)), len(inter_ds) - int(0.8 * len(inter_ds))])  # type: ignore
 
 
 class TULetterHighDataModule(DataModule):
@@ -64,29 +57,29 @@ class TULetterHighDataModule(DataModule):
     This datamodule loads the base TUDatasets without transforming.
     See below how to add a transform the easiest way.
     """
-    def __init__(self,config):
-        self.config = config
-        super().__init__(config.root,config.batch_size,config.num_workers)
 
-    
+    def __init__(self, config):
+        self.config = config
+        super().__init__(config.root, config.batch_size, config.num_workers)
+
     def prepare_data(self):
         TUDataset(
-                pre_transform = transforms.Compose([]),
-                name = self.config.name,
-                root = self.config.root,
-                )
+            pre_transform=transforms.Compose([]),
+            name=self.config.name,
+            root=self.config.root,
+        )
 
     def setup(self):
         entire_ds = TUDataset(
-                pre_transform = transforms.Compose([]),
-                name = self.config.name,
-                root = self.config.root,
-                )
-        inter_ds, self.test_ds = random_split(entire_ds, [int(0.8*len(entire_ds)), len(entire_ds)-int(0.8*len(entire_ds))]) # type: ignore
-        self.train_ds, self.val_ds = random_split(inter_ds, [int(0.8*len(inter_ds)), len(inter_ds)-int(0.8*len(inter_ds))]) # type: ignore
+            pre_transform=transforms.Compose([]),
+            name=self.config.name,
+            root=self.config.root,
+        )
+        inter_ds, self.test_ds = random_split(entire_ds, [int(0.8 * len(entire_ds)), len(entire_ds) - int(0.8 * len(entire_ds))])  # type: ignore
+        self.train_ds, self.val_ds = random_split(inter_ds, [int(0.8 * len(inter_ds)), len(inter_ds) - int(0.8 * len(inter_ds))])  # type: ignore
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     @dataclass
     class TUDataConfig:
@@ -98,6 +91,3 @@ if __name__ == '__main__':
     config = TUDataConfig()
     data = TUDataModule(config)
     print(data.train_ds[0])
-
-
-

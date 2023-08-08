@@ -1,4 +1,4 @@
-import os 
+import os
 from omegaconf import OmegaConf
 import shutil
 from config import *
@@ -14,14 +14,16 @@ NOTE: Gets ran every time make run is called.
 #  │ Helper methods                                           │
 #  ╰──────────────────────────────────────────────────────────╯
 
+
 def create_experiment_folder(path):
-    shutil.rmtree(path,ignore_errors=True)
+    shutil.rmtree(path, ignore_errors=True)
     os.makedirs(path)
 
-def save_config(cfg,path):
+
+def save_config(cfg, path):
     c = OmegaConf.create(cfg)
-    with open(path,"w") as f:
-        OmegaConf.save(c,f)
+    with open(path, "w") as f:
+        OmegaConf.save(c, f)
 
 
 #  ╭──────────────────────────────────────────────────────────╮
@@ -31,7 +33,7 @@ def save_config(cfg,path):
 
 def tu_letter_high_classification() -> None:
     """
-    This experiment trains and classifies the letter high dataset in 
+    This experiment trains and classifies the letter high dataset in
     the TU dataset.
     """
 
@@ -39,12 +41,9 @@ def tu_letter_high_classification() -> None:
     create_experiment_folder(experiment)
 
     # Create Trainer Config
-    trainer = TrainerConfig(
-            lr=0.0001,
-            num_epochs=100
-            )
+    trainer = TrainerConfig(lr=0.0001, num_epochs=100)
 
-    # Base configs for the models, same for all in this 
+    # Base configs for the models, same for all in this
     # experiment
     num_features = 2
     bump_steps = 32
@@ -54,77 +53,73 @@ def tu_letter_high_classification() -> None:
     # Create CNN model config
     cnn_pointsmodel = ModelConfig(
         name="ECTCNNPointsModel",
-        config = ECTCNNModelConfig(
+        config=ECTCNNModelConfig(
             num_features=num_features,
-            bump_steps=bump_steps, 
+            bump_steps=bump_steps,
             num_thetas=num_thetas,
-            num_classes=num_classes
-            )
-        )
-
+            num_classes=num_classes,
+        ),
+    )
 
     # Create CNN Edges model config
     cnn_edgesmodel = ModelConfig(
         name="ECTCNNEdgesModel",
-        config = ECTCNNModelConfig(
+        config=ECTCNNModelConfig(
             num_features=num_features,
-            bump_steps=bump_steps, 
+            bump_steps=bump_steps,
             num_thetas=num_thetas,
             num_classes=num_classes,
-            )
-        )
-
+        ),
+    )
 
     # Create linear points model config
     linear_pointsmodel = ModelConfig(
-            name="ECTLinearPointsModel",
-            config = ECTLinearModelConfig(
-                num_features=num_features,
-                bump_steps=bump_steps, 
-                num_thetas=num_thetas,
-                num_classes=num_classes,
-                hidden=100, 
-                )
-            )
-
+        name="ECTLinearPointsModel",
+        config=ECTLinearModelConfig(
+            num_features=num_features,
+            bump_steps=bump_steps,
+            num_thetas=num_thetas,
+            num_classes=num_classes,
+            hidden=100,
+        ),
+    )
 
     # Create linear edges model config
     linear_edgesmodel = ModelConfig(
-            name="ECTLinearEdgesModel",
-            config = ECTLinearModelConfig(
-                num_features=num_features,
-                bump_steps=bump_steps, 
-                num_thetas=num_thetas,
-                num_classes=num_classes,
-                hidden=100, 
-                )
-            )
-
+        name="ECTLinearEdgesModel",
+        config=ECTLinearModelConfig(
+            num_features=num_features,
+            bump_steps=bump_steps,
+            num_thetas=num_thetas,
+            num_classes=num_classes,
+            hidden=100,
+        ),
+    )
 
     # Create the dataset config.
     data = DataModuleConfig(
         name="TUDataModule",
-            config=TUDataConfig(
-                name="Letter-high",
-                num_workers=0,
-                batch_size=64
-                )
-            )
+        config=TUDataConfig(name="Letter-high", num_workers=0, batch_size=64),
+    )
 
-    cnn_points_config = Config(data,cnn_pointsmodel,trainer)
-    cnn_edges_config = Config(data,cnn_edgesmodel,trainer)
-    linear_points_config = Config(data,linear_pointsmodel,trainer)
-    linear_edges_config = Config(data,linear_edgesmodel,trainer)
-    
-    save_config(cnn_points_config,os.path.join(experiment,f"cnn_points_config.yaml"))
-    save_config(cnn_edges_config,os.path.join(experiment,f"cnn_edges_config.yaml"))
-    save_config(linear_points_config,os.path.join(experiment,f"linear_points_config.yaml"))
-    save_config(linear_edges_config,os.path.join(experiment,f"linear_edges_config.yaml"))
+    cnn_points_config = Config(data, cnn_pointsmodel, trainer)
+    cnn_edges_config = Config(data, cnn_edgesmodel, trainer)
+    linear_points_config = Config(data, linear_pointsmodel, trainer)
+    linear_edges_config = Config(data, linear_edgesmodel, trainer)
+
+    save_config(cnn_points_config, os.path.join(experiment, f"cnn_points_config.yaml"))
+    save_config(cnn_edges_config, os.path.join(experiment, f"cnn_edges_config.yaml"))
+    save_config(
+        linear_points_config, os.path.join(experiment, f"linear_points_config.yaml")
+    )
+    save_config(
+        linear_edges_config, os.path.join(experiment, f"linear_edges_config.yaml")
+    )
 
 
 def gnn_mnist_classification() -> None:
     """
-    This experiment trains multiple models on the GNN MNIST pointcloud and 
+    This experiment trains multiple models on the GNN MNIST pointcloud and
     evaluates them.
     Models used:
         - ECTLinear
@@ -134,94 +129,92 @@ def gnn_mnist_classification() -> None:
     create_experiment_folder(experiment)
 
     # Create Trainer Config
-    trainer = TrainerConfig(lr=0.001,num_epochs=100)
+    trainer = TrainerConfig(lr=0.001, num_epochs=100)
 
-
-    # Base configs for the models, same for all in this 
+    # Base configs for the models, same for all in this
     # experiment
     num_features = 3
     bump_steps = 32
     num_thetas = 32
     num_classes = 10
-    hidden=100
+    hidden = 100
 
     # Create CNN model config
     cnn_pointsmodel = ModelConfig(
         name="ECTCNNPointsModel",
-        config = ECTCNNModelConfig(
+        config=ECTCNNModelConfig(
             num_features=num_features,
-            bump_steps=bump_steps, 
+            bump_steps=bump_steps,
             num_thetas=num_thetas,
             num_classes=num_classes,
-            hidden=hidden
-            )
-        )
+            hidden=hidden,
+        ),
+    )
 
     # Create CNN Edges model config
     cnn_edgesmodel = ModelConfig(
         name="ECTCNNEdgesModel",
-        config = ECTCNNModelConfig(
+        config=ECTCNNModelConfig(
             num_features=num_features,
-            bump_steps=bump_steps, 
+            bump_steps=bump_steps,
             num_thetas=num_thetas,
             num_classes=num_classes,
-            hidden=hidden
-            )
-        )
-
+            hidden=hidden,
+        ),
+    )
 
     # Create linear points model config
     linear_pointsmodel = ModelConfig(
-            name="ECTLinearPointsModel",
-            config = ECTLinearModelConfig(
-                num_features=num_features,
-                bump_steps=bump_steps, 
-                num_thetas=num_thetas,
-                num_classes=num_classes,
-                hidden=100, 
-                )
-            )
+        name="ECTLinearPointsModel",
+        config=ECTLinearModelConfig(
+            num_features=num_features,
+            bump_steps=bump_steps,
+            num_thetas=num_thetas,
+            num_classes=num_classes,
+            hidden=100,
+        ),
+    )
 
     # Create linear edges model config
     linear_edgesmodel = ModelConfig(
-            name="ECTLinearEdgesModel",
-            config = ECTLinearModelConfig(
-                num_features=num_features,
-                bump_steps=bump_steps, 
-                num_thetas=num_thetas,
-                num_classes=num_classes,
-                hidden=100, 
-                )
-            )
+        name="ECTLinearEdgesModel",
+        config=ECTLinearModelConfig(
+            num_features=num_features,
+            bump_steps=bump_steps,
+            num_thetas=num_thetas,
+            num_classes=num_classes,
+            hidden=100,
+        ),
+    )
 
     # Create the dataset config.
     data = DataModuleConfig(
         name="GNNBenchmarkDataModule",
-        config=GNNBenchmarkConfig(
-            name="MNIST",
-            num_workers=4,
-            batch_size=128
-            )
-        )
-    
-    cnn_points_config = Config(data,cnn_pointsmodel,trainer)
-    cnn_edges_config = Config(data,cnn_edgesmodel,trainer)
-    linear_points_config = Config(data,linear_pointsmodel,trainer)
-    linear_edges_config = Config(data,linear_edgesmodel,trainer)
-    
-    save_config(cnn_points_config,os.path.join(experiment,f"cnn_points_config.yaml"))
-    save_config(cnn_edges_config,os.path.join(experiment,f"cnn_edges_config.yaml"))
-    save_config(linear_points_config,os.path.join(experiment,f"linear_points_config.yaml"))
-    save_config(linear_edges_config,os.path.join(experiment,f"linear_edges_config.yaml"))
+        config=GNNBenchmarkConfig(name="MNIST", num_workers=4, batch_size=128),
+    )
+
+    cnn_points_config = Config(data, cnn_pointsmodel, trainer)
+    cnn_edges_config = Config(data, cnn_edgesmodel, trainer)
+    linear_points_config = Config(data, linear_pointsmodel, trainer)
+    linear_edges_config = Config(data, linear_edgesmodel, trainer)
+
+    save_config(cnn_points_config, os.path.join(experiment, f"cnn_points_config.yaml"))
+    save_config(cnn_edges_config, os.path.join(experiment, f"cnn_edges_config.yaml"))
+    save_config(
+        linear_points_config, os.path.join(experiment, f"linear_points_config.yaml")
+    )
+    save_config(
+        linear_edges_config, os.path.join(experiment, f"linear_edges_config.yaml")
+    )
 
 
 def gnn_cifar10_classification() -> None:
     """
-    This experiment trains multiple models on the GNN CIFAR10 super pixel 
+    This experiment trains multiple models on the GNN CIFAR10 super pixel
     graph and evaluates them.
     Models used:
         - Full ECT + CNN
-        - Full ECT + Linear 
+        - Full ECT + Linear
         - Points ECT + CNN
         - Points ECT + Linear
     """
@@ -229,12 +222,9 @@ def gnn_cifar10_classification() -> None:
     create_experiment_folder(experiment)
 
     # Create Trainer Config
-    trainer = TrainerConfig(
-            lr=0.001,
-            num_epochs=100
-            )
-    
-    # Base configs for the models, same for all in this 
+    trainer = TrainerConfig(lr=0.001, num_epochs=100)
+
+    # Base configs for the models, same for all in this
     # experiment
     num_features = 5
     bump_steps = 32
@@ -244,79 +234,77 @@ def gnn_cifar10_classification() -> None:
     # Create CNN model config
     cnn_pointsmodel = ModelConfig(
         name="ECTCNNPointsModel",
-        config = ECTCNNModelConfig(
+        config=ECTCNNModelConfig(
             num_features=num_features,
-            bump_steps=bump_steps, 
+            bump_steps=bump_steps,
             num_thetas=num_thetas,
-            num_classes=num_classes
-            )
-        )
+            num_classes=num_classes,
+        ),
+    )
 
     # Create CNN Edges model config
     cnn_edgesmodel = ModelConfig(
         name="ECTCNNEdgesModel",
-        config = ECTCNNModelConfig(
+        config=ECTCNNModelConfig(
             num_features=num_features,
-            bump_steps=bump_steps, 
+            bump_steps=bump_steps,
             num_thetas=num_thetas,
             num_classes=num_classes,
-            )
-        )
-
+        ),
+    )
 
     # Create linear points model config
     linear_pointsmodel = ModelConfig(
-            name="ECTLinearPointsModel",
-            config = ECTLinearModelConfig(
-                num_features=num_features,
-                bump_steps=bump_steps, 
-                num_thetas=num_thetas,
-                num_classes=num_classes,
-                hidden=100, 
-                )
-            )
+        name="ECTLinearPointsModel",
+        config=ECTLinearModelConfig(
+            num_features=num_features,
+            bump_steps=bump_steps,
+            num_thetas=num_thetas,
+            num_classes=num_classes,
+            hidden=100,
+        ),
+    )
 
     # Create linear edges model config
     linear_edgesmodel = ModelConfig(
-            name="ECTLinearEdgesModel",
-            config = ECTLinearModelConfig(
-                num_features=num_features,
-                bump_steps=bump_steps, 
-                num_thetas=num_thetas,
-                num_classes=num_classes,
-                hidden=100, 
-                )
-            )
+        name="ECTLinearEdgesModel",
+        config=ECTLinearModelConfig(
+            num_features=num_features,
+            bump_steps=bump_steps,
+            num_thetas=num_thetas,
+            num_classes=num_classes,
+            hidden=100,
+        ),
+    )
 
     # Create the dataset config.
     data = DataModuleConfig(
         name="GNNBenchmarkDataModule",
-        config=GNNBenchmarkConfig(
-            name="CIFAR10",
-            num_workers=12,
-            batch_size=256
-            )
-        )
+        config=GNNBenchmarkConfig(name="CIFAR10", num_workers=12, batch_size=256),
+    )
 
+    cnn_points_config = Config(data, cnn_pointsmodel, trainer)
+    cnn_edges_config = Config(data, cnn_edgesmodel, trainer)
+    linear_points_config = Config(data, linear_pointsmodel, trainer)
+    linear_edges_config = Config(data, linear_edgesmodel, trainer)
 
-    cnn_points_config = Config(data,cnn_pointsmodel,trainer)
-    cnn_edges_config = Config(data,cnn_edgesmodel,trainer)
-    linear_points_config = Config(data,linear_pointsmodel,trainer)
-    linear_edges_config = Config(data,linear_edgesmodel,trainer)
-    
-    save_config(cnn_points_config,os.path.join(experiment,f"cnn_points_config.yaml"))
-    save_config(cnn_edges_config,os.path.join(experiment,f"cnn_edges_config.yaml"))
-    save_config(linear_points_config,os.path.join(experiment,f"linear_points_config.yaml"))
-    save_config(linear_edges_config,os.path.join(experiment,f"linear_edges_config.yaml"))
+    save_config(cnn_points_config, os.path.join(experiment, f"cnn_points_config.yaml"))
+    save_config(cnn_edges_config, os.path.join(experiment, f"cnn_edges_config.yaml"))
+    save_config(
+        linear_points_config, os.path.join(experiment, f"linear_points_config.yaml")
+    )
+    save_config(
+        linear_edges_config, os.path.join(experiment, f"linear_edges_config.yaml")
+    )
 
 
 def gnn_modelnet10_classification() -> None:
     """
-    This experiment trains multiple models on the GNN Modelnet10 classification 
+    This experiment trains multiple models on the GNN Modelnet10 classification
     using the following models
     Models used:
         - Full ECT + CNN
-        - Full ECT + Linear 
+        - Full ECT + Linear
         - Points ECT + CNN
         - Points ECT + Linear
     """
@@ -324,44 +312,41 @@ def gnn_modelnet10_classification() -> None:
     create_experiment_folder(experiment)
 
     # Create Trainer Config
-    trainer = TrainerConfig(
-            lr=0.0001,
-            num_epochs=100
-            )
-    
-    # Base configs for the models, same for all in this 
+    trainer = TrainerConfig(lr=0.0001, num_epochs=100)
+
+    # Base configs for the models, same for all in this
     # Experiment
     num_features = 3
     bump_steps = 32
     num_thetas = 32
     num_classes = 10
-    hidden=100
+    hidden = 100
 
     # Create CNN model config
     cnn_pointsmodel = ModelConfig(
         name="ECTCNNPointsModel",
-        config = ECTCNNModelConfig(
+        config=ECTCNNModelConfig(
             num_features=num_features,
-            bump_steps=bump_steps, 
+            bump_steps=bump_steps,
             num_thetas=num_thetas,
             num_classes=num_classes,
-            hidden=hidden
-            )
-        )
+            hidden=hidden,
+        ),
+    )
 
     # Create linear points model config
     linear_pointsmodel = ModelConfig(
-            name="ECTLinearPointsModel",
-            config = ECTLinearModelConfig(
-                num_features=num_features,
-                bump_steps=bump_steps, 
-                num_thetas=num_thetas,
-                num_classes=num_classes,
-                hidden=hidden, 
-                )
-            )
+        name="ECTLinearPointsModel",
+        config=ECTLinearModelConfig(
+            num_features=num_features,
+            bump_steps=bump_steps,
+            num_thetas=num_thetas,
+            num_classes=num_classes,
+            hidden=hidden,
+        ),
+    )
 
-    for samplepoints in [100,1000,5000]:
+    for samplepoints in [100, 1000, 5000]:
         # Create the dataset configuration.
         data = DataModuleConfig(
             name="ModelNetPointsDataModule",
@@ -369,24 +354,30 @@ def gnn_modelnet10_classification() -> None:
                 samplepoints=samplepoints,
                 root=f"./data/modelnet{samplepoints}",
                 batch_size=64,
-                num_workers=0
-                )
-            )
+                num_workers=0,
+            ),
+        )
 
-        cnn_points_config = Config(data,cnn_pointsmodel,trainer)
-        linear_points_config = Config(data,linear_pointsmodel,trainer)
-        
-        save_config(cnn_points_config,os.path.join(experiment,f"cnn_points_{samplepoints}_config.yaml"))
-        save_config(linear_points_config,os.path.join(experiment,f"linear_points_{samplepoints}_config.yaml"))
+        cnn_points_config = Config(data, cnn_pointsmodel, trainer)
+        linear_points_config = Config(data, linear_pointsmodel, trainer)
+
+        save_config(
+            cnn_points_config,
+            os.path.join(experiment, f"cnn_points_{samplepoints}_config.yaml"),
+        )
+        save_config(
+            linear_points_config,
+            os.path.join(experiment, f"linear_points_{samplepoints}_config.yaml"),
+        )
 
 
 def gnn_modelnet40_classification() -> None:
     """
-    This experiment trains multiple models on the GNN Modelnet10 classification 
+    This experiment trains multiple models on the GNN Modelnet10 classification
     using the following models
     Models used:
         - Full ECT + CNN
-        - Full ECT + Linear 
+        - Full ECT + Linear
         - Points ECT + CNN
         - Points ECT + Linear
     """
@@ -394,12 +385,9 @@ def gnn_modelnet40_classification() -> None:
     create_experiment_folder(experiment)
 
     # Create Trainer Config
-    trainer = TrainerConfig(
-            lr=0.00001,
-            num_epochs=100
-            )
-    
-    # Base configs for the models, same for all in this 
+    trainer = TrainerConfig(lr=0.00001, num_epochs=100)
+
+    # Base configs for the models, same for all in this
     # experiment
     num_features = 3
     bump_steps = 32
@@ -409,28 +397,26 @@ def gnn_modelnet40_classification() -> None:
     # Create CNN model config
     cnn_pointsmodel = ModelConfig(
         name="ECTCNNPointsModel",
-        config = ECTCNNModelConfig(
+        config=ECTCNNModelConfig(
             num_features=num_features,
-            bump_steps=bump_steps, 
+            bump_steps=bump_steps,
             num_thetas=num_thetas,
             num_classes=num_classes,
-            hidden=800, 
-            )
-        )
-
+            hidden=800,
+        ),
+    )
 
     # Create linear points model config
     linear_pointsmodel = ModelConfig(
-            name="ECTLinearPointsModel",
-            config = ECTLinearModelConfig(
-                num_features=num_features,
-                bump_steps=bump_steps, 
-                num_thetas=num_thetas,
-                num_classes=num_classes,
-                hidden=500, 
-                )
-            )
-
+        name="ECTLinearPointsModel",
+        config=ECTLinearModelConfig(
+            num_features=num_features,
+            bump_steps=bump_steps,
+            num_thetas=num_thetas,
+            num_classes=num_classes,
+            hidden=500,
+        ),
+    )
 
     for samplepoints in [100]:
         # Create the dataset configuration.
@@ -440,23 +426,29 @@ def gnn_modelnet40_classification() -> None:
                 name="40",
                 samplepoints=samplepoints,
                 root=f"./data/modelnet40{samplepoints}",
-                batch_size=256
-                )
-            )
+                batch_size=256,
+            ),
+        )
 
-        cnn_points_config = Config(data,cnn_pointsmodel,trainer)
-        linear_points_config = Config(data,linear_pointsmodel,trainer)
-        
-        save_config(cnn_points_config,os.path.join(experiment,f"cnn_points_{samplepoints}_config.yaml"))
-        save_config(linear_points_config,os.path.join(experiment,f"linear_points_{samplepoints}_config.yaml"))
+        cnn_points_config = Config(data, cnn_pointsmodel, trainer)
+        linear_points_config = Config(data, linear_pointsmodel, trainer)
+
+        save_config(
+            cnn_points_config,
+            os.path.join(experiment, f"cnn_points_{samplepoints}_config.yaml"),
+        )
+        save_config(
+            linear_points_config,
+            os.path.join(experiment, f"linear_points_{samplepoints}_config.yaml"),
+        )
 
 
 def manifold_classification() -> None:
     """
-    This experiment trains a ect cnn and linear model to distinguish 
-    three classes, 
-    - a noisy torus, 
-    - a sphere and 
+    This experiment trains a ect cnn and linear model to distinguish
+    three classes,
+    - a noisy torus,
+    - a sphere and
     - a mobius strip.
 
     Models used:
@@ -467,135 +459,102 @@ def manifold_classification() -> None:
     experiment = "./experiment/manifold_classification"
     create_experiment_folder(experiment)
 
-
     # Create Trainer Config
-    trainer = TrainerConfig(num_epochs=100,lr=0.0001)
-
+    trainer = TrainerConfig(num_epochs=100, lr=0.0001)
 
     # Create linear model config
     linear_pointsmodel = ModelConfig(
-            name="ECTLinearPointsModel",
-            config = ECTLinearModelConfig(
-                bump_steps=32, 
-                hidden=10, 
-                num_thetas=32,
-                num_classes=3)
-            )
-    
+        name="ECTLinearPointsModel",
+        config=ECTLinearModelConfig(
+            bump_steps=32, hidden=10, num_thetas=32, num_classes=3
+        ),
+    )
+
     # Create linear model config
     linear_edgesmodel = ModelConfig(
-            name="ECTLinearEdgesModel",
-            config = ECTLinearModelConfig(
-                bump_steps=32, 
-                hidden=10, 
-                num_thetas=32,
-                num_classes=3)
-            )
-
+        name="ECTLinearEdgesModel",
+        config=ECTLinearModelConfig(
+            bump_steps=32, hidden=10, num_thetas=32, num_classes=3
+        ),
+    )
 
     # Create CNN model config
     cnn_pointsmodel = ModelConfig(
         name="ECTCNNPointsModel",
-        config = ECTCNNModelConfig(
-            bump_steps=32, 
-            num_thetas=32,
-            num_classes=3
-            )
-        )
-
+        config=ECTCNNModelConfig(bump_steps=32, num_thetas=32, num_classes=3),
+    )
 
     # Create CNN model config
     cnn_edgesmodel = ModelConfig(
         name="ECTCNNEdgesModel",
-        config = ECTCNNModelConfig(
-            bump_steps=32, 
-            num_thetas=32,
-            num_classes=3
-            )
-        )
+        config=ECTCNNModelConfig(bump_steps=32, num_thetas=32, num_classes=3),
+    )
 
     # Create Data config
     data = DataModuleConfig(
         name="ManifoldDataModule",
-        config=ManifoldConfig(
-            pin_memory=True,
-            batch_size=64,
-            num_samples = 100
-            )
-        )
-    
+        config=ManifoldConfig(pin_memory=True, batch_size=64, num_samples=100),
+    )
 
-    linear_points_config = Config(data,linear_pointsmodel,trainer)
-    linear_edges_config = Config(data,linear_edgesmodel,trainer)
-    cnn_points_config = Config(data,cnn_pointsmodel,trainer)
-    cnn_edges_config = Config(data,cnn_edgesmodel,trainer)
-    
-    save_config(linear_points_config,os.path.join(experiment,f"linear_points.yaml"))
-    save_config(linear_edges_config,os.path.join(experiment,f"linear_edges.yaml"))
-    save_config(cnn_points_config,os.path.join(experiment,f"cnn_points.yaml"))
-    save_config(cnn_edges_config,os.path.join(experiment,f"cnn_edges.yaml"))
+    linear_points_config = Config(data, linear_pointsmodel, trainer)
+    linear_edges_config = Config(data, linear_edgesmodel, trainer)
+    cnn_points_config = Config(data, cnn_pointsmodel, trainer)
+    cnn_edges_config = Config(data, cnn_edgesmodel, trainer)
+
+    save_config(linear_points_config, os.path.join(experiment, f"linear_points.yaml"))
+    save_config(linear_edges_config, os.path.join(experiment, f"linear_edges.yaml"))
+    save_config(cnn_points_config, os.path.join(experiment, f"cnn_points.yaml"))
+    save_config(cnn_edges_config, os.path.join(experiment, f"cnn_edges.yaml"))
 
 
 def theta_sweep():
     """
-    This experiment trains two models with varying number of angles used. 
+    This experiment trains two models with varying number of angles used.
     The configs are stored in separate folders so the two experiments
     can be ran independently (it takes a while).
 
-    The models are trained on the mnist super pixel dataset 
+    The models are trained on the mnist super pixel dataset
     """
 
     linear_experiment = "./experiment/linear_theta_sweep"
     create_experiment_folder(linear_experiment)
-    
+
     cnn_experiment = "./experiment/cnn_theta_sweep"
     create_experiment_folder(cnn_experiment)
 
     # Create the dataset config.
     data = DataModuleConfig(
         name="GNNBenchmarkDataModule",
-        config=GNNBenchmarkConfig(
-            name="MNIST",
-            num_workers=4,
-            batch_size=128
-            )
-        )
-
-
+        config=GNNBenchmarkConfig(name="MNIST", num_workers=4, batch_size=128),
+    )
 
     # Create Trainer Config
-    trainer = TrainerConfig(num_epochs=100,lr=0.001)
+    trainer = TrainerConfig(num_epochs=100, lr=0.001)
 
     """ for idx, num_thetas in [[8,45],[9,50]]:  """
 
-    for idx, num_thetas in enumerate(range(5,55,5)): 
+    for idx, num_thetas in enumerate(range(5, 55, 5)):
         linear_model = ModelConfig(
-                name="ECTLinearPointsModel",
-                config = ECTLinearModelConfig(
-                    bump_steps=32, 
-                    hidden=100, 
-                    num_thetas=num_thetas,
-                    num_classes=10
-                    )
-                )
+            name="ECTLinearPointsModel",
+            config=ECTLinearModelConfig(
+                bump_steps=32, hidden=100, num_thetas=num_thetas, num_classes=10
+            ),
+        )
 
         cnn_model = ModelConfig(
-                name="ECTCNNPointsModel",
-                config = ECTCNNModelConfig(
-                    bump_steps=32, 
-                    hidden=100,
-                    num_thetas=num_thetas,
-                    num_classes=10
-                    )
-                )
+            name="ECTCNNPointsModel",
+            config=ECTCNNModelConfig(
+                bump_steps=32, hidden=100, num_thetas=num_thetas, num_classes=10
+            ),
+        )
 
-        linear_config = Config(data,linear_model,trainer)
-        cnn_config = Config(data,cnn_model,trainer)
+        linear_config = Config(data, linear_model, trainer)
+        cnn_config = Config(data, cnn_model, trainer)
 
-        save_config(linear_config,os.path.join(linear_experiment,f"linear_{idx}.yaml"))
-        save_config(cnn_config,os.path.join(cnn_experiment,f"cnn_{idx}.yaml"))
-
-
+        save_config(
+            linear_config, os.path.join(linear_experiment, f"linear_{idx}.yaml")
+        )
+        save_config(cnn_config, os.path.join(cnn_experiment, f"cnn_{idx}.yaml"))
 
 
 if __name__ == "__main__":
@@ -606,5 +565,3 @@ if __name__ == "__main__":
     gnn_modelnet40_classification()
     manifold_classification()
     theta_sweep()
-
-

@@ -8,14 +8,17 @@ class Config:
     model: Any
     trainer: Any
 
+
 #  ╭──────────────────────────────────────────────────────────╮
 #  │ Data Configurations                                      │
 #  ╰──────────────────────────────────────────────────────────╯
 
+
 @dataclass
 class DataModuleConfig:
-  name: str
-  config: Any
+    name: str
+    config: Any
+
 
 @dataclass
 class GNNBenchmarkConfig:
@@ -45,6 +48,7 @@ class ModelnetConfig:
     pin_memory: bool = True
     name: str = "10"
 
+
 @dataclass
 class ManifoldConfig:
     root: str = "./data/Manifold"
@@ -59,39 +63,43 @@ class ManifoldConfig:
 #  │ Model Configurations                                     │
 #  ╰──────────────────────────────────────────────────────────╯
 
+
 @dataclass
 class ModelConfig:
-  name: str
-  config: Any
+    name: str
+    config: Any
+
 
 @dataclass
 class ECTLinearModelConfig:
-    num_thetas : int
+    num_thetas: int
     hidden: int
-    bump_steps : int 
+    bump_steps: int
     batch_size: int = 128
-    R : float = 1.2
-    scale : int = 500
-    num_features : int = 3
+    R: float = 1.2
+    scale: int = 500
+    num_features: int = 3
     num_classes: int = 100
+
 
 @dataclass
 class ECTCNNModelConfig:
-    num_thetas : int
-    bump_steps : int 
+    num_thetas: int
+    bump_steps: int
     batch_size: int = 128
-    R : float = 1.1
-    scale : int = 500
-    num_features : int = 3
+    R: float = 1.1
+    scale: int = 500
+    num_features: int = 3
     num_classes: int = 10
     hidden: int = 100
+
 
 #  ╭──────────────────────────────────────────────────────────╮
 #  │ Trainer configurations                                   │
 #  ╰──────────────────────────────────────────────────────────╯
 
+
 @dataclass
 class TrainerConfig:
     lr: float = 0.001
     num_epochs: int = 200
-

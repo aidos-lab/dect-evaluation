@@ -14,72 +14,65 @@ import torchvision.transforms as transforms
 
 
 class CenterTransform(object):
-  def __call__(self, data):
-    data.x -= data.x.mean()
-    data.x /= data.x.pow(2).sum(axis=1).sqrt().max()
-    return data
-
-
+    def __call__(self, data):
+        data.x -= data.x.mean()
+        data.x /= data.x.pow(2).sum(axis=1).sqrt().max()
+        return data
 
 
 class ManifoldDataModule(DataModule):
-    def __init__(self,config):
+    def __init__(self, config):
         self.config = config
-        self.transform =transforms.Compose([
-            FaceToEdge(),
-            CenterTransform()
-            ]) 
-        super().__init__(config.root,config.batch_size,config.num_workers,config.pin_memory)
+        self.transform = transforms.Compose([FaceToEdge(), CenterTransform()])
+        super().__init__(
+            config.root, config.batch_size, config.num_workers, config.pin_memory
+        )
 
     def prepare_data(self):
         self.train_ds = ManifoldDataset(
-                self.config,
-                split="train",
-                pre_transform=self.transform
-                )
+            self.config, split="train", pre_transform=self.transform
+        )
         self.test_ds = ManifoldDataset(
-                self.config,split="test",
-                pre_transform=self.transform
-                )
+            self.config, split="test", pre_transform=self.transform
+        )
         self.val_ds = ManifoldDataset(
-                self.config,
-                split="val",
-                pre_transform=self.transform
-                )
+            self.config, split="val", pre_transform=self.transform
+        )
         self.entire_ds = ManifoldDataset(
-                self.config,
-                split="train",
-                pre_transform=self.transform
-                )
+            self.config, split="train", pre_transform=self.transform
+        )
 
     def setup(self):
         pass
 
 
-
 class ManifoldDataset(Dataset):
     """Represents a 2D segmentation dataset.
-    
+
     Input params:
         configuration: Configuration dictionary.
     """
-    def __init__(self,config,split,pre_transform):
-        super().__init__(root=config.root, transform=pre_transform, pre_transform=pre_transform, pre_filter=None)
+
+    def __init__(self, config, split, pre_transform):
+        super().__init__(
+            root=config.root,
+            transform=pre_transform,
+            pre_transform=pre_transform,
+            pre_filter=None,
+        )
         self.config = config
         self.split = split
         self.clean()
-        self.files = [] 
+        self.files = []
         self.create_spheres()
         self.create_mobius()
         self.create_torus()
-        self.file_frame = pd.DataFrame(self.files,columns = ["filename","y"])
+        self.file_frame = pd.DataFrame(self.files, columns=["filename", "y"])
 
     def clean(self):
         path = f"{self.config.root}/{self.split}"
-        shutil.rmtree(path,ignore_errors=True)
-        os.makedirs(path,exist_ok=True)
-        
-
+        shutil.rmtree(path, ignore_errors=True)
+        os.makedirs(path, exist_ok=True)
 
     def get(self, index):
         if torch.is_tensor(index):
@@ -108,9 +101,8 @@ class ManifoldDataset(Dataset):
             base_mesh.vertices = o3d.utility.Vector3dVector(vertices)
             base_mesh.compute_vertex_normals()
             f_name = f"{self.config.root}/{self.split}/sphere_{self.split}_{i}.ply"
-            o3d.io.write_triangle_mesh(f_name,base_mesh)       
-            self.files.append([f_name,int(0)])
-
+            o3d.io.write_triangle_mesh(f_name, base_mesh)
+            self.files.append([f_name, int(0)])
 
     def create_mobius(self, noise=None):
         if not noise:
@@ -122,10 +114,10 @@ class ManifoldDataset(Dataset):
             base_mesh.vertices = o3d.utility.Vector3dVector(vertices)
             base_mesh.compute_vertex_normals()
             f_name = f"{self.config.root}/{self.split}/mobius_{self.split}_{i}.ply"
-            o3d.io.write_triangle_mesh(f_name,base_mesh)       
-            self.files.append([f_name,int(1)])
+            o3d.io.write_triangle_mesh(f_name, base_mesh)
+            self.files.append([f_name, int(1)])
 
-    def create_torus(self,noise=None):
+    def create_torus(self, noise=None):
         if not noise:
             noise = 0.1
 
@@ -136,14 +128,8 @@ class ManifoldDataset(Dataset):
             base_mesh.vertices = o3d.utility.Vector3dVector(vertices)
             base_mesh.compute_vertex_normals()
             f_name = f"{self.config.root}/{self.split}/torus_{self.split}_{i}.ply"
-            o3d.io.write_triangle_mesh(f_name,base_mesh)       
-            self.files.append([f_name,int(2)])
-
-
-
-
-
-
+            o3d.io.write_triangle_mesh(f_name, base_mesh)
+            self.files.append([f_name, int(2)])
 
 
 # bunny = o3d.data.BunnyMesh()
@@ -165,26 +151,7 @@ class ManifoldDataset(Dataset):
 """"""
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 """ xyz = sample_from_sphere(n=100, d=2, r=1, noise=None, ambient=None, seed=None).detach().numpy() """
-
 
 
 """ # Pass xyz to Open3D.o3d.geometry.PointCloud and visualize """
@@ -216,7 +183,7 @@ class ManifoldDataset(Dataset):
 """            pcd, """
 """            depth=8, """
 """            width=0) """
-           
+
 
 """ mesh = o3d.geometry.TriangleMesh.create_torus(torus_radius=1.0, tube_radius=0.5, radial_resolution=30, tubular_resolution=20) """
 """"""
@@ -233,8 +200,3 @@ class ManifoldDataset(Dataset):
 """"""
 """"""
 """ trimesh.convex.is_convex(tri_mesh) """
-
-
-
-
-
