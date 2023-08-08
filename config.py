@@ -1,58 +1,25 @@
-from typing import Any
-from dataclasses import dataclass
+from typing import Any, Protocol
+from dataclasses import dataclass, field
 
 
 @dataclass(frozen=True)
 class Config:
+    meta: Any
     data: Any
     model: Any
     trainer: Any
+
+@dataclass
+class Meta:
+    name: str
+    project: str = "desct"
+    tags: list[str] = field(default_factory=list)
+
 
 #  ╭──────────────────────────────────────────────────────────╮
 #  │ Data Configurations                                      │
 #  ╰──────────────────────────────────────────────────────────╯
 
-@dataclass
-class DataModuleConfig:
-  name: str
-  config: Any
-
-@dataclass
-class GNNBenchmarkConfig:
-    name: str = "MNIST"
-    root: str = "./data"
-    batch_size: int = 128
-    num_workers: int = 0
-    split: str = "train"
-    pin_memory: bool = True
-
-
-@dataclass
-class TUDataConfig:
-    name: str = "Letter-high"
-    root: str = "./data"
-    batch_size: int = 128
-    num_workers: int = 0
-    pin_memory: bool = True
-
-
-@dataclass
-class ModelnetConfig:
-    root: str = "./data"
-    batch_size: int = 128
-    num_workers: int = 0
-    samplepoints: int = 100
-    pin_memory: bool = True
-    name: str = "10"
-
-@dataclass
-class ManifoldConfig:
-    root: str = "./data/Manifold"
-    batch_size: int = 128
-    num_workers: int = 0
-    samplepoints: int = 100
-    num_samples: int = 25
-    pin_memory: bool = True
 
 
 #  ╭──────────────────────────────────────────────────────────╮
@@ -64,27 +31,6 @@ class ModelConfig:
   name: str
   config: Any
 
-@dataclass
-class ECTLinearModelConfig:
-    num_thetas : int
-    hidden: int
-    bump_steps : int 
-    batch_size: int = 128
-    R : float = 1.2
-    scale : int = 500
-    num_features : int = 3
-    num_classes: int = 100
-
-@dataclass
-class ECTCNNModelConfig:
-    num_thetas : int
-    bump_steps : int 
-    batch_size: int = 128
-    R : float = 1.1
-    scale : int = 500
-    num_features : int = 3
-    num_classes: int = 10
-    hidden: int = 100
 
 #  ╭──────────────────────────────────────────────────────────╮
 #  │ Trainer configurations                                   │

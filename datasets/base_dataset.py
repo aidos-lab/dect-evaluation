@@ -3,6 +3,18 @@ from torch_geometric.loader import DataLoader, ImbalancedSampler
 from torch_geometric.data import Dataset
 import torch
 
+from typing import Protocol
+from dataclasses import dataclass
+
+@dataclass
+class DataModuleConfig(Protocol):
+    module: str
+    root: str = "./data"
+    num_workers: int = 0
+    batch_size: int = 64
+    pin_memory: bool = True
+
+
 
 class DataModule(ABC):
     train_ds: Dataset

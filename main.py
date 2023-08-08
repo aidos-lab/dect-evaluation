@@ -1,132 +1,119 @@
-import wandb
-from logs import log_msg
-import glob
-from datasets import load_datamodule
-from models import load_model
-from omegaconf import OmegaConf
 import torch
+from omegaconf import OmegaConf
+from utils import count_parameters
+from utils import listdir
+from logger import Logger, timing
+from metrics.metrics import compute_confusion, compute_acc
+
+import loaders.factory as loader
 import time
-import os
 torch.cuda.empty_cache()
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-from sklearn.metrics import confusion_matrix
+mylogger = Logger()
 
-def compute_confusion(model, loader):
-    y_true = []
-    y_pred = []
-    with torch.no_grad():
-        for batch in loader:
-            batch_gpu, y_gpu = batch.to(device), batch.y.to(device)
-            y_pred.append(model(batch_gpu))
-            y_true.append(y_gpu)
+class Experiment:
+    def __init__(self, experiment,logger, dev=True):
+        """
+        Creates the setup and does inits
+        - Loads datamodules 
+        - Loads models
+        - Initializes logger
+        """
 
-        y_true = torch.cat(y_true)
-        y_pred = torch.cat(y_pred).max(axis=1)[1]
-        cfm = confusion_matrix(y_true.cpu().detach().numpy(),y_pred.cpu().detach().numpy())
-    return cfm
+        self.config = OmegaConf.load(experiment)
+        self.dev = dev
+        self.logger = logger
+        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-def compute_acc(model, loader, loss_fn):
-    correct = 0
-    total = 0
-    loss = 0
-    y_true = []
-    y_pred = []
-    with torch.no_grad():
-        for batch in loader:
-            batch_gpu, y_gpu = batch.to(device), batch.y.to(device)
-            y_pred.append(model(batch_gpu))
-            y_true.append(y_gpu)
-        y_true = torch.cat(y_true)
-        y_pred = torch.cat(y_pred)
-        loss = torch.sqrt(loss_fn(y_pred, y_true))
-        y_pred = y_pred.max(axis=1)[1]
-        correct = (y_pred == y_true).float().sum()
-        acc = correct / len(y_true)
-    return loss, acc
-
-def count_parameters(model):
-    return sum(p.numel() for p in model.parameters() if p.requires_grad)
-
-
-def train_model(config,run=None):
-    dm = load_datamodule(
-        name=config.data.name,
-        config=config.data.config
-    )
-    """ dm.info() """
-    model = load_model(
-            name=config.model.name,
-            config=config.model.config
-            )
-    log_msg(f"{config.model.name} has {count_parameters(model)} trainable parameters")
-    model = model.to(device)
-    loss_fn = torch.nn.CrossEntropyLoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=config.trainer.lr)
-
-
-    start = time.time() 
-    loss = torch.empty(0)
-    for epoch in range(config.trainer.num_epochs):
-        for batch in dm.train_dataloader():
-            batch_gpu, y_gpu = batch.to(device), batch.y.to(device)
-            optimizer.zero_grad(set_to_none=True)
-            pred = model(batch_gpu)
-            loss = loss_fn(pred, y_gpu)
-            loss.backward()
-            optimizer.step()
-        if run:
-            run.log({"epoch": epoch, "train_loss": loss.item()})
-        if epoch % 10 == 0:
-            end = time.time()
-            loss, acc = compute_acc(model, dm.val_dataloader(), loss_fn)
-            log_msg(f"epoch {epoch} | train loss {loss.item():.2f} | Accuracy {acc:.2f} | time {start-end:.2f}")
-            if run:
-                run.log({"epoch": epoch, "val_loss":loss.item()})
-                run.log({"epoch": epoch, "val_acc":acc})
-            start = time.time()
-
-    loss,acc = compute_acc(model,dm.test_dataloader(),loss_fn)
-    cfm = compute_confusion(model,dm.test_dataloader())
-    log_msg(f"Test accuracy {acc:.2f}")
-    print(cfm)
-    if run:
-        run.log({"thetas": config.model.config.num_thetas, "test_acc": acc})  # type: ignore
-        run.log({"test_loss": loss})  # type: ignore
-    return run
-
-
-def run_experiment(experiment,dev=False):
-    files = glob.glob(f"./experiment/{experiment}/*")
-
-    for file in files:
-        config = OmegaConf.load(file)
-        log_msg(f"\n{OmegaConf.to_yaml(config, resolve=True)}") # type: ignore
-
-        tags = [
-            config.model.name,
-            config.data.name
-                ]
-        if not dev:
-            run = wandb.init(
-                    project="desct-test" if dev else "desct-final", 
-                    name=experiment,
-                    tags=tags,
-                    reinit=True,
-                    config=OmegaConf.to_container(config, resolve=True) # type: ignore
-                    )
-            run = train_model(config,run)
-            run.join() # type: ignore
-        else:
-            run = train_model(config,run=None)
-
+        self.logger.log("Setup")
+        self.logger.wandb_init(self.config.meta)
         
+        # Load the dataset
+        self.dm = loader.load_module("dataset",self.config.data)
+
+        print(self.config.model)
+        # Load the model
+        model = loader.load_module("model",self.config.model)
+
+        # Send model to device
+        self.model = model.to(self.device)
+
+        # Loss function and optimizer.
+        self.loss_fn = torch.nn.CrossEntropyLoss()
+        self.optimizer = torch.optim.Adam(model.parameters(), lr=self.config.trainer.lr)
+
+        # Log info
+        self.logger.log(f"{self.config.model.module} has {count_parameters(self.model)} trainable parameters")
+
+
+    @timing(mylogger)
+    def run(self):
+        """
+        Runs an experiment given the loaded config files.
+        """
+        start = time.time()
+        for epoch in range(self.config.trainer.num_epochs):
+            self.run_epoch()
+
+            if epoch % 10 == 0:
+                end = time.time()
+                self.compute_metrics(epoch)
+                self.logger.log(msg=f"Training the model 10 epochs took: {end - start:.2f} seconds.")
+                start = time.time()
+
+        self.finalize_run()
+
+
+    def run_epoch(self):
+        for batch in self.dm.train_dataloader():
+            batch_gpu, y_gpu = batch.to(self.device), batch.y.to(self.device)
+
+            self.optimizer.zero_grad(set_to_none=True)
+
+            pred = self.model(batch_gpu)
+
+            loss = self.loss_fn(pred, y_gpu)
+            loss.backward()
+
+            self.optimizer.step()
+
+
+    @timing(mylogger)
+    def finalize_run(self):
+        # Compute accuracy
+        loss,acc = compute_acc(self.model,self.dm.test_dataloader(),self.loss_fn)
+
+        # Compute confusion 
+        cfm = compute_confusion(self.model,self.dm.test_dataloader())
+
+        # Log statements
+        self.logger.log(
+                f"Test accuracy {acc:.2f},\n Confusion Matrix:\n {cfm}.",
+                params={"thetas": self.config.model.config.num_thetas, "test_acc": acc,"test_loss": loss}
+                )
+
+
+    def compute_metrics(self,epoch):
+        loss, acc = compute_acc(self.model, self.dm.val_dataloader(), self.loss_fn)
+
+        # Log statements to console
+        self.logger.log(
+                msg = f"epoch {epoch} | train loss {loss.item():.2f} | Accuracy {acc:.2f}",
+                params = {"epoch": epoch, "val_loss":loss.item(), "val_acc":acc}
+                        )
+
+def main():
+    experiment = "letter_high_classification"
+    for experiment in listdir(f"./experiment/{experiment}"): 
+        print("Running experiment", experiment)
+        exp = Experiment(
+                experiment, 
+                logger = mylogger, 
+                dev=True
+            )
+        exp.run()
 
 if __name__ == "__main__":
-    experiments = os.listdir("./experiment")
-    experiments = ['letter_high_classification']
-    for experiment in experiments: 
-        print("Running experiment", experiment)
-        run_experiment(experiment,dev=True)
+    main()
 
 
