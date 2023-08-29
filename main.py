@@ -73,11 +73,9 @@ class Experiment:
             # weight_decay=1e-7,
             # eps=1e-4,
         )
-        self.scheduler = torch.optim.lr_scheduler.MultiStepLR(
-            self.optimizer,
-            milestones=[900],
-            gamma=0.1,
-        )
+        # self.scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+        #     self.optimizer, mode="min", factor=0.1, patience=10
+        # )
 
         self.early_stopper = EarlyStopper()
 
@@ -98,10 +96,6 @@ class Experiment:
         start = time.time()
         for epoch in range(self.config.trainer.num_epochs):
             self.run_epoch()
-
-            val_loss, _ = compute_acc(
-                self.model, self.dm.val_dataloader(), self.config.model.num_classes
-            )
 
             # if self.early_stopper(val_loss):
             #     break
@@ -139,7 +133,10 @@ class Experiment:
             clip_grad(self.model, 5)
             self.optimizer.step()
 
-        self.scheduler.step()
+        val_loss, _ = compute_acc(
+            self.model, self.dm.val_dataloader(), self.config.model.num_classes
+        )
+        # self.scheduler.step(val_loss)
         del batch_gpu, y_gpu, pred, loss
 
     def compute_metrics(self, epoch, run_time):
@@ -174,11 +171,11 @@ def main():
         # "ENZYMES",
         # "IMDB-BINARY",
         # "Letter-high",
-        "Letter-med",
+        # "Letter-med",
         # "Letter-low",
         # "gnn_mnist_classification",
         # "gnn_cifar10_classification",
-        # "PROTEINS_full",
+        "PROTEINS_full",
         # "REDDIT-BINARY",
     ]
     # experiments = [

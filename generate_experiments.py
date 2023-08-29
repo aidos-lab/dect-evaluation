@@ -132,9 +132,7 @@ def tu_letter_low_classification(
 
     for module in modules:
         modelconfig = ECTModelConfig(
-            module=module,
-            num_features=2,
-            num_classes=15,
+            module=module, num_features=2, num_classes=15, hidden=100
         )
 
         config = Config(meta, data, modelconfig, trainer)
@@ -251,6 +249,8 @@ def tu_proteins(experiment_folder="experiment", trainer=None, meta=None) -> None
     experiment = f"./{experiment_folder}/PROTEINS_full"
     create_experiment_folder(experiment)
 
+    trainer = TrainerConfig(lr=0.001, num_epochs=100, num_reruns=5)
+
     modules = [
         # "models.ect_cnn_points",
         "models.ect_cnn_edges",
@@ -259,11 +259,16 @@ def tu_proteins(experiment_folder="experiment", trainer=None, meta=None) -> None
     ]
 
     # Create the dataset config.
-    data = TUProteinsFullConfig()
+    data = TUProteinsFullConfig(batch_size=128)
 
     for module in modules:
         modelconfig = ECTModelConfig(
-            module=module, num_features=32, num_classes=2, num_thetas=64, bump_steps=64
+            module=module,
+            num_features=32,
+            num_classes=2,
+            num_thetas=32,
+            bump_steps=32,
+            hidden=50,
         )
 
         config = Config(meta, data, modelconfig, trainer)
