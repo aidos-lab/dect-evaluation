@@ -4,24 +4,30 @@ from utils import count_parameters
 from utils import listdir
 from logger import Logger, timing
 from metrics.metrics import compute_confusion, compute_acc
-
 import loaders.factory as loader
 import time
 
-torch.cuda.empty_cache()
+import torchmetrics
 
+torch.cuda.empty_cache()
 mylogger = Logger()
+
+
+def clip_grad(model, max_norm):
+    total_norm = 0
+    for p in model.parameters():
+        param_norm = p.grad.data.norm(2)
+        total_norm += param_norm**2
+    total_norm = total_norm ** (0.5)
+    clip_coef = max_norm / (total_norm + 1e-6)
+    if clip_coef < 1:
+        for p in model.parameters():
+            p.grad.data.mul_(clip_coef)
+    return total_norm
 
 
 class Experiment:
     def __init__(self, experiment, logger, dev=True):
-        """
-        Creates the setup and does inits
-        - Loads datamodules
-        - Loads models
-        - Initializes logger
-        """
-
         self.config = OmegaConf.load(experiment)
         self.dev = dev
         self.logger = logger
@@ -32,7 +38,7 @@ class Experiment:
 
         # Load the dataset
         self.dm = loader.load_module("dataset", self.config.data)
-
+        print(self.dm.entire_ds[0].x.shape)
         print(self.config.model)
         # Load the model
         model = loader.load_module("model", self.config.model)
@@ -42,9 +48,23 @@ class Experiment:
 
         # Loss function and optimizer.
         self.loss_fn = torch.nn.CrossEntropyLoss()
-        self.optimizer = torch.optim.Adam(model.parameters(), lr=self.config.trainer.lr)
+        self.optimizer = torch.optim.Adam(
+            [{"params": self.model.parameters()}],
+            lr=self.config.trainer.lr,
+            # weight_decay=1e-7,
+            # eps=1e-4,
+        )
+        self.scheduler = torch.optim.lr_scheduler.MultiStepLR(
+            self.optimizer,
+            milestones=[900],
+            gamma=0.1,
+        )
+
+        self.accuracy_list = []
 
         # Log info
+        # Log info
+        self.logger.log(f"Configurations:\n {OmegaConf.to_yaml(self.config)}")
         self.logger.log(
             f"{self.config.model.module} has {count_parameters(self.model)} trainable parameters"
         )
@@ -60,61 +80,97 @@ class Experiment:
 
             if epoch % 10 == 0:
                 end = time.time()
-                self.compute_metrics(epoch)
-                self.logger.log(
-                    msg=f"Training the model 10 epochs took: {end - start:.2f} seconds."
-                )
+                self.compute_metrics(epoch, end - start)
                 start = time.time()
 
-        self.finalize_run()
+        # Compute test accuracy
+        loss, acc = compute_acc(
+            self.model, self.dm.test_dataloader(), self.config.model.num_classes
+        )
+        self.accuracy_list.append(acc)
 
-    def run_epoch(self):
-        for batch in self.dm.train_dataloader():
-            batch_gpu, y_gpu = batch.to(self.device), batch.y.to(self.device)
+        # # Compute confusion
+        # cfm = compute_confusion(self.model, self.dm.test_dataloader())
 
-            self.optimizer.zero_grad(set_to_none=True)
-
-            pred = self.model(batch_gpu)
-
-            loss = self.loss_fn(pred, y_gpu)
-            loss.backward()
-
-            self.optimizer.step()
-
-    @timing(mylogger)
-    def finalize_run(self):
-        # Compute accuracy
-        loss, acc = compute_acc(self.model, self.dm.test_dataloader(), self.loss_fn)
-
-        # Compute confusion
-        cfm = compute_confusion(self.model, self.dm.test_dataloader())
-
+        # Save angles
+        # torch.save(self.model.ectlayer.v, "test.pt")
         # Log statements
         self.logger.log(
-            f"Test accuracy {acc:.2f},\n Confusion Matrix:\n {cfm}.",
+            f"Test accuracy: {acc:.3f}",
             params={
-                "thetas": self.config.model.num_thetas,
+                # "thetas": self.config.model.num_thetas,
                 "test_acc": acc,
                 "test_loss": loss,
             },
         )
+        return loss, acc
 
-    def compute_metrics(self, epoch):
-        loss, acc = compute_acc(self.model, self.dm.val_dataloader(), self.loss_fn)
+    def run_epoch(self):
+        self.model.train()
+        for batch in self.dm.train_dataloader():
+            batch_gpu, y_gpu = batch.to(self.device), batch.y.to(self.device)
+            self.optimizer.zero_grad()
+            pred = self.model(batch_gpu)
+            loss = self.loss_fn(pred, y_gpu)
+            loss.backward()
+            clip_grad(self.model, 5)
+            self.optimizer.step()
+
+        self.scheduler.step()
+        del batch_gpu, y_gpu, pred, loss
+
+    def compute_metrics(self, epoch, run_time):
+        val_loss, val_acc = compute_acc(
+            self.model, self.dm.val_dataloader(), self.config.model.num_classes
+        )
+        train_loss, train_acc = compute_acc(
+            self.model, self.dm.train_dataloader(), self.config.model.num_classes
+        )
 
         # Log statements to console
         self.logger.log(
-            msg=f"epoch {epoch} | train loss {loss.item():.2f} | Accuracy {acc:.2f}",
-            params={"epoch": epoch, "val_loss": loss.item(), "val_acc": acc},
+            msg=f"epoch {epoch} | Train Loss {train_loss.item():.3f} | Val Loss {val_loss.item():.3f} | Train Accuracy {train_acc:.3f} | Val Accuracy {val_acc:.3f} | Run time {run_time:.2f} ",
+            params={"epoch": epoch, "val_acc": val_acc},
         )
 
 
+def compute_avg(acc: torch.Tensor):
+    # torch.save(self.model.ectlayer.v, "test.pt")
+    final_acc_mean = torch.mean(acc)
+    final_acc_std = torch.std(acc)
+    print(acc)
+    # Log statements
+    mylogger.log(
+        f"Final accuracy {final_acc_mean:.3f} with std {final_acc_std:.3f}.",
+    )
+
+
 def main():
-    experiment = "letter_high_classification"
-    for experiment in listdir(f"./experiment/{experiment}"):
-        print("Running experiment", experiment)
-        exp = Experiment(experiment, logger=mylogger, dev=True)
-        exp.run()
+    experiments = [
+        "DD",
+        "ENZYMES",
+        # "IMDB-BINARY",
+        "Letter-high",
+        "Letter-med",
+        "Letter-low",
+        # "gnn_mnist_classification",
+        # "gnn_cifar10_classification",
+        "PROTEINS_full",
+        # "REDDIT-BINARY",
+    ]
+    # experiments = [
+    #     "gnn_mnist_classification",
+    # ]
+
+    for experiment in experiments:
+        for config in listdir(f"./experiment/{experiment}"):
+            accs = []
+            for _ in range(5):
+                print("Running experiment", experiment, config)
+                exp = Experiment(config, logger=mylogger, dev=True)
+                loss, acc = exp.run()
+                accs.append(acc)
+            compute_avg(torch.tensor(accs))
 
 
 if __name__ == "__main__":

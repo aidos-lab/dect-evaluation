@@ -1,21 +1,37 @@
 import torch
 import os
+from utils import listdir
+from torch_geometric.loader import DataLoader, ImbalancedSampler
+from datasets.gnn_benchmark import CenterTransform, ThresholdTransform
+from config import TrainerConfig, Meta, Config
+from datasets.gnn_benchmark import GNNBenchmarkDataModuleConfig
+from datasets.modelnet import ModelNetPointsDataModule, ModelNetDataModuleConfig
+from models.base_model import ECTModelConfig
 
-"""
-This is an almost copy of the main program and runs ALL experiments in the experiment 
-folder for 1 epoch to check if everything works. 
-It does not interfere with the configs.
-"""
+# from generate_experiments import (
+#     create_experiment_folder,
+#     tu_letter_high_classification,
+#     gnn_classification,
+#     gnn_modelnet_classification,
+#     manifold_classification,
+#     theta_sweep,
+#     save_config,
+# )
+import torchvision.transforms as transforms
 
-from main import run_experiment
+from loaders.factory import load_module
+from torch_geometric.datasets import GNNBenchmarkDataset
+from main import Experiment
+from logger import Logger, timing
+import time
+
+mylogger = Logger()
 
 
-def test_all_experiments():
-    experiments = os.listdir("./experiment")
-    for experiment in experiments:
-        print("Running experiment", experiment)
-        run_experiment(experiment, dev=True)
+def main():
+    exp = Experiment("ect_cnn.yaml", logger=mylogger, dev=True)
+    exp.run()
 
 
 if __name__ == "__main__":
-    test_all_experiments()
+    main()

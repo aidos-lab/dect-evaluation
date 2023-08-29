@@ -36,8 +36,8 @@ class ECTCNNPointsModel(BaseModel):
             list(self.conv1(torch.rand(1, config.bump_steps, config.num_thetas)).shape),
         )
         self.linear1 = nn.Linear(num_features, config.hidden)
-        self.linear2 = nn.Linear(config.hidden, 100)
-        self.linear3 = nn.Linear(100, config.num_classes)
+        self.linear2 = nn.Linear(config.hidden, config.hidden)
+        self.linear3 = nn.Linear(config.hidden, config.num_classes)
 
     def forward(self, batch):
         x = self.ectlayer(batch)

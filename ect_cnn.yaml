@@ -1,0 +1,24 @@
+meta:
+  name: desct-test-new
+  project: desct
+  tags: []
+  experiment_folder: experiment
+data:
+  module: datasets.modelnet
+  root: ./data/modelnet_aligned_40_100
+  num_workers: 0
+  batch_size: 64
+  pin_memory: true
+  name: '40'
+  samplepoints: 100
+model:
+  module: models.ect_best_model
+  num_thetas: 32
+  bump_steps: 32
+  R: 1.1
+  num_features: 3
+  num_classes: 40
+  hidden: 200
+trainer:
+  lr: 0.001
+  num_epochs: 150

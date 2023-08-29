@@ -21,7 +21,13 @@ class Logger:
         ch = logging.StreamHandler()
         ch.setLevel(logging.DEBUG)
         ch.setFormatter(formatter)
+
+        fh = logging.FileHandler(filename=f"./logs/test-{timestr}.logs", mode="a")
+        fh.setLevel(logging.DEBUG)
+        fh.setFormatter(formatter)
+
         self.logger.addHandler(ch)
+        self.logger.addHandler(fh)
 
     def wandb_init(self, config):
         if self.dev:

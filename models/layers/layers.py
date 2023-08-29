@@ -24,7 +24,7 @@ class EctPointsLayer(nn.Module):
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.v = torch.nn.Parameter(
             torch.rand(size=(config.num_thetas, config.num_features)) - 0.5
-        )  # .to(device)
+        )
         self.num_thetas = config.num_thetas
         self.bump_steps = config.bump_steps  # Sampling density in ect curve
         self.num_features = config.num_features
@@ -34,11 +34,12 @@ class EctPointsLayer(nn.Module):
             .view(-1, 1, 1)
             .to(self.device)
         )
+
         # self.out = torch.zeros(self.num_thetas, self.batch_size, self.bump_steps, dtype=torch.float32, device=self.device)
         """ self.zero_tensor_1dim=torch.tensor(0,dtype=torch.float32) """
 
     def forward(self, data):
-        nh = (data.x @ self.v.T).unsqueeze(0)
+        nh = data.x @ self.v.T  # Removed unsqueese statement
         out = torch.zeros(
             self.bump_steps,
             data.batch.max() + 1,
@@ -46,6 +47,10 @@ class EctPointsLayer(nn.Module):
             dtype=torch.float32,
             device=self.device,
         )
+        # print("batch shape", data.batch.shape)
+        # print("node height", nh.shape)
+        # print("lin shape", self.lin.shape)
+        # print("out shape", out)
         return rel(nh, data.batch, out, self.lin)
 
     def extra_repr(self):
@@ -83,7 +88,7 @@ class EctFacesLayer(EctPointsLayer):
         super(EctFacesLayer, self).__init__(config)
 
     def forward(self, data):
-        nh = (data.x @ self.v.T).unsqueeze(0)
+        nh = data.x @ self.v.T
         eh, _ = nh[data.edge_index].max(dim=0)
         fh, _ = nh[data.face_index].max(dim=0)
         out = torch.zeros(

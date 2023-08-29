@@ -34,6 +34,20 @@ class CenterTransform(object):
         return data
 
 
+transforms_dict = {
+    "MNIST": [
+        ThresholdTransform(),
+        CenterTransform(),
+    ],
+    "CIFAR10": [
+        ThresholdTransform(),
+        CenterTransform(),
+    ],
+    "PATTERN": [
+        CenterTransform(),
+    ],
+}
+
 #  ╭──────────────────────────────────────────────────────────╮
 #  │ Datasets                                                 │
 #  ╰──────────────────────────────────────────────────────────╯
@@ -42,12 +56,7 @@ class CenterTransform(object):
 class GNNBenchmarkDataModule(DataModule):
     def __init__(self, config):
         self.config = config
-        self.transform = transforms.Compose(
-            [
-                ThresholdTransform(),
-                CenterTransform(),
-            ]
-        )
+        self.transform = transforms.Compose(transforms_dict[self.config.name])
         super().__init__(config.root, config.batch_size, config.num_workers)
 
     def prepare_data(self):

@@ -5,11 +5,12 @@ from torch.utils.data import random_split
 import torch
 from loaders.factory import register
 from dataclasses import dataclass
+import numpy as np
 
 
 @dataclass
 class ModelNetDataModuleConfig(DataModuleConfig):
-    root: str = "./data/modelnet100"
+    root: str = "./data/modelnet"
     name: str = "10"
     module: str = "datasets.modelnet"
     samplepoints: int = 100
@@ -34,6 +35,22 @@ class CenterTransform(object):
         return data
 
 
+class Standardize(object):
+    def __init__(self, samplepoints):
+        self.samplepoints = samplepoints
+
+    def __call__(self, data):
+        x = data.pos
+        data.pos = None
+        clipper = torch.mean(torch.abs(x))
+        z = torch.clip(x, -100 * clipper, 100 * clipper)
+        mean = torch.mean(z)
+        std = torch.std(z)
+        normalized = (z - mean) / std
+        data.x = normalized
+        return data
+
+
 #  ╭──────────────────────────────────────────────────────────╮
 #  │ Datasets                                                 │
 #  ╰──────────────────────────────────────────────────────────╯
@@ -45,8 +62,7 @@ class ModelNetPointsDataModule(DataModule):
         self.pre_transform = transforms.Compose(
             [
                 transforms.SamplePoints(self.config.samplepoints),
-                ModelNetTransform(),
-                CenterTransform(),
+                Standardize(self.config.samplepoints),
             ]
         )
         super().__init__(
@@ -74,7 +90,15 @@ class ModelNetPointsDataModule(DataModule):
             train=True,
             name=self.config.name,
         )
-        self.train_ds, self.val_ds = random_split(self.entire_ds, [0.8, 0.2])  # type: ignore
+        self.train_ds, self.val_ds = random_split(
+            self.entire_ds,
+            [
+                int(0.9 * len(self.entire_ds)),
+                len(self.entire_ds) - int(0.9 * len(self.entire_ds)),
+            ],
+        )
+        # self.train_ds = self.entire_ds
+        # self.val_ds = self.entire_ds  # type: ignore
         self.test_ds = ModelNet(
             root=self.config.root,
             pre_transform=self.pre_transform,
