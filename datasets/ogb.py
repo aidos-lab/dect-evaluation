@@ -22,6 +22,7 @@ class CenterTransform(object):
         data.x = data.x.float()
         data.x -= data.x.mean()
         data.x /= data.x.pow(2).sum(axis=1).sqrt().max()
+        data.y = data.y.squeeze(0)
         return data
 
 
@@ -70,14 +71,17 @@ class OGBDataModule(DataModule):
         )
 
     def setup(self):
-        entire_ds = PygGraphPropPredDataset(
+        self.entire_ds = PygGraphPropPredDataset(
             pre_transform=transforms.Compose([CenterTransform()]),
             name=self.config.name,
             root=self.config.root,
         )
         inter_ds, self.test_ds = random_split(
-            entire_ds,
-            [int(0.9 * len(entire_ds)), len(entire_ds) - int(0.9 * len(entire_ds))],
+            self.entire_ds,
+            [
+                int(0.9 * len(self.entire_ds)),
+                len(self.entire_ds) - int(0.9 * len(self.entire_ds)),
+            ],
         )  # type: ignore
         self.train_ds, self.val_ds = random_split(inter_ds, [int(0.9 * len(inter_ds)), len(inter_ds) - int(0.9 * len(inter_ds))])  # type: ignore
 

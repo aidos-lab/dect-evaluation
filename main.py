@@ -170,17 +170,15 @@ def main():
         # "DD",
         # "ENZYMES",
         # "IMDB-BINARY",
-        # "Letter-high",
+        "Letter-high",
         # "Letter-med",
         # "Letter-low",
         # "gnn_mnist_classification",
         # "gnn_cifar10_classification",
-        "PROTEINS_full",
+        # "PROTEINS_full",
         # "REDDIT-BINARY",
+        # "OGB-MOLHIV"
     ]
-    # experiments = [
-    #     "gnn_mnist_classification",
-    # ]
 
     for experiment in experiments:
         for config in listdir(f"./experiment/{experiment}"):
