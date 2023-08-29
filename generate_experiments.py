@@ -1,12 +1,21 @@
 import os
 from omegaconf import OmegaConf
 import shutil
-from datasets.tu import TUDataModuleConfig
 from datasets.gnn_benchmark import GNNBenchmarkDataModuleConfig
 from datasets.modelnet import ModelNetDataModuleConfig
 from datasets.manifold import ManifoldDataModuleConfig
-
-
+from datasets.ogb import MOLHIVDataModuleConfig, OGBDataModule
+from datasets.tu import (
+    TUDataModule,
+    TUEnzymesConfig,
+    TUIMDBBConfig,
+    TUDDConfig,
+    TUProteinsFullConfig,
+    TURedditBConfig,
+    TULetterHighConfig,
+    TULetterLowConfig,
+    TULetterMedConfig,
+)
 from models.base_model import ECTModelConfig
 from config import Config, TrainerConfig, Meta
 
@@ -25,35 +34,101 @@ def save_config(cfg, path):
     with open(path, "w") as f:
         OmegaConf.save(c, f)
 
-
-#  ╭──────────────────────────────────────────────────────────╮
-#  │ Experiments                                              │
-#  ╰──────────────────────────────────────────────────────────╯
-
-# Create meta data
-meta = Meta("desct-test-new")
-
-# Create Trainer Config
-trainer = TrainerConfig(lr=0.0001, num_epochs=100)
+    #  ╭──────────────────────────────────────────────────────────╮
+    #  │ Experiments                                              │
+    #  ╰──────────────────────────────────────────────────────────╯
 
 
-def tu_letter_high_classification() -> None:
-    experiment = "./experiment/letter_high_classification"
+def ogb_mol(experiment_folder="experiment", trainer=None, meta=None) -> None:
+    experiment = f"./{experiment_folder}/OGB-MOLHIV"
     create_experiment_folder(experiment)
 
     modules = [
-        "models.ect_cnn_points",
+        # "models.ect_cnn_points",
         "models.ect_cnn_edges",
-        "models.ect_linear_points",
-        "models.ect_linear_edges",
+        # "models.ect_linear_points",
+        # "models.ect_linear_edges",
     ]
 
     # Create the dataset config.
-    data = TUDataModuleConfig(
-        module="datasets.tu",
-        name="Letter-high",
-        num_workers=0,
-    )
+    data = MOLHIVDataModuleConfig()
+
+    for module in modules:
+        modelconfig = ECTModelConfig(
+            module=module, num_features=1, num_classes=2, num_thetas=32, bump_steps=32
+        )
+
+        config = Config(meta, data, modelconfig, trainer)
+        save_config(
+            config, os.path.join(experiment, f"{module.split(sep='.')[1]}.yaml")
+        )
+
+
+def tu_reddit_b(experiment_folder="experiment", trainer=None, meta=None) -> None:
+    experiment = f"./{experiment_folder}/REDDIT-BINARY"
+    create_experiment_folder(experiment)
+
+    modules = [
+        # "models.ect_cnn_points",
+        "models.ect_cnn_edges",
+        # "models.ect_linear_points",
+        # "models.ect_linear_edges",
+    ]
+
+    # Create the dataset config.
+    data = TURedditBConfig()
+
+    for module in modules:
+        modelconfig = ECTModelConfig(
+            module=module, num_features=1, num_classes=2, num_thetas=32, bump_steps=32
+        )
+
+        config = Config(meta, data, modelconfig, trainer)
+        save_config(
+            config, os.path.join(experiment, f"{module.split(sep='.')[1]}.yaml")
+        )
+
+
+def tu_imdb_b(experiment_folder="experiment", trainer=None, meta=None) -> None:
+    experiment = f"./{experiment_folder}/IMDB-BINARY"
+    create_experiment_folder(experiment)
+
+    modules = [
+        # "models.ect_cnn_points",
+        "models.ect_cnn_edges",
+        # "models.ect_linear_points",
+        # "models.ect_linear_edges",
+    ]
+
+    # Create the dataset config.
+    data = TUIMDBBConfig()
+
+    for module in modules:
+        modelconfig = ECTModelConfig(
+            module=module, num_features=541, num_classes=2, num_thetas=32, bump_steps=32
+        )
+
+        config = Config(meta, data, modelconfig, trainer)
+        save_config(
+            config, os.path.join(experiment, f"{module.split(sep='.')[1]}.yaml")
+        )
+
+
+def tu_letter_low_classification(
+    experiment_folder="experiment", trainer=None, meta=None
+) -> None:
+    experiment = f"./{experiment_folder}/Letter-low"
+    create_experiment_folder(experiment)
+
+    modules = [
+        # "models.ect_cnn_points",
+        "models.ect_cnn_edges",
+        # "models.ect_linear_points",
+        # "models.ect_linear_edges",
+    ]
+
+    # Create the dataset config.
+    data = TULetterLowConfig(batch_size=32)
 
     for module in modules:
         modelconfig = ECTModelConfig(
@@ -68,32 +143,28 @@ def tu_letter_high_classification() -> None:
         )
 
 
-def gnn_classification(name="MNIST") -> None:
-    experiment = f"./experiment/gnn_{name.lower()}_classification"
+def tu_letter_med_classification(
+    experiment_folder="experiment", trainer=None, meta=None
+) -> None:
+    experiment = f"./{experiment_folder}/Letter-med"
     create_experiment_folder(experiment)
 
-    # Create meta data
-    meta = Meta("desct-test-new")
-
-    # Create Trainer Config
-    trainer = TrainerConfig(lr=0.0001, num_epochs=100)
-
     modules = [
-        "models.ect_cnn_points",
+        # "models.ect_cnn_points",
         "models.ect_cnn_edges",
-        "models.ect_linear_points",
-        "models.ect_linear_edges",
+        # "models.ect_linear_points",
+        # "models.ect_linear_edges",
     ]
 
     # Create the dataset config.
-    data = GNNBenchmarkDataModuleConfig(
-        module="datasets.gnn_benchmark",
-        name=name,
-    )
+    data = TULetterMedConfig(batch_size=32)
 
     for module in modules:
-        # Create linear points model config
-        modelconfig = ECTModelConfig(module=module)
+        modelconfig = ECTModelConfig(
+            module=module,
+            num_features=2,
+            num_classes=15,
+        )
 
         config = Config(meta, data, modelconfig, trainer)
         save_config(
@@ -101,19 +172,165 @@ def gnn_classification(name="MNIST") -> None:
         )
 
 
-def gnn_modelnet_classification(name="10") -> None:
-    experiment = f"./experiment/gnn_modelnet_{name}_classification"
+def tu_letter_high_classification(
+    experiment_folder="experiment", trainer=None, meta=None
+) -> None:
+    experiment = f"./{experiment_folder}/Letter-high"
     create_experiment_folder(experiment)
 
-    # Create meta data
-    meta = Meta("desct-test-new")
+    modules = [
+        # "models.ect_cnn_points",
+        "models.ect_cnn_edges",
+        # "models.ect_linear_points",
+        # "models.ect_linear_edges",
+    ]
 
-    # Create Trainer Config
-    trainer = TrainerConfig(lr=0.0001, num_epochs=100)
+    # Create the dataset config.
+    data = TULetterHighConfig(batch_size=32)
+
+    for module in modules:
+        modelconfig = ECTModelConfig(
+            module=module,
+            num_features=2,
+            num_classes=15,
+        )
+
+        config = Config(meta, data, modelconfig, trainer)
+        save_config(
+            config, os.path.join(experiment, f"{module.split(sep='.')[1]}.yaml")
+        )
+
+
+def tu_dd(experiment_folder="experiment", trainer=None, meta=None) -> None:
+    experiment = f"./{experiment_folder}/DD"
+    create_experiment_folder(experiment)
+
+    modules = [
+        # "models.ect_cnn_points",
+        "models.ect_cnn_edges",
+        # "models.ect_linear_points",
+        # "models.ect_linear_edges",
+    ]
+
+    # Create the dataset config.
+    data = TUDDConfig()
+
+    for module in modules:
+        modelconfig = ECTModelConfig(
+            module=module, num_features=89, num_classes=2, num_thetas=32, bump_steps=32
+        )
+
+        config = Config(meta, data, modelconfig, trainer)
+        save_config(
+            config, os.path.join(experiment, f"{module.split(sep='.')[1]}.yaml")
+        )
+
+
+def tu_enzymes(experiment_folder="experiment", trainer=None, meta=None) -> None:
+    experiment = f"./{experiment_folder}/ENZYMES"
+    create_experiment_folder(experiment)
+
+    modules = [
+        # "models.ect_cnn_points",
+        "models.ect_cnn_edges",
+        # "models.ect_linear_points",
+        # "models.ect_linear_edges",
+    ]
+
+    # Create the dataset config.
+    data = TUEnzymesConfig()
+
+    for module in modules:
+        modelconfig = ECTModelConfig(
+            module=module, num_features=21, num_classes=6, num_thetas=32, bump_steps=32
+        )
+
+        config = Config(meta, data, modelconfig, trainer)
+        save_config(
+            config, os.path.join(experiment, f"{module.split(sep='.')[1]}.yaml")
+        )
+
+
+def tu_proteins(experiment_folder="experiment", trainer=None, meta=None) -> None:
+    experiment = f"./{experiment_folder}/PROTEINS_full"
+    create_experiment_folder(experiment)
+
+    modules = [
+        # "models.ect_cnn_points",
+        "models.ect_cnn_edges",
+        # "models.ect_linear_points",
+        # "models.ect_linear_edges",
+    ]
+
+    # Create the dataset config.
+    data = TUProteinsFullConfig()
+
+    for module in modules:
+        modelconfig = ECTModelConfig(
+            module=module, num_features=32, num_classes=2, num_thetas=64, bump_steps=64
+        )
+
+        config = Config(meta, data, modelconfig, trainer)
+        save_config(
+            config, os.path.join(experiment, f"{module.split(sep='.')[1]}.yaml")
+        )
+
+
+def gnn_classification(
+    name="MNIST", experiment_folder="experiment", trainer=None, meta=None
+) -> None:
+    experiment = f"./{experiment_folder}/gnn_{name.lower()}_classification"
+    create_experiment_folder(experiment)
+
+    modules = [
+        # "models.ect_cnn_points",
+        "models.ect_cnn_edges",
+        # "models.ect_linear_points",
+        # "models.ect_linear_edges",
+    ]
+
+    # Create the dataset config.
+    data = GNNBenchmarkDataModuleConfig(
+        module="datasets.gnn_benchmark",
+        batch_size=256,
+        name=name,
+        pin_memory=False,
+    )
+
+    if name == "MNIST" or name == "PATTERN":
+        num_features = 3
+    else:
+        num_features = 5
+
+    if name == "PATTERN":
+        num_classes = 2
+    else:
+        num_classes = 10
+
+    for module in modules:
+        # Create linear points model config
+        modelconfig = ECTModelConfig(
+            module=module,
+            num_features=num_features,
+            hidden=100,
+            num_classes=num_classes,
+        )
+
+        config = Config(meta, data, modelconfig, trainer)
+        save_config(
+            config, os.path.join(experiment, f"{module.split(sep='.')[1]}.yaml")
+        )
+
+
+def gnn_modelnet_classification(
+    name="10", experiment_folder="experiment", trainer=None, meta=None
+) -> None:
+    experiment = f"./{experiment_folder}/gnn_modelnet_{name}_classification"
+    create_experiment_folder(experiment)
 
     modules = [
         "models.ect_cnn_points",
-        "models.ect_linear_points",
+        # "models.ect_linear_points",
     ]
 
     for module in modules:
@@ -123,8 +340,11 @@ def gnn_modelnet_classification(name="10") -> None:
 
             # Create the dataset config.
             data = ModelNetDataModuleConfig(
+                root=f"./data/modelnet_{name}_{samplepoints}",
                 module="datasets.modelnet",
                 samplepoints=samplepoints,
+                name=name,
+                drop_last=True,
             )
 
             config = Config(meta, data, modelconfig, trainer)
@@ -136,7 +356,9 @@ def gnn_modelnet_classification(name="10") -> None:
             )
 
 
-def manifold_classification() -> None:
+def manifold_classification(
+    experiment_folder="experiment", trainer=None, meta=None
+) -> None:
     """
     This experiment trains a ect cnn and linear model to distinguish
     three classes,
@@ -149,26 +371,20 @@ def manifold_classification() -> None:
         - ECTCNN
     """
 
-    experiment = "./experiment/manifold_classification"
+    experiment = f"./{experiment_folder}/manifold_classification"
     create_experiment_folder(experiment)
 
-    # Create meta data
-    meta = Meta("desct-test-new")
-
-    # Create Trainer Config
-    trainer = TrainerConfig(lr=0.0001, num_epochs=100)
-
     modules = [
-        "models.ect_cnn_points",
-        "models.ect_cnn_edges",
-        "models.ect_linear_points",
-        "models.ect_linear_edges",
+        # "models.ect_cnn_points",
+        # "models.ect_cnn_edges",
+        # "models.ect_linear_points",
+        # "models.ect_linear_edges",
+        "models.ect_linear_faces",
+        "models.ect_cnn_faces",
     ]
 
     # Create the dataset config.
-    data = ManifoldDataModuleConfig(
-        module="datasets.manifold",
-    )
+    data = ManifoldDataModuleConfig(module="datasets.manifold", batch_size=32)
 
     for module in modules:
         # Create linear points model config
@@ -180,56 +396,53 @@ def manifold_classification() -> None:
         )
 
 
-def theta_sweep():
-    """
-    This experiment trains two models with varying number of angles used.
-    The configs are stored in separate folders so the two experiments
-    can be ran independently (it takes a while).
-
-    The models are trained on the mnist super pixel dataset
-    """
-
-    experiment = "./experiment/theta_sweep"
+def theta_sweep(experiment_folder="experiment", trainer=None, meta=None):
+    experiment = f"./{experiment_folder}/theta_sweep"
     create_experiment_folder(experiment)
 
-    # Create meta data
-    meta = Meta("desct-test-new")
-    # Create Trainer Config
-    trainer = TrainerConfig(lr=0.0001, num_epochs=100)
-
     modules = [
-        "models.ect_cnn_points",
-        "models.ect_cnn_edges",
         "models.ect_linear_points",
-        "models.ect_linear_edges",
     ]
 
     # Create the dataset config.
     data = GNNBenchmarkDataModuleConfig(
-        module="datasets.gnn_benchmark",
-        name="MNIST",
+        module="datasets.gnn_benchmark", name="MNIST", pin_memory=False
     )
 
     for module in modules:
-        for theta in range(5, 55, 5):
+        for theta in range(1, 32):
             # Create linear points model config
-            modelconfig = ECTModelConfig(
-                module=module,
-                num_thetas=theta,
-            )
+            modelconfig = ECTModelConfig(module=module, num_thetas=theta, hidden=100)
 
             config = Config(meta, data, modelconfig, trainer)
             save_config(
                 config,
-                os.path.join(experiment, f"{module.split(sep='.')[1]}_{theta}.yaml"),
+                os.path.join(
+                    experiment, f"{module.split(sep='.')[1]}_{theta:03d}.yaml"
+                ),
             )
 
 
 if __name__ == "__main__":
-    tu_letter_high_classification()
-    gnn_classification("MNIST")
-    gnn_classification("CIFAR10")
-    gnn_modelnet_classification("10")
-    gnn_modelnet_classification("40")
-    manifold_classification()
-    theta_sweep()
+    # Create Trainer Config
+
+    trainer = TrainerConfig(lr=0.001, num_epochs=100, num_reruns=5)
+    # Create meta data
+    meta = Meta("desct-test-new")
+    experiment_folder = "experiment"
+
+    tu_proteins(experiment_folder, trainer, meta)
+    tu_dd(experiment_folder, trainer, meta)
+    tu_enzymes(experiment_folder, trainer, meta)
+    tu_imdb_b(experiment_folder, trainer, meta)
+    tu_reddit_b(experiment_folder, trainer, meta)
+    tu_letter_high_classification(experiment_folder, trainer, meta)
+    tu_letter_med_classification(experiment_folder, trainer, meta)
+    tu_letter_low_classification(experiment_folder, trainer, meta)
+
+    gnn_classification("MNIST", experiment_folder, trainer, meta)
+    gnn_classification("CIFAR10", experiment_folder, trainer, meta)
+    # gnn_modelnet_classification("10", experiment_folder, trainer, meta)
+    # gnn_modelnet_classification("40", experiment_folder, trainer, meta)
+    # manifold_classification(experiment_folder, trainer, meta)
+    # theta_sweep(experiment_folder, trainer, meta)

@@ -1,0 +1,26 @@
+meta:
+  name: desct-test-new
+  project: desct
+  tags: []
+  experiment_folder: experiment
+data:
+  module: datasets.gnn_benchmark
+  root: ./data
+  num_workers: 0
+  batch_size: 256
+  pin_memory: false
+  drop_last: false
+  name: PATTERN
+model:
+  module: models.ect_cnn_points
+  num_thetas: 32
+  bump_steps: 32
+  batch_size: 128
+  R: 1.1
+  num_features: 3
+  num_classes: 2
+  hidden: 100
+trainer:
+  lr: 0.001
+  num_epochs: 100
+  num_reruns: 5

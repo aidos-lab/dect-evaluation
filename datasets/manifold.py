@@ -32,8 +32,9 @@ class ManifoldDataModuleConfig(DataModuleConfig):
 def read_ply(path):
     mesh = trimesh.load_mesh(path)
     pos = torch.from_numpy(mesh.vertices).to(torch.float)
+    edge = torch.from_numpy(mesh.edges).to(torch.long).t()
     face = torch.from_numpy(mesh.faces).to(torch.long).t()
-    return Data(pos=pos, face=face)
+    return Data(pos=pos, edge_index=edge, face_index=face)
 
 
 class ManifoldDataModule(DataModule):

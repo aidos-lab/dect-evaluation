@@ -15,6 +15,7 @@ class Meta:
     name: str
     project: str = "desct"
     tags: list[str] = field(default_factory=list)
+    experiment_folder: str = "experiment"
 
 
 #  ╭──────────────────────────────────────────────────────────╮
@@ -42,3 +43,4 @@ class ModelConfig:
 class TrainerConfig:
     lr: float = 0.001
     num_epochs: int = 200
+    num_reruns: int = 1

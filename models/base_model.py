@@ -17,4 +17,4 @@ class ECTModelConfig:
     R: float = 1.1
     num_features: int = 3
     num_classes: int = 10
-    hidden: int = 100
+    hidden: int = 50
