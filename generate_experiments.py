@@ -55,7 +55,7 @@ def ogb_mol(experiment_folder="experiment", trainer=None, meta=None) -> None:
 
     for module in modules:
         modelconfig = ECTModelConfig(
-            module=module, num_features=1, num_classes=2, num_thetas=32, bump_steps=32
+            module=module, num_features=9, num_classes=2, num_thetas=32, bump_steps=32
         )
 
         config = Config(meta, data, modelconfig, trainer)
@@ -432,17 +432,18 @@ if __name__ == "__main__":
     meta = Meta("desct-test-new")
     experiment_folder = "experiment"
 
-    tu_proteins(experiment_folder, trainer, meta)
-    tu_dd(experiment_folder, trainer, meta)
-    tu_enzymes(experiment_folder, trainer, meta)
-    tu_imdb_b(experiment_folder, trainer, meta)
-    tu_reddit_b(experiment_folder, trainer, meta)
-    tu_letter_high_classification(experiment_folder, trainer, meta)
-    tu_letter_med_classification(experiment_folder, trainer, meta)
-    tu_letter_low_classification(experiment_folder, trainer, meta)
+    # tu_proteins(experiment_folder, trainer, meta)
+    # tu_dd(experiment_folder, trainer, meta)
+    # tu_enzymes(experiment_folder, trainer, meta)
+    # tu_imdb_b(experiment_folder, trainer, meta)
+    # tu_reddit_b(experiment_folder, trainer, meta)
+    # tu_letter_high_classification(experiment_folder, trainer, meta)
+    # tu_letter_med_classification(experiment_folder, trainer, meta)
+    # tu_letter_low_classification(experiment_folder, trainer, meta)
 
-    gnn_classification("MNIST", experiment_folder, trainer, meta)
-    gnn_classification("CIFAR10", experiment_folder, trainer, meta)
+    ogb_mol(experiment_folder, trainer, meta)
+    # gnn_classification("MNIST", experiment_folder, trainer, meta)
+    # gnn_classification("CIFAR10", experiment_folder, trainer, meta)
     # gnn_modelnet_classification("10", experiment_folder, trainer, meta)
     # gnn_modelnet_classification("40", experiment_folder, trainer, meta)
     # manifold_classification(experiment_folder, trainer, meta)

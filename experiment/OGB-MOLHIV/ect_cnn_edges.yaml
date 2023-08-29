@@ -4,24 +4,23 @@ meta:
   tags: []
   experiment_folder: experiment
 data:
-  module: datasets.tu
+  module: datasets.ogb
   root: ./data
   num_workers: 0
   batch_size: 64
   pin_memory: true
   drop_last: false
-  name: Letter-high
-  cleaned: false
+  name: ogbg-molhiv
 model:
   module: models.ect_cnn_edges
   num_thetas: 32
   bump_steps: 32
   batch_size: 128
   R: 1.1
-  num_features: 2
-  num_classes: 15
-  hidden: 100
+  num_features: 9
+  num_classes: 2
+  hidden: 50
 trainer:
   lr: 0.001
-  num_epochs: 150
+  num_epochs: 100
   num_reruns: 5
