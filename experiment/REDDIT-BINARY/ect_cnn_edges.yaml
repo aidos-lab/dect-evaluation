@@ -21,7 +21,7 @@ model:
   R: 1.1
   num_features: 1
   num_classes: 2
-  hidden: 100
+  hidden: 50
 trainer:
   lr: 0.001
   num_epochs: 100

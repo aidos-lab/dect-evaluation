@@ -40,7 +40,7 @@ class ECTCNNEdgesModel(BaseModel):
         self.linear3 = nn.Linear(config.hidden // 2, config.num_classes)
         # self.dropout1 = nn.Dropout()
         # self.dropout2 = nn.Dropout()
-        # self.dropout3 = nn.Dropout()
+        self.dropout3 = nn.Dropout()
 
     def forward(self, batch):
         x = self.ectlayer(batch)
@@ -53,7 +53,7 @@ class ECTCNNEdgesModel(BaseModel):
         # x = self.dropout2(x)
         x = self.linear2(x)
         x = nn.functional.relu(x)
-        # x = self.dropout3(x)
+        x = self.dropout3(x)
         x = self.linear3(x)
         return x
 
