@@ -1,0 +1,26 @@
+Average with bottlenecked model with 
+- 3 hidden layers depth 32*32, 50, 25.
+- No dropout
+-clearly overtraining 
+- clear
+ Final accuracy 0.751 with std 0.038.
+
+Average with bottlenecked model with 
+- 3 hidden layers depth 32*32, 50, 25.
+- 1layer dropout
+Final accuracy 0.781 with std 0.046.
+
+
+Average with bottlenecked model with 
+- 3 hidden layers depth 32*32, 50, 25.
+- 2 layer dropout
+Final accuracy 0.783 with std 0.042.
+
+
+Average with bottlenecked model with 
+- 3 hidden layers depth 32*32, 50, 25.
+- 1 layer dropout
+- early stop epoch epochs loss increasing (total)
+Final accuracy 0.798 with std 0.051
+Final accuracy 0.790 with std 0.026.
+2023-08-29 10:19:07,925 - INFO - Final accuracy 0.802 with std 0.027.
