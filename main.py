@@ -13,6 +13,25 @@ torch.cuda.empty_cache()
 mylogger = Logger()
 
 
+class EarlyStopper:
+    def __init__(self, patience=5, min_delta=0):
+        self.patience = patience
+        self.min_delta = min_delta
+        self.counter = 0
+        self.min_validation_loss = torch.inf
+
+    def __call__(self, validation_loss):
+        if validation_loss < self.min_validation_loss:
+            self.min_validation_loss = validation_loss
+            self.counter = 0
+        elif validation_loss > (self.min_validation_loss + self.min_delta):
+            self.counter += 1
+            if self.counter >= self.patience:
+                print("stopped early")
+                return True
+        return False
+
+
 def clip_grad(model, max_norm):
     total_norm = 0
     for p in model.parameters():
@@ -60,6 +79,8 @@ class Experiment:
             gamma=0.1,
         )
 
+        self.early_stopper = EarlyStopper()
+
         self.accuracy_list = []
 
         # Log info
@@ -78,6 +99,13 @@ class Experiment:
         for epoch in range(self.config.trainer.num_epochs):
             self.run_epoch()
 
+            val_loss, _ = compute_acc(
+                self.model, self.dm.val_dataloader(), self.config.model.num_classes
+            )
+
+            # if self.early_stopper(val_loss):
+            #     break
+
             if epoch % 10 == 0:
                 end = time.time()
                 self.compute_metrics(epoch, end - start)
@@ -89,11 +117,6 @@ class Experiment:
         )
         self.accuracy_list.append(acc)
 
-        # # Compute confusion
-        # cfm = compute_confusion(self.model, self.dm.test_dataloader())
-
-        # Save angles
-        # torch.save(self.model.ectlayer.v, "test.pt")
         # Log statements
         self.logger.log(
             f"Test accuracy: {acc:.3f}",

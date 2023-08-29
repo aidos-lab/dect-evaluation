@@ -36,11 +36,11 @@ class ECTCNNEdgesModel(BaseModel):
             list(self.conv1(torch.rand(1, config.bump_steps, config.num_thetas)).shape),
         )
         self.linear1 = nn.Linear(num_features, config.hidden)
-        self.linear2 = nn.Linear(config.hidden, config.hidden)
-        self.linear3 = nn.Linear(config.hidden, config.num_classes)
+        self.linear2 = nn.Linear(config.hidden, config.hidden // 2)
+        self.linear3 = nn.Linear(config.hidden // 2, config.num_classes)
         # self.dropout1 = nn.Dropout()
         # self.dropout2 = nn.Dropout()
-        self.dropout3 = nn.Dropout()
+        # self.dropout3 = nn.Dropout()
 
     def forward(self, batch):
         x = self.ectlayer(batch)
@@ -53,7 +53,7 @@ class ECTCNNEdgesModel(BaseModel):
         # x = self.dropout2(x)
         x = self.linear2(x)
         x = nn.functional.relu(x)
-        x = self.dropout3(x)
+        # x = self.dropout3(x)
         x = self.linear3(x)
         return x
 
@@ -163,5 +163,5 @@ from loaders.factory import register
 
 
 def initialize():
-    # register("model", ECTCNNEdgesModel)
-    register("model", VGG16)
+    register("model", ECTCNNEdgesModel)
+    # register("model", VGG16)

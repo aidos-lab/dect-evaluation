@@ -7,6 +7,7 @@ from config import TrainerConfig, Meta, Config
 from datasets.gnn_benchmark import GNNBenchmarkDataModuleConfig
 from datasets.modelnet import ModelNetPointsDataModule, ModelNetDataModuleConfig
 from models.base_model import ECTModelConfig
+from main import compute_avg
 
 # from generate_experiments import (
 #     create_experiment_folder,
@@ -29,8 +30,13 @@ mylogger = Logger()
 
 
 def main():
-    exp = Experiment("ect_cnn.yaml", logger=mylogger, dev=True)
-    exp.run()
+    accs = []
+    for _ in range(5):
+        print("Running experiment", "ect_cnn_best.yaml")
+        exp = Experiment("ect_cnn_best.yaml", logger=mylogger, dev=True)
+        loss, acc = exp.run()
+        accs.append(acc)
+    compute_avg(torch.tensor(accs))
 
 
 if __name__ == "__main__":
