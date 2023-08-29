@@ -7,7 +7,7 @@ data:
   module: datasets.tu
   root: ./data
   num_workers: 0
-  batch_size: 64
+  batch_size: 128
   pin_memory: true
   drop_last: false
   name: PROTEINS_full
@@ -15,8 +15,8 @@ data:
   use_node_attr: true
 model:
   module: models.ect_cnn_edges
-  num_thetas: 64
-  bump_steps: 64
+  num_thetas: 32
+  bump_steps: 32
   batch_size: 128
   R: 1.1
   num_features: 32
