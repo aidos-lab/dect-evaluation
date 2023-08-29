@@ -24,4 +24,4 @@ model:
   hidden: 50 
 trainer:
   lr: 0.001
-  num_epochs: 150
+  num_epochs: 100
