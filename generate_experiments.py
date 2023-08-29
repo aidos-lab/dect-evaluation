@@ -161,9 +161,7 @@ def tu_letter_med_classification(
 
     for module in modules:
         modelconfig = ECTModelConfig(
-            module=module,
-            num_features=2,
-            num_classes=15,
+            module=module, num_features=2, num_classes=15, hidden=100
         )
 
         config = Config(meta, data, modelconfig, trainer)
