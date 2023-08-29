@@ -23,5 +23,5 @@ model:
   hidden: 100
 trainer:
   lr: 0.001
-  num_epochs: 100
+  num_epochs: 150
   num_reruns: 5

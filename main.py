@@ -14,7 +14,7 @@ mylogger = Logger()
 
 
 class EarlyStopper:
-    def __init__(self, patience=5, min_delta=0):
+    def __init__(self, patience=15, min_delta=0.01):
         self.patience = patience
         self.min_delta = min_delta
         self.counter = 0
@@ -170,15 +170,15 @@ def compute_avg(acc: torch.Tensor):
 
 def main():
     experiments = [
-        "DD",
-        "ENZYMES",
+        # "DD",
+        # "ENZYMES",
         # "IMDB-BINARY",
         "Letter-high",
-        "Letter-med",
-        "Letter-low",
+        # "Letter-med",
+        # "Letter-low",
         # "gnn_mnist_classification",
         # "gnn_cifar10_classification",
-        "PROTEINS_full",
+        # "PROTEINS_full",
         # "REDDIT-BINARY",
     ]
     # experiments = [

@@ -184,15 +184,13 @@ def tu_letter_high_classification(
         # "models.ect_linear_points",
         # "models.ect_linear_edges",
     ]
-
+    trainer = TrainerConfig(lr=0.001, num_epochs=150, num_reruns=5)
     # Create the dataset config.
     data = TULetterHighConfig(batch_size=32)
 
     for module in modules:
         modelconfig = ECTModelConfig(
-            module=module,
-            num_features=2,
-            num_classes=15,
+            module=module, num_features=2, num_classes=15, hidden=100
         )
 
         config = Config(meta, data, modelconfig, trainer)
