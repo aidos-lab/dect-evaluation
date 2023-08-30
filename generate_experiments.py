@@ -15,6 +15,8 @@ from datasets.tu import (
     TULetterHighConfig,
     TULetterLowConfig,
     TULetterMedConfig,
+    TUNCI1Config,
+    TUNCI109Config,
 )
 from models.base_model import ECTModelConfig
 from config import Config, TrainerConfig, Meta
@@ -37,6 +39,86 @@ def save_config(cfg, path):
     #  ╭──────────────────────────────────────────────────────────╮
     #  │ Experiments                                              │
     #  ╰──────────────────────────────────────────────────────────╯
+
+
+# def tu_bbbp(experiment_folder="experiment", trainer=None, meta=None) -> None:
+#     experiment = f"./{experiment_folder}/BBBP"
+#     create_experiment_folder(experiment)
+
+#     modules = [
+#         # "models.ect_cnn_points",
+#         "models.ect_cnn_edges",
+#         # "models.ect_linear_points",
+#         # "models.ect_linear_edges",
+#     ]
+
+#     # Create the dataset config.
+#     data = TUNCI1Config()
+
+#     for module in modules:
+#         modelconfig = ECTModelConfig(
+#             module=module, num_features=30, num_classes=2, num_thetas=32, bump_steps=32
+#         )
+
+#         config = Config(meta, data, modelconfig, trainer)
+#         save_config(
+#             config, os.path.join(experiment, f"{module.split(sep='.')[1]}.yaml")
+#         )
+
+
+def tu_nci1(experiment_folder="experiment", trainer=None, meta=None) -> None:
+    experiment = f"./{experiment_folder}/nci1"
+    create_experiment_folder(experiment)
+
+    modules = [
+        # "models.ect_cnn_points",
+        "models.ect_cnn_edges",
+        # "models.ect_linear_points",
+        # "models.ect_linear_edges",
+    ]
+    trainer = TrainerConfig(lr=0.001, num_epochs=100, num_reruns=5)
+    # Create the dataset config.
+    data = TUNCI1Config()
+
+    for module in modules:
+        modelconfig = ECTModelConfig(
+            module=module, num_features=30, num_classes=2, num_thetas=32, bump_steps=32
+        )
+
+        config = Config(meta, data, modelconfig, trainer)
+        save_config(
+            config, os.path.join(experiment, f"{module.split(sep='.')[1]}.yaml")
+        )
+
+
+def tu_nci109(experiment_folder="experiment", trainer=None, meta=None) -> None:
+    experiment = f"./{experiment_folder}/nci109"
+    create_experiment_folder(experiment)
+    trainer = TrainerConfig(lr=0.001, num_epochs=500, num_reruns=5)
+    modules = [
+        # "models.ect_cnn_points",
+        "models.ect_cnn_edges",
+        # "models.ect_linear_points",
+        # "models.ect_linear_edges",
+    ]
+
+    # Create the dataset config.
+    data = TUNCI109Config(batch_size=64)
+
+    for module in modules:
+        modelconfig = ECTModelConfig(
+            module=module,
+            num_features=36,
+            num_classes=2,
+            num_thetas=64,
+            bump_steps=64,
+            hidden=50,
+        )
+
+        config = Config(meta, data, modelconfig, trainer)
+        save_config(
+            config, os.path.join(experiment, f"{module.split(sep='.')[1]}.yaml")
+        )
 
 
 def ogb_mol(experiment_folder="experiment", trainer=None, meta=None) -> None:
@@ -427,11 +509,12 @@ def theta_sweep(experiment_folder="experiment", trainer=None, meta=None):
 if __name__ == "__main__":
     # Create Trainer Config
 
-    trainer = TrainerConfig(lr=0.001, num_epochs=100, num_reruns=5)
+    trainer = TrainerConfig(lr=0.01, num_epochs=100, num_reruns=5)
     # Create meta data
     meta = Meta("desct-test-new")
     experiment_folder = "experiment"
-
+    tu_nci1(experiment_folder, trainer, meta)
+    tu_nci109(experiment_folder, trainer, meta)
     # tu_proteins(experiment_folder, trainer, meta)
     # tu_dd(experiment_folder, trainer, meta)
     # tu_enzymes(experiment_folder, trainer, meta)
@@ -441,7 +524,7 @@ if __name__ == "__main__":
     # tu_letter_med_classification(experiment_folder, trainer, meta)
     # tu_letter_low_classification(experiment_folder, trainer, meta)
 
-    ogb_mol(experiment_folder, trainer, meta)
+    # ogb_mol(experiment_folder, trainer, meta)
     # gnn_classification("MNIST", experiment_folder, trainer, meta)
     # gnn_classification("CIFAR10", experiment_folder, trainer, meta)
     # gnn_modelnet_classification("10", experiment_folder, trainer, meta)

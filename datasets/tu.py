@@ -28,6 +28,14 @@ class CenterTransform(object):
         return data
 
 
+class Normalize(object):
+    def __call__(self, data):
+        mean = data.x.mean()
+        std = data.x.std()
+        data.x = (data.x - mean) / std
+        return data
+
+
 class NormalizedDegree(object):
     def __init__(self, mean, std):
         self.mean = mean
@@ -52,6 +60,8 @@ transforms_dict = {
         NormalizedDegree(2.31, 20.66),
         CenterTransform(),
     ],
+    "NCI1": [CenterTransform()],
+    "NCI109": [],
 }
 
 #  ╭──────────────────────────────────────────────────────────╮
@@ -63,6 +73,30 @@ transforms_dict = {
 Define the dataset classes, provide dataset/dataloader parameters 
 in the config file or overwrite them in the class definition.
 """
+
+
+@dataclass
+class TUBBBPConfig(DataModuleConfig):
+    module: str = "datasets.tu"
+    name: str = "BBBP"
+    cleaned: bool = True
+    use_node_attr: bool = True
+
+
+@dataclass
+class TUNCI109Config(DataModuleConfig):
+    module: str = "datasets.tu"
+    name: str = "NCI109"
+    cleaned: bool = True
+    use_node_attr: bool = True
+
+
+@dataclass
+class TUNCI1Config(DataModuleConfig):
+    module: str = "datasets.tu"
+    name: str = "NCI1"
+    cleaned: bool = True
+    use_node_attr: bool = True
 
 
 @dataclass
@@ -158,11 +192,11 @@ class TUDataModule(DataModule):
         inter_ds, self.test_ds = random_split(
             self.entire_ds,
             [
-                int(0.9 * len(self.entire_ds)),
-                len(self.entire_ds) - int(0.9 * len(self.entire_ds)),
+                int(0.8 * len(self.entire_ds)),
+                len(self.entire_ds) - int(0.8 * len(self.entire_ds)),
             ],
         )  # type: ignore
-        self.train_ds, self.val_ds = random_split(inter_ds, [int(0.9 * len(inter_ds)), len(inter_ds) - int(0.9 * len(inter_ds))])  # type: ignore
+        self.train_ds, self.val_ds = random_split(inter_ds, [int(0.8 * len(inter_ds)), len(inter_ds) - int(0.8 * len(inter_ds))])  # type: ignore
 
 
 def initialize():

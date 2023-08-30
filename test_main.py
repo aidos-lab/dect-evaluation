@@ -31,11 +31,10 @@ mylogger = Logger()
 
 def main():
     accs = []
-    for _ in range(5):
-        print("Running experiment", "ect_cnn_best.yaml")
-        exp = Experiment("ect_cnn_best.yaml", logger=mylogger, dev=True)
-        loss, acc = exp.run()
-        accs.append(acc)
+    print("Running experiment", "ect_cnn_best.yaml")
+    exp = Experiment("ect_cnn_best.yaml", logger=mylogger, dev=True)
+    loss, acc = exp.run()
+    accs.append(acc)
     compute_avg(torch.tensor(accs))
 
 

@@ -25,10 +25,13 @@ class ECTCNNEdgesModel(BaseModel):
         super().__init__(config)
         self.ectlayer = EctPointsLayer(config)
         geotorch.constraints.sphere(self.ectlayer, "v")
+
         self.conv1 = nn.Sequential(
             nn.Conv2d(1, 8, kernel_size=3),
+            # nn.BatchNorm1d(30),
             nn.MaxPool2d(2),
             nn.Conv2d(8, 16, kernel_size=3),
+            # nn.BatchNorm2d(13),
             nn.MaxPool2d(2),
         )
         num_features = functools.reduce(
@@ -41,9 +44,11 @@ class ECTCNNEdgesModel(BaseModel):
         # self.dropout1 = nn.Dropout()
         # self.dropout2 = nn.Dropout()
         self.dropout3 = nn.Dropout()
+        # self.layer_norm = nn.LayerNorm([32, 32])
 
     def forward(self, batch):
         x = self.ectlayer(batch)
+        # x = self.layer_norm(x)
         x = x.unsqueeze(1)
         """ x = x / torch.max(torch.abs(x)) """
         x = self.conv1(x)
