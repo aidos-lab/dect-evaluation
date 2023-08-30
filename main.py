@@ -170,7 +170,7 @@ def main():
         # "DD",
         # "ENZYMES",
         # "IMDB-BINARY",
-        "Letter-high",
+        # "Letter-high",
         # "Letter-med",
         # "Letter-low",
         # "gnn_mnist_classification",
@@ -178,6 +178,8 @@ def main():
         # "PROTEINS_full",
         # "REDDIT-BINARY",
         # "OGB-MOLHIV"
+        # "nci1",
+        "nci109",
     ]
 
     for experiment in experiments:
