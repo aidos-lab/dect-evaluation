@@ -23,7 +23,7 @@ from dataclasses import dataclass
 class ECTCNNEdgesModel(BaseModel):
     def __init__(self, config):
         super().__init__(config)
-        self.ectlayer = EctPointsLayer(config)
+        self.ectlayer = EctEdgesLayer(config)
         geotorch.constraints.sphere(self.ectlayer, "v")
 
         self.conv1 = nn.Sequential(
@@ -39,8 +39,8 @@ class ECTCNNEdgesModel(BaseModel):
             list(self.conv1(torch.rand(1, config.bump_steps, config.num_thetas)).shape),
         )
         self.linear1 = nn.Linear(num_features, config.hidden)
-        self.linear2 = nn.Linear(config.hidden, config.hidden // 2)
-        self.linear3 = nn.Linear(config.hidden // 2, config.num_classes)
+        self.linear2 = nn.Linear(config.hidden, config.hidden)
+        self.linear3 = nn.Linear(config.hidden, config.num_classes)
         # self.dropout1 = nn.Dropout()
         # self.dropout2 = nn.Dropout()
         self.dropout3 = nn.Dropout()
