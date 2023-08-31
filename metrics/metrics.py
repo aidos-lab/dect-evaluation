@@ -37,6 +37,7 @@ def compute_acc(model, loader, num_classes=None):
             batch_gpu, y_gpu = batch.to(device), batch.y.to(device)
             logits = model(batch_gpu)
             loss += loss_fn(logits, y_gpu)
+            auroc(logits, y_gpu)
             acc(logits, y_gpu)
     a = acc.compute()
     roc = auroc.compute()
