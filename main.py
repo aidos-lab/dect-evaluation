@@ -106,14 +106,14 @@ class Experiment:
                 start = time.time()
 
         # Compute test accuracy
-        loss, acc = compute_acc(
+        loss, acc, roc = compute_acc(
             self.model, self.dm.test_dataloader(), self.config.model.num_classes
         )
         self.accuracy_list.append(acc)
 
         # Log statements
         self.logger.log(
-            f"Test accuracy: {acc:.3f}",
+            f"Test accuracy: {acc:.3f}, {roc:.3f}",
             params={
                 # "thetas": self.config.model.num_thetas,
                 "test_acc": acc,
@@ -133,23 +133,23 @@ class Experiment:
             clip_grad(self.model, 5)
             self.optimizer.step()
 
-        val_loss, _ = compute_acc(
+        val_loss, _, _ = compute_acc(
             self.model, self.dm.val_dataloader(), self.config.model.num_classes
         )
         # self.scheduler.step(val_loss)
         del batch_gpu, y_gpu, pred, loss
 
     def compute_metrics(self, epoch, run_time):
-        val_loss, val_acc = compute_acc(
+        val_loss, val_acc, val_roc = compute_acc(
             self.model, self.dm.val_dataloader(), self.config.model.num_classes
         )
-        train_loss, train_acc = compute_acc(
+        train_loss, train_acc, _ = compute_acc(
             self.model, self.dm.train_dataloader(), self.config.model.num_classes
         )
 
         # Log statements to console
         self.logger.log(
-            msg=f"epoch {epoch} | Train Loss {train_loss.item():.3f} | Val Loss {val_loss.item():.3f} | Train Accuracy {train_acc:.3f} | Val Accuracy {val_acc:.3f} | Run time {run_time:.2f} ",
+            msg=f"epoch {epoch} | Train Loss {train_loss.item():.3f} | Val Loss {val_loss.item():.3f} | Train Accuracy {train_acc:.3f} | Val Accuracy {val_acc:.3f} | Val roc {val_roc:.3f}|Run time {run_time:.2f} ",
             params={"epoch": epoch, "val_acc": val_acc},
         )
 
@@ -179,13 +179,18 @@ def main():
         # "REDDIT-BINARY",
         # "OGB-MOLHIV"
         # "nci1",
-        "nci109",
+        # "nci109",
+        "dhfr",
+        "fingerprint",
+        "frankenstein",
+        "cox2",
+        "bzr",
     ]
 
     for experiment in experiments:
         for config in listdir(f"./experiment/{experiment}"):
             accs = []
-            for _ in range(5):
+            for _ in range(1):
                 print("Running experiment", experiment, config)
                 exp = Experiment(config, logger=mylogger, dev=True)
                 loss, acc = exp.run()
