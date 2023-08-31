@@ -74,6 +74,13 @@ transforms_dict = {
     ],
     "NCI1": [NCI109Transform(), CenterTransform()],
     "NCI109": [],
+    "BZR": [CenterTransform()],
+    "COX2": [CenterTransform()],
+    "FRANKENSTEIN": [CenterTransform()],
+    "Fingerprint": [CenterTransform()],
+    "Cuneiform": [CenterTransform()],
+    "COLLAB": [CenterTransform()],
+    "DHFR": [CenterTransform()],
 }
 
 #  ╭──────────────────────────────────────────────────────────╮
@@ -85,6 +92,62 @@ transforms_dict = {
 Define the dataset classes, provide dataset/dataloader parameters 
 in the config file or overwrite them in the class definition.
 """
+
+
+@dataclass
+class TUBZRConfig(DataModuleConfig):
+    module: str = "datasets.tu"
+    name: str = "BZR"
+    cleaned: bool = True
+    use_node_attr: bool = True
+
+
+@dataclass
+class TUCOX2Config(DataModuleConfig):
+    module: str = "datasets.tu"
+    name: str = "COX2"
+    cleaned: bool = True
+    use_node_attr: bool = True
+
+
+@dataclass
+class TUFrankensteinConfig(DataModuleConfig):
+    module: str = "datasets.tu"
+    name: str = "FRANKENSTEIN"
+    cleaned: bool = True
+    use_node_attr: bool = True
+
+
+@dataclass
+class TUFingerprintConfig(DataModuleConfig):
+    module: str = "datasets.tu"
+    name: str = "Fingerprint"
+    cleaned: bool = True
+    use_node_attr: bool = True
+
+
+@dataclass
+class TUCuneiformConfig(DataModuleConfig):
+    module: str = "datasets.tu"
+    name: str = "Cuneiform"
+    cleaned: bool = True
+    use_node_attr: bool = True
+
+
+@dataclass
+class TUCollabConfig(DataModuleConfig):
+    module: str = "datasets.tu"
+    name: str = "COLLAB"
+    cleaned: bool = True
+    use_node_attr: bool = True
+
+
+@dataclass
+class TUDHFRConfig(DataModuleConfig):
+    module: str = "datasets.tu"
+    name: str = "DHFR"
+    cleaned: bool = True
+    use_node_attr: bool = True
 
 
 @dataclass

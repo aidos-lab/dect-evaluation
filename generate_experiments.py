@@ -17,6 +17,11 @@ from datasets.tu import (
     TULetterMedConfig,
     TUNCI1Config,
     TUNCI109Config,
+    TUBZRConfig,
+    TUCOX2Config,
+    TUFrankensteinConfig,
+    TUFingerprintConfig,
+    TUDHFRConfig,
 )
 from models.base_model import ECTModelConfig
 from config import Config, TrainerConfig, Meta
@@ -64,6 +69,121 @@ def save_config(cfg, path):
 #         save_config(
 #             config, os.path.join(experiment, f"{module.split(sep='.')[1]}.yaml")
 #         )
+
+# ,
+# TUFrankensteinConfig,
+# TUFingerprintConfig,
+# TUDHFRConfig,
+
+
+def tu_dhfr(experiment_folder="experiment", trainer=None, meta=None) -> None:
+    experiment = f"./{experiment_folder}/dhfr"
+    create_experiment_folder(experiment)
+
+    modules = [
+        "models.ect_cnn_edges",
+    ]
+    # trainer = TrainerConfig(lr=0.001, num_epochs=100, num_reruns=5)
+    # Create the dataset config.
+    data = TUDHFRConfig()
+
+    for module in modules:
+        modelconfig = ECTModelConfig(
+            module=module, num_features=38, num_classes=2, num_thetas=32, bump_steps=32
+        )
+
+        config = Config(meta, data, modelconfig, trainer)
+        save_config(
+            config, os.path.join(experiment, f"{module.split(sep='.')[1]}.yaml")
+        )
+
+
+def tu_fingerprint(experiment_folder="experiment", trainer=None, meta=None) -> None:
+    experiment = f"./{experiment_folder}/fingerprint"
+    create_experiment_folder(experiment)
+
+    modules = [
+        "models.ect_cnn_edges",
+    ]
+    # trainer = TrainerConfig(lr=0.001, num_epochs=100, num_reruns=5)
+    # Create the dataset config.
+    data = TUFingerprintConfig()
+
+    for module in modules:
+        modelconfig = ECTModelConfig(
+            module=module, num_features=2, num_classes=6, num_thetas=32, bump_steps=32
+        )
+
+        config = Config(meta, data, modelconfig, trainer)
+        save_config(
+            config, os.path.join(experiment, f"{module.split(sep='.')[1]}.yaml")
+        )
+
+
+def tu_frankenstein(experiment_folder="experiment", trainer=None, meta=None) -> None:
+    experiment = f"./{experiment_folder}/frankenstein"
+    create_experiment_folder(experiment)
+
+    modules = [
+        "models.ect_cnn_edges",
+    ]
+    # trainer = TrainerConfig(lr=0.001, num_epochs=100, num_reruns=5)
+    # Create the dataset config.
+    data = TUFrankensteinConfig()
+
+    for module in modules:
+        modelconfig = ECTModelConfig(
+            module=module, num_features=780, num_classes=2, num_thetas=32, bump_steps=32
+        )
+
+        config = Config(meta, data, modelconfig, trainer)
+        save_config(
+            config, os.path.join(experiment, f"{module.split(sep='.')[1]}.yaml")
+        )
+
+
+def tu_cox2(experiment_folder="experiment", trainer=None, meta=None) -> None:
+    experiment = f"./{experiment_folder}/cox2"
+    create_experiment_folder(experiment)
+
+    modules = [
+        "models.ect_cnn_edges",
+    ]
+    # trainer = TrainerConfig(lr=0.001, num_epochs=100, num_reruns=5)
+    # Create the dataset config.
+    data = TUCOX2Config()
+
+    for module in modules:
+        modelconfig = ECTModelConfig(
+            module=module, num_features=38, num_classes=2, num_thetas=32, bump_steps=32
+        )
+
+        config = Config(meta, data, modelconfig, trainer)
+        save_config(
+            config, os.path.join(experiment, f"{module.split(sep='.')[1]}.yaml")
+        )
+
+
+def tu_bzr(experiment_folder="experiment", trainer=None, meta=None) -> None:
+    experiment = f"./{experiment_folder}/bzr"
+    create_experiment_folder(experiment)
+
+    modules = [
+        "models.ect_cnn_edges",
+    ]
+    # trainer = TrainerConfig(lr=0.001, num_epochs=100, num_reruns=5)
+    # Create the dataset config.
+    data = TUBZRConfig()
+
+    for module in modules:
+        modelconfig = ECTModelConfig(
+            module=module, num_features=38, num_classes=2, num_thetas=32, bump_steps=32
+        )
+
+        config = Config(meta, data, modelconfig, trainer)
+        save_config(
+            config, os.path.join(experiment, f"{module.split(sep='.')[1]}.yaml")
+        )
 
 
 def tu_nci1(experiment_folder="experiment", trainer=None, meta=None) -> None:
@@ -509,12 +629,18 @@ def theta_sweep(experiment_folder="experiment", trainer=None, meta=None):
 if __name__ == "__main__":
     # Create Trainer Config
 
-    trainer = TrainerConfig(lr=0.01, num_epochs=100, num_reruns=5)
+    trainer = TrainerConfig(lr=0.001, num_epochs=20, num_reruns=5)
     # Create meta data
     meta = Meta("desct-test-new")
     experiment_folder = "experiment"
-    tu_nci1(experiment_folder, trainer, meta)
-    tu_nci109(experiment_folder, trainer, meta)
+    tu_bzr(experiment_folder, trainer, meta)
+    tu_cox2(experiment_folder, trainer, meta)
+    tu_frankenstein(experiment_folder, trainer, meta)
+    tu_fingerprint(experiment_folder, trainer, meta)
+    tu_dhfr(experiment_folder, trainer, meta)
+
+    # tu_nci1(experiment_folder, trainer, meta)
+    # tu_nci109(experiment_folder, trainer, meta)
     # tu_proteins(experiment_folder, trainer, meta)
     # tu_dd(experiment_folder, trainer, meta)
     # tu_enzymes(experiment_folder, trainer, meta)
