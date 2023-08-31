@@ -10,6 +10,7 @@ from torch_geometric import transforms
 from loaders.factory import register
 from torch_geometric.transforms import OneHotDegree
 from torch_geometric.utils import degree
+from torch_geometric.utils import degree
 
 
 #  ╭──────────────────────────────────────────────────────────╮
@@ -48,6 +49,17 @@ class NormalizedDegree(object):
         return data
 
 
+class NCI109Transform(object):
+    def __call__(self, data):
+        deg = degree(data.edge_index[0], dtype=torch.float).unsqueeze(0).T
+        atom_number = torch.argmax(data.x, dim=-1, keepdim=True)
+        data.x = torch.hstack([deg, atom_number])
+        # print(deg)
+        # print(atom_number)
+        # print()
+        return data
+
+
 transforms_dict = {
     "DD": [CenterTransform()],
     "ENZYMES": [CenterTransform()],
@@ -60,7 +72,7 @@ transforms_dict = {
         NormalizedDegree(2.31, 20.66),
         CenterTransform(),
     ],
-    "NCI1": [CenterTransform()],
+    "NCI1": [NCI109Transform(), CenterTransform()],
     "NCI109": [],
 }
 

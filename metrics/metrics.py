@@ -1,6 +1,6 @@
 import torch
 from sklearn.metrics import confusion_matrix
-from torchmetrics.classification import MulticlassAccuracy
+from torchmetrics.classification import MulticlassAccuracy, BinaryAUROC
 
 
 def compute_confusion(model, loader):
@@ -29,6 +29,7 @@ def compute_acc(model, loader, num_classes=None):
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     model = model.eval()
     acc = torchmetrics.Accuracy(task="multiclass", num_classes=num_classes).to(device)
+    auroc = BinaryAUROC().to(device)
     loss_fn = torch.nn.CrossEntropyLoss()
     loss = torch.tensor([0.0], device=device)
     with torch.no_grad():
@@ -38,5 +39,7 @@ def compute_acc(model, loader, num_classes=None):
             loss += loss_fn(logits, y_gpu)
             acc(logits, y_gpu)
     a = acc.compute()
+    roc = auroc.compute()
     acc.reset()
-    return loss, a
+    roc.reset()
+    return loss, a, roc

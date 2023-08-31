@@ -1,0 +1,27 @@
+meta:
+  name: desct-test-new
+  project: desct
+  tags: []
+  experiment_folder: experiment
+data:
+  module: datasets.tu
+  root: ./data
+  num_workers: 0
+  batch_size: 128
+  pin_memory: true
+  drop_last: false
+  name: NCI1
+  cleaned: true
+  use_node_attr: true
+model:
+  module: models.ect_best_model
+  num_thetas: 32
+  bump_steps: 32
+  batch_size: 64
+  R: 1.1
+  num_features: 2
+  num_classes: 2
+  hidden: 10 
+trainer:
+  lr: 0.001
+  num_epochs: 100
