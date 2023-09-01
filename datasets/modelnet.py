@@ -63,6 +63,7 @@ class ModelNetPointsDataModule(DataModule):
             [
                 transforms.SamplePoints(self.config.samplepoints),
                 Standardize(self.config.samplepoints),
+                CenterTransform(),
             ]
         )
         super().__init__(

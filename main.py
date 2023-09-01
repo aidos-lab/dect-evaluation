@@ -113,7 +113,7 @@ class Experiment:
 
         # Log statements
         self.logger.log(
-            f"Test accuracy: {acc:.3f}, {roc:.3f}",
+            f"Test accuracy: {acc:.3f}",
             params={
                 # "thetas": self.config.model.num_thetas,
                 "test_acc": acc,
@@ -150,7 +150,7 @@ class Experiment:
 
         # Log statements to console
         self.logger.log(
-            msg=f"epoch {epoch} | Train Loss {train_loss.item():.3f} | Val Loss {val_loss.item():.3f} | Train Accuracy {train_acc:.3f} | Val Accuracy {val_acc:.3f} | Val roc {val_roc:.3f}|Run time {run_time:.2f} ",
+            msg=f"epoch {epoch} | Train Loss {train_loss.item():.3f} | Val Loss {val_loss.item():.3f} | Train Accuracy {train_acc:.3f} | Val Accuracy {val_acc:.3f} | Run time {run_time:.2f} ",
             params={"epoch": epoch, "val_acc": val_acc},
         )
 
