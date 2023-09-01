@@ -29,7 +29,7 @@ def compute_acc(model, loader, num_classes=None):
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     model = model.eval()
     acc = torchmetrics.Accuracy(task="multiclass", num_classes=num_classes).to(device)
-    auroc = AUROC(task="multiclass", num_classes=num_classes).to(device)
+    # auroc = AUROC(task="multiclass", num_classes=num_classes).to(device)
     loss_fn = torch.nn.CrossEntropyLoss()
     loss = torch.tensor([0.0], device=device)
     with torch.no_grad():
@@ -37,10 +37,10 @@ def compute_acc(model, loader, num_classes=None):
             batch_gpu, y_gpu = batch.to(device), batch.y.to(device)
             logits = model(batch_gpu)
             loss += loss_fn(logits, y_gpu)
-            auroc(logits, y_gpu)
+            # auroc(logits, y_gpu)
             acc(logits, y_gpu)
     a = acc.compute()
-    roc = auroc.compute()
+    # roc = auroc.compute()
     acc.reset()
-    auroc.reset()
-    return loss, a, roc
+    # auroc.reset()
+    return loss, a, None
