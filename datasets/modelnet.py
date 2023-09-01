@@ -132,12 +132,11 @@ class ModelNetPointsDataModule(DataModule):
 class ModelNetMeshDataModule(DataModule):
     def __init__(self, config):
         self.config = config
+        self.pre_transform = transforms.Compose([ModelNetTransform()])
         super().__init__(
             config.root, config.batch_size, config.num_workers, config.pin_memory
         )
-        self.pre_transform = transforms.Compose(
-            [ModelNetTransform(), CenterTransform()]
-        )
+
         self.prepare_data()
         self.setup()
 

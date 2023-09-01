@@ -83,13 +83,18 @@ def tu_dhfr(experiment_folder="experiment", trainer=None, meta=None) -> None:
     modules = [
         "models.ect_cnn_edges",
     ]
-    # trainer = TrainerConfig(lr=0.001, num_epochs=100, num_reruns=5)
+    trainer = TrainerConfig(lr=0.001, num_epochs=200, num_reruns=5)
     # Create the dataset config.
     data = TUDHFRConfig()
 
     for module in modules:
         modelconfig = ECTModelConfig(
-            module=module, num_features=38, num_classes=2, num_thetas=32, bump_steps=32
+            module=module,
+            num_features=38,
+            num_classes=2,
+            num_thetas=32,
+            bump_steps=32,
+            hidden=40,
         )
 
         config = Config(meta, data, modelconfig, trainer)
@@ -107,11 +112,16 @@ def tu_fingerprint(experiment_folder="experiment", trainer=None, meta=None) -> N
     ]
     # trainer = TrainerConfig(lr=0.001, num_epochs=100, num_reruns=5)
     # Create the dataset config.
-    data = TUFingerprintConfig()
+    data = TUFingerprintConfig(cleaned=False)
 
     for module in modules:
         modelconfig = ECTModelConfig(
-            module=module, num_features=2, num_classes=6, num_thetas=32, bump_steps=32
+            module=module,
+            num_features=2,
+            num_classes=6,
+            num_thetas=32,
+            bump_steps=32,
+            hidden=40,
         )
 
         config = Config(meta, data, modelconfig, trainer)
@@ -133,7 +143,12 @@ def tu_frankenstein(experiment_folder="experiment", trainer=None, meta=None) -> 
 
     for module in modules:
         modelconfig = ECTModelConfig(
-            module=module, num_features=780, num_classes=2, num_thetas=32, bump_steps=32
+            module=module,
+            num_features=780,
+            num_classes=2,
+            num_thetas=32,
+            bump_steps=32,
+            hidden=20,
         )
 
         config = Config(meta, data, modelconfig, trainer)
@@ -149,7 +164,7 @@ def tu_cox2(experiment_folder="experiment", trainer=None, meta=None) -> None:
     modules = [
         "models.ect_cnn_edges",
     ]
-    # trainer = TrainerConfig(lr=0.001, num_epochs=100, num_reruns=5)
+    trainer = TrainerConfig(lr=0.001, num_epochs=200, num_reruns=5)
     # Create the dataset config.
     data = TUCOX2Config()
 
@@ -171,13 +186,18 @@ def tu_bzr(experiment_folder="experiment", trainer=None, meta=None) -> None:
     modules = [
         "models.ect_cnn_edges",
     ]
-    # trainer = TrainerConfig(lr=0.001, num_epochs=100, num_reruns=5)
+    trainer = TrainerConfig(lr=0.001, num_epochs=200, num_reruns=5)
     # Create the dataset config.
     data = TUBZRConfig()
 
     for module in modules:
         modelconfig = ECTModelConfig(
-            module=module, num_features=38, num_classes=2, num_thetas=32, bump_steps=32
+            module=module,
+            num_features=38,
+            num_classes=2,
+            num_thetas=32,
+            bump_steps=32,
+            hidden=50,
         )
 
         config = Config(meta, data, modelconfig, trainer)
@@ -491,11 +511,11 @@ def gnn_classification(
         # "models.ect_linear_points",
         # "models.ect_linear_edges",
     ]
-
+    trainer = TrainerConfig(lr=0.001, num_epochs=200, num_reruns=5)
     # Create the dataset config.
     data = GNNBenchmarkDataModuleConfig(
         module="datasets.gnn_benchmark",
-        batch_size=256,
+        batch_size=64,
         name=name,
         pin_memory=False,
     )
@@ -515,7 +535,7 @@ def gnn_classification(
         modelconfig = ECTModelConfig(
             module=module,
             num_features=num_features,
-            hidden=100,
+            hidden=200,
             num_classes=num_classes,
         )
 
@@ -629,7 +649,7 @@ def theta_sweep(experiment_folder="experiment", trainer=None, meta=None):
 if __name__ == "__main__":
     # Create Trainer Config
 
-    trainer = TrainerConfig(lr=0.001, num_epochs=20, num_reruns=5)
+    trainer = TrainerConfig(lr=0.001, num_epochs=100, num_reruns=5)
     # Create meta data
     meta = Meta("desct-test-new")
     experiment_folder = "experiment"
@@ -639,21 +659,19 @@ if __name__ == "__main__":
     tu_fingerprint(experiment_folder, trainer, meta)
     tu_dhfr(experiment_folder, trainer, meta)
 
-    # tu_nci1(experiment_folder, trainer, meta)
-    # tu_nci109(experiment_folder, trainer, meta)
+    tu_cox2(experiment_folder, trainer, meta)
     # tu_proteins(experiment_folder, trainer, meta)
     # tu_dd(experiment_folder, trainer, meta)
-    # tu_enzymes(experiment_folder, trainer, meta)
     # tu_imdb_b(experiment_folder, trainer, meta)
     # tu_reddit_b(experiment_folder, trainer, meta)
     # tu_letter_high_classification(experiment_folder, trainer, meta)
     # tu_letter_med_classification(experiment_folder, trainer, meta)
     # tu_letter_low_classification(experiment_folder, trainer, meta)
 
-    # ogb_mol(experiment_folder, trainer, meta)
+    ogb_mol(experiment_folder, trainer, meta)
     # gnn_classification("MNIST", experiment_folder, trainer, meta)
-    # gnn_classification("CIFAR10", experiment_folder, trainer, meta)
+    gnn_classification("CIFAR10", experiment_folder, trainer, meta)
     # gnn_modelnet_classification("10", experiment_folder, trainer, meta)
-    # gnn_modelnet_classification("40", experiment_folder, trainer, meta)
+    gnn_modelnet_classification("40", experiment_folder, trainer, meta)
     # manifold_classification(experiment_folder, trainer, meta)
     # theta_sweep(experiment_folder, trainer, meta)

@@ -7,7 +7,7 @@ data:
   module: datasets.gnn_benchmark
   root: ./data
   num_workers: 0
-  batch_size: 256
+  batch_size: 64
   pin_memory: false
   drop_last: false
   name: CIFAR10
@@ -19,8 +19,8 @@ model:
   R: 1.1
   num_features: 5
   num_classes: 10
-  hidden: 100
+  hidden: 200
 trainer:
   lr: 0.001
-  num_epochs: 100
+  num_epochs: 200
   num_reruns: 5

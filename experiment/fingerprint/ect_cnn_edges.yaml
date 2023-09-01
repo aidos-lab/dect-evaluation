@@ -11,7 +11,7 @@ data:
   pin_memory: true
   drop_last: false
   name: Fingerprint
-  cleaned: true
+  cleaned: false
   use_node_attr: true
 model:
   module: models.ect_cnn_edges
@@ -21,8 +21,8 @@ model:
   R: 1.1
   num_features: 2
   num_classes: 6
-  hidden: 50
+  hidden: 40
 trainer:
   lr: 0.001
-  num_epochs: 20
+  num_epochs: 100
   num_reruns: 5

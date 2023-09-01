@@ -18,6 +18,7 @@ from main import compute_avg
 #     theta_sweep,
 #     save_config,
 # )
+
 import torchvision.transforms as transforms
 
 from loaders.factory import load_module
@@ -32,7 +33,7 @@ mylogger = Logger()
 def main():
     accs = []
     print("Running experiment", "ect_cnn_best.yaml")
-    exp = Experiment("ect_cnn_best.yaml", logger=mylogger, dev=True)
+    exp = Experiment("ect_cnn.yaml", logger=mylogger, dev=True)
     loss, acc = exp.run()
     accs.append(acc)
     compute_avg(torch.tensor(accs))
