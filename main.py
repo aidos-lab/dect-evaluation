@@ -14,7 +14,7 @@ mylogger = Logger()
 
 
 class EarlyStopper:
-    def __init__(self, patience=15, min_delta=0.01):
+    def __init__(self, patience=10, min_delta=0.01):
         self.patience = patience
         self.min_delta = min_delta
         self.counter = 0
@@ -57,7 +57,7 @@ class Experiment:
 
         # Load the dataset
         self.dm = loader.load_module("dataset", self.config.data)
-        print(self.dm.entire_ds[0].x.shape)
+        # print(self.dm.entire_ds[0].x.shape)
         print(self.config.model)
         # Load the model
         model = loader.load_module("model", self.config.model)
@@ -136,6 +136,7 @@ class Experiment:
         val_loss, _, _ = compute_acc(
             self.model, self.dm.val_dataloader(), self.config.model.num_classes
         )
+        return val_loss
         # self.scheduler.step(val_loss)
         del batch_gpu, y_gpu, pred, loss
 
@@ -178,19 +179,15 @@ def main():
         # "PROTEINS_full",
         # "REDDIT-BINARY",
         # "OGB-MOLHIV"
-        # "nci1",
-        # "nci109",
-        "dhfr",
-        "fingerprint",
-        "frankenstein",
-        "cox2",
-        "bzr",
+        # "dhfr",
+        # "bzr",
+        "cox2"
     ]
 
     for experiment in experiments:
         for config in listdir(f"./experiment/{experiment}"):
             accs = []
-            for _ in range(1):
+            for _ in range(5):
                 print("Running experiment", experiment, config)
                 exp = Experiment(config, logger=mylogger, dev=True)
                 loss, acc = exp.run()

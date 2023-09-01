@@ -21,8 +21,8 @@ model:
   R: 1.1
   num_features: 38
   num_classes: 2
-  hidden: 50
+  hidden: 40
 trainer:
   lr: 0.001
-  num_epochs: 20
+  num_epochs: 200
   num_reruns: 5

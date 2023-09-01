@@ -73,7 +73,7 @@ transforms_dict = {
         CenterTransform(),
     ],
     "NCI1": [NCI109Transform(), CenterTransform()],
-    "NCI109": [],
+    "NCI109": [CenterTransform()],
     "BZR": [CenterTransform()],
     "COX2": [CenterTransform()],
     "FRANKENSTEIN": [CenterTransform()],
