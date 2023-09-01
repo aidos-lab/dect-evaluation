@@ -43,4 +43,4 @@ def compute_acc(model, loader, num_classes=None):
     # roc = auroc.compute()
     acc.reset()
     # auroc.reset()
-    return loss, a, None
+    return loss, a, torch.tensor([0])

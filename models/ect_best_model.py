@@ -39,10 +39,10 @@ class ECTCNNPointsModel(BaseModel):
             list(self.conv1(torch.rand(1, config.bump_steps, config.num_thetas)).shape),
         )
         self.linear1 = nn.Linear(num_features, config.hidden)
-        self.linear2 = nn.Linear(config.hidden, config.hidden)
-        self.linear3 = nn.Linear(config.hidden, config.num_classes)
+        self.linear2 = nn.Linear(config.hidden, config.hidden // 2)
+        self.linear3 = nn.Linear(config.hidden // 2, config.num_classes)
         # self.dropout1 = nn.Dropout()
-        # self.dropout2 = nn.Dropout()
+        self.dropout2 = nn.Dropout()
         self.dropout3 = nn.Dropout()
         # self.layer_norm = nn.LayerNorm([32, 32])
 
@@ -55,7 +55,7 @@ class ECTCNNPointsModel(BaseModel):
         x = x.view(x.size(0), -1)
         x = self.linear1(x)
         x = nn.functional.relu(x)
-        # x = self.dropout2(x)
+        x = self.dropout2(x)
         x = self.linear2(x)
         x = nn.functional.relu(x)
         x = self.dropout3(x)
