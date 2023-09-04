@@ -73,9 +73,9 @@ class Experiment:
             # weight_decay=1e-7,
             # eps=1e-4,
         )
-        # self.scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
-        #     self.optimizer, mode="min", factor=0.1, patience=10
-        # )
+        self.scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+            self.optimizer, mode="min", factor=0.2, patience=10, verbose=True
+        )
 
         self.early_stopper = EarlyStopper()
 
