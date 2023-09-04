@@ -6,7 +6,7 @@ from logger import Logger, timing
 from metrics.metrics import compute_confusion, compute_acc
 import loaders.factory as loader
 import time
-
+from collections import Counter
 import torchmetrics
 
 torch.cuda.empty_cache()
@@ -57,6 +57,10 @@ class Experiment:
 
         # Load the dataset
         self.dm = loader.load_module("dataset", self.config.data)
+        print(Counter(torch.concat([batch.y for batch in self.dm.train_ds]).numpy()))
+        print(Counter(torch.concat([batch.y for batch in self.dm.val_ds]).numpy()))
+        print(Counter(torch.concat([batch.y for batch in self.dm.test_ds]).numpy()))
+
         print(self.dm.entire_ds[0].x.shape)
         print(self.config.model)
         # Load the model

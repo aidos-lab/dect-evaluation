@@ -2,9 +2,12 @@ from abc import ABC, abstractmethod
 from torch_geometric.loader import DataLoader, ImbalancedSampler
 from torch_geometric.data import Dataset
 import torch
-
+import torch_geometric
+import itertools
 from typing import Protocol
 from dataclasses import dataclass
+from torch.utils.data import Subset
+from sklearn.model_selection import StratifiedKFold, train_test_split
 
 
 @dataclass
@@ -18,13 +21,16 @@ class DataModuleConfig(Protocol):
 
 
 class DataModule(ABC):
-    train_ds: Dataset
-    test_ds: Dataset
-    val_ds: Dataset
-    entire_ds: Dataset
+    train_ds: Dataset | None
+    test_ds: Dataset | None
+    val_ds: Dataset | None
+    entire_ds: Dataset | None
 
     def __init__(self, root, batch_size, num_workers, pin_memory=True, drop_last=True):
         super().__init__()
+        self.seed = 4338
+        self.n_splits = 3
+        self.fold = 0
         self.data_dir = root
         self.batch_size = batch_size
         self.num_workers = num_workers
@@ -38,9 +44,29 @@ class DataModule(ABC):
     def prepare_data(self):
         raise NotImplementedError()
 
-    @abstractmethod
     def setup(self):
-        raise NotImplementedError()
+        # # Prevents previous experiments to be overwritten.
+        # if self.train_ds and self.test_ds and self.val_ds:
+        #     return
+
+        n_instances = len(self.entire_ds)
+        labels = torch.concat([data.y for data in self.entire_ds])
+        print(labels.shape)
+        skf = StratifiedKFold(
+            n_splits=self.n_splits, random_state=self.seed, shuffle=True
+        )
+        skf_iterator = skf.split(
+            torch.tensor([i for i in range(n_instances)]),
+            torch.tensor(labels),
+        )
+        train_index, test_index = next(itertools.islice(skf_iterator, self.fold, None))
+        train_index, val_index = train_test_split(train_index, random_state=self.seed)
+        train_index = train_index.tolist()
+        val_index = val_index.tolist()
+        test_index = test_index.tolist()
+        self.train_ds = Subset(self.entire_ds, train_index)
+        self.val_ds = Subset(self.entire_ds, val_index)
+        self.test_ds = Subset(self.entire_ds, test_index)
 
     def train_dataloader(self):
         return DataLoader(
