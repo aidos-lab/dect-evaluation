@@ -57,7 +57,7 @@ class Experiment:
 
         # Load the dataset
         self.dm = loader.load_module("dataset", self.config.data)
-        # print(self.dm.entire_ds[0].x.shape)
+        print(self.dm.entire_ds[0].x.shape)
         print(self.config.model)
         # Load the model
         model = loader.load_module("model", self.config.model)
@@ -73,8 +73,11 @@ class Experiment:
             # weight_decay=1e-7,
             # eps=1e-4,
         )
-        self.scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
-            self.optimizer, mode="min", factor=0.2, patience=10, verbose=True
+        # self.scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+        #     self.optimizer, mode="min", factor=0.2, patience=10, verbose=True
+        # )
+        self.scheduler = torch.optim.lr_scheduler.MultiStepLR(
+            self.optimizer, milestones=[150, 200], gamma=0.5
         )
 
         self.early_stopper = EarlyStopper()
@@ -136,9 +139,10 @@ class Experiment:
         val_loss, _, _ = compute_acc(
             self.model, self.dm.val_dataloader(), self.config.model.num_classes
         )
+        self.scheduler.step()
         return val_loss
-        # self.scheduler.step(val_loss)
-        del batch_gpu, y_gpu, pred, loss
+
+        # del batch_gpu, y_gpu, pred, loss
 
     def compute_metrics(self, epoch, run_time):
         val_loss, val_acc, val_roc = compute_acc(

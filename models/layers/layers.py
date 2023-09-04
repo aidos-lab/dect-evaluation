@@ -11,7 +11,7 @@ import sys
 
 @torch.jit.script
 def rel(nh, batch, out, lin):
-    ecc = torch.nn.functional.relu(torch.sub(lin, nh))
+    ecc = torch.nn.functional.sigmoid(200 * torch.sub(lin, nh))
     return torch.index_add(out, 1, batch, ecc).movedim(0, 1)
 
 

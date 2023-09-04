@@ -7,10 +7,10 @@ import numpy as np
 
 dataset = ModelNetPointsDataModule(
     ModelNetDataModuleConfig(
-        root="./data/modelnet_aligned_40_1000",
+        root="./data/modelnet_aligned_40_100",
         module="datasets.modelnet",
         name="40",
-        samplepoints=1000,
+        samplepoints=100,
     )
 )
 
@@ -18,22 +18,28 @@ dataset = ModelNetPointsDataModule(
 for batch in dataset.train_dataloader():
     break
 
+
+print(batch.x.norm(dim=-1).max())
+
 layer = EctPointsLayer(
     ECTModelConfig(module="", num_features=3, bump_steps=36, num_thetas=36)
 ).to("cuda:0")
 
-print(batch.x)
-print(batch.x.shape)
+# print(batch.x)
+# print(batch.x.shape)
+
+import matplotlib.pyplot as plt
+
+idx = 3
 
 res = layer(batch.to("cuda:0"))
 print(res.shape)
 
-img = res[0].reshape(36, 36).detach().cpu().numpy()
+img = res[idx].reshape(36, 36).detach().cpu().numpy()
 
-import matplotlib.pyplot as plt
 
-print(np.max(img))
+# print("MAX", np.max(img))
 
-print(res[0])
+print(res[idx])
 plt.imshow(img)
 plt.show()
