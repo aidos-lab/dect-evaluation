@@ -51,6 +51,21 @@ class Standardize(object):
         return data
 
 
+class Rotate(object):
+    def __call__(self, batch):
+        theta = (torch.rand(1) - 0.5) * torch.pi / 5
+        rot = torch.tensor(
+            [
+                [torch.cos(theta), -torch.sin(theta), 0],
+                [torch.sin(theta), torch.cos(theta), 0],
+                [0, 0, 1],
+            ]
+        )
+        batch.x = batch.x @ rot
+        # scaling
+        return batch
+
+
 #  ╭──────────────────────────────────────────────────────────╮
 #  │ Datasets                                                 │
 #  ╰──────────────────────────────────────────────────────────╯
@@ -71,31 +86,33 @@ class ModelNetPointsDataModule(DataModule):
         )
 
     def prepare_data(self):
-        ModelNet(
-            root=self.config.root,
-            pre_transform=self.pre_transform,
-            train=True,
-            name=self.config.name,
-        )
-        ModelNet(
-            root=self.config.root,
-            pre_transform=self.pre_transform,
-            train=False,
-            name=self.config.name,
-        )
+        pass
+        # ModelNet(
+        #     root=self.config.root,
+        #     pre_transform=self.pre_transform,
+        #     train=True,
+        #     name=self.config.name,
+        # )
+        # ModelNet(
+        #     root=self.config.root,
+        #     pre_transform=self.pre_transform,
+        #     train=False,
+        #     name=self.config.name,
+        # )
 
     def setup(self):
         self.entire_ds = ModelNet(
             root=self.config.root,
             pre_transform=self.pre_transform,
+            transform=Rotate(),
             train=True,
             name=self.config.name,
         )
         self.train_ds, self.val_ds = random_split(
             self.entire_ds,
             [
-                int(0.9 * len(self.entire_ds)),
-                len(self.entire_ds) - int(0.9 * len(self.entire_ds)),
+                int(0.8 * len(self.entire_ds)),
+                len(self.entire_ds) - int(0.8 * len(self.entire_ds)),
             ],
         )
         # self.train_ds = self.entire_ds
