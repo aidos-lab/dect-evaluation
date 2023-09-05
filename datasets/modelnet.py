@@ -87,42 +87,43 @@ class ModelNetPointsDataModule(DataModule):
 
     def prepare_data(self):
         pass
-        # ModelNet(
-        #     root=self.config.root,
-        #     pre_transform=self.pre_transform,
-        #     train=True,
-        #     name=self.config.name,
-        # )
-        # ModelNet(
-        #     root=self.config.root,
-        #     pre_transform=self.pre_transform,
-        #     train=False,
-        #     name=self.config.name,
-        # )
 
     def setup(self):
-        self.entire_ds = ModelNet(
-            root=self.config.root,
-            pre_transform=self.pre_transform,
-            transform=Rotate(),
-            train=True,
-            name=self.config.name,
-        )
-        self.train_ds, self.val_ds = random_split(
-            self.entire_ds,
+        self.entire_ds = torch.utils.data.ConcatDataset(
             [
-                int(0.8 * len(self.entire_ds)),
-                len(self.entire_ds) - int(0.8 * len(self.entire_ds)),
-            ],
+                ModelNet(
+                    root=self.config.root,
+                    pre_transform=self.pre_transform,
+                    transform=Rotate(),
+                    train=True,
+                    name=self.config.name,
+                ),
+                ModelNet(
+                    root=self.config.root,
+                    pre_transform=self.pre_transform,
+                    transform=Rotate(),
+                    train=False,
+                    name=self.config.name,
+                ),
+            ]
         )
-        # self.train_ds = self.entire_ds
-        # self.val_ds = self.entire_ds  # type: ignore
-        self.test_ds = ModelNet(
-            root=self.config.root,
-            pre_transform=self.pre_transform,
-            train=False,
-            name=self.config.name,
+        n_instances = len(self.entire_ds)
+        labels = torch.concat([data.y for data in self.entire_ds])
+        skf = StratifiedKFold(
+            n_splits=self.n_splits, random_state=self.seed, shuffle=True
         )
+        skf_iterator = skf.split(
+            torch.tensor([i for i in range(n_instances)]),
+            torch.tensor(labels),
+        )
+        train_index, test_index = next(itertools.islice(skf_iterator, self.fold, None))
+        train_index, val_index = train_test_split(train_index, random_state=self.seed)
+        train_index = train_index.tolist()
+        val_index = val_index.tolist()
+        test_index = test_index.tolist()
+        self.train_ds = Subset(self.entire_ds, train_index)
+        self.val_ds = Subset(self.entire_ds, val_index)
+        self.test_ds = Subset(self.entire_ds, test_index)
 
     """ def info(self): """
     """     print("len train_ds", len(self.train_ds)) """
