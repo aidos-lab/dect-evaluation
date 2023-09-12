@@ -7,6 +7,12 @@ from loaders.factory import register
 from dataclasses import dataclass
 import numpy as np
 
+import itertools
+from typing import Protocol
+from dataclasses import dataclass
+from torch.utils.data import Subset
+from sklearn.model_selection import StratifiedKFold, train_test_split
+
 
 @dataclass
 class ModelNetDataModuleConfig(DataModuleConfig):
@@ -66,14 +72,24 @@ class Rotate(object):
         return batch
 
 
+class Project(object):
+    def __call__(self, batch):
+        batch.x = batch.x[:, :2]
+        # scaling
+        return batch
+
+
 #  ╭──────────────────────────────────────────────────────────╮
 #  │ Datasets                                                 │
 #  ╰──────────────────────────────────────────────────────────╯
 
 
-class ModelNetPointsDataModule(DataModule):
+class ModelNetPointsDataModuleStratified(DataModule):
     def __init__(self, config):
         self.config = config
+        self.n_splits = 2
+        self.fold = 0
+        self.seed = 0
         self.pre_transform = transforms.Compose(
             [
                 transforms.SamplePoints(self.config.samplepoints),
@@ -94,14 +110,14 @@ class ModelNetPointsDataModule(DataModule):
                 ModelNet(
                     root=self.config.root,
                     pre_transform=self.pre_transform,
-                    transform=Rotate(),
+                    # transform=Rotate(),
                     train=True,
                     name=self.config.name,
                 ),
                 ModelNet(
                     root=self.config.root,
                     pre_transform=self.pre_transform,
-                    transform=Rotate(),
+                    # transform=Rotate(),
                     train=False,
                     name=self.config.name,
                 ),
@@ -148,10 +164,16 @@ class ModelNetPointsDataModule(DataModule):
     """     print("Bincount test",counts) """
 
 
-class ModelNetMeshDataModule(DataModule):
+class ModelNetPointsDataModule(DataModule):
     def __init__(self, config):
         self.config = config
-        self.pre_transform = transforms.Compose([ModelNetTransform()])
+        self.pre_transform = transforms.Compose(
+            [
+                transforms.SamplePoints(self.config.samplepoints),
+                Standardize(self.config.samplepoints),
+                CenterTransform(),
+            ]
+        )
         super().__init__(
             config.root, config.batch_size, config.num_workers, config.pin_memory
         )
@@ -163,27 +185,31 @@ class ModelNetMeshDataModule(DataModule):
         ModelNet(
             root=self.config.root,
             pre_transform=self.pre_transform,
+            transform=Rotate(),
             train=True,
             name=self.config.name,
         )
         ModelNet(
             root=self.config.root,
             pre_transform=self.pre_transform,
+            transform=Rotate(),
             train=False,
             name=self.config.name,
         )
 
     def setup(self):
-        entire_ds = ModelNet(
+        self.entire_ds = ModelNet(
             root=self.config.root,
             pre_transform=self.pre_transform,
+            transform=Rotate(),
             train=True,
             name=self.config.name,
         )
-        self.train_ds, self.val_ds = random_split(entire_ds, [int(0.8 * len(entire_ds)), len(entire_ds) - int(0.8 * len(entire_ds))])  # type: ignore
+        self.train_ds, self.val_ds = random_split(self.entire_ds, [int(0.8 * len(self.entire_ds)), len(self.entire_ds) - int(0.8 * len(self.entire_ds))])  # type: ignore
         self.test_ds = ModelNet(
             root=self.config.root,
             pre_transform=self.pre_transform,
+            transform=Rotate(),
             train=False,
             name=self.config.name,
         )
