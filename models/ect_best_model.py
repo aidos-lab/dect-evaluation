@@ -33,8 +33,8 @@ class TestModel(BaseModel):
 
     def forward(self, batch):
         x = self.ectlayer(batch)
-        x /= 100
-        x -= 0.5
+        x /= 50
+        x -= 1
         x, _ = self.phi(x).max(1)
         # print(x.shape)
         # raise "hello"
