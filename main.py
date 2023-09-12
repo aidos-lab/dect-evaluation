@@ -77,7 +77,7 @@ class Experiment:
         #     self.optimizer, mode="min", factor=0.2, patience=10, verbose=True
         # )
         self.scheduler = torch.optim.lr_scheduler.MultiStepLR(
-            self.optimizer, milestones=[150, 200], gamma=0.5
+            self.optimizer, milestones=[150, 200], gamma=0.1
         )
 
         self.early_stopper = EarlyStopper()
