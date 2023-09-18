@@ -5,12 +5,12 @@ meta:
   experiment_folder: experiment
 data:
   module: datasets.modelnet
-  root: ./data/modelnet_aligned_40_100
+  root: ./data/modelnet_aligned_40_1000
   num_workers: 0
-  batch_size: 32
+  batch_size: 16
   pin_memory: true
   name: '40'
-  samplepoints: 100
+  samplepoints: 1000
 model:
   module: models.ect_best_model
   num_thetas: 128
