@@ -34,7 +34,10 @@ def main():
     accs = []
     for _ in range(5):
         print("Running experiment", "ect_cnn_best.yaml")
-        exp = Experiment("ect_cnn.yaml", logger=mylogger, dev=True)
+        # exp = Experiment(
+        #     "./experiment/Letter-high/ect_cnn_edges.yaml", logger=mylogger, dev=True
+        # )
+        exp = Experiment("ect_cnn_fixed.yaml", logger=mylogger, dev=True)
         loss, acc = exp.run()
         accs.append(acc)
     compute_avg(torch.tensor(accs))
