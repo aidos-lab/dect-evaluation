@@ -183,7 +183,7 @@ class DTanh(BaseModel):
         print(self)
 
     def forward(self, data):
-        phi_output = self.phi(data.x.view(-1, 1000, 3))
+        phi_output = self.phi(data.x.view(-1, 100, 3))
         sum_output, _ = phi_output.max(1)
         ro_output = self.ro(sum_output)
         return ro_output
