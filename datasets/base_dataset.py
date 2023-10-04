@@ -16,7 +16,6 @@ class DataModule(ABC):
         self.num_workers = num_workers
         self.pin_memory = pin_memory
         self.drop_last = drop_last
-        self.prepare_data()
         self.setup()
 
     @abstractmethod
