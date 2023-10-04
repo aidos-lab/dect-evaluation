@@ -3,6 +3,7 @@ from torch_geometric.utils import degree
 from torch_geometric.data import Data
 import matplotlib.pyplot as plt
 import torchvision
+import vedo
 
 
 def plot_batch(data):
@@ -94,44 +95,9 @@ class MnistTransform:
         idx = torch.nonzero(img.squeeze(), as_tuple=True)
         gp = torch.vstack([self.X[idx], self.Y[idx]]).T
         dly = vedo.delaunay2d(gp, mode="xy", alpha=0.03).c("w").lc("o").lw(1)
-        # print(torch.tensor(dly.edges()).T.shape)
-        # print(torch.tensor(dly.faces()).T.shape)
-        # print(torch.tensor(dly.points()).shape)
 
         return Data(
             x=torch.tensor(dly.points()),
             face=torch.tensor(dly.faces(), dtype=torch.long).T,
             y=torch.tensor(y, dtype=torch.long),
         )
-
-
-if __name__ == "__main__":
-    """
-    Important note, when testing.
-    - The return type is a reference to the original transformed object,
-        NOT a deep copy. Hence NEVER reuse data instances when testing.
-    """
-    # Test subtract of mean
-    data = Data(x=torch.tensor([[20.0, 0, 0], [0, 1.0, 0], [0, 0, 1.0]]))
-    data.x -= compute_mean(data)
-    data.x /= compute_radius(data)
-    print("subtract mean\n", data.x)
-    plot_batch(data)
-
-    # Test subtract of mean all
-    data = Data(x=torch.tensor([[20.0, 0, 0], [0, 1.0, 0], [0, 0, 1.0]]))
-    data.x -= data.x.mean()
-    data.x /= compute_radius(data)
-    print("subtract total mean\n", data.x)
-    plot_batch(data)
-
-    # Test normalize
-    data = Data(x=torch.tensor([[2.0, 0, 0], [0, 1.0, 1.0], [0, 0, 1.0]]))
-    data.x /= compute_radius(data)
-    print("normalized\n", data.x)
-
-    # Test center transform.
-    data = Data(x=torch.tensor([[2.0, 0, 0], [0, 1.0, 0], [0, 0, 1.0]]))
-    transform = CenterTransform()
-    out = transform(data)
-    print("Center transform\n", out.x)
