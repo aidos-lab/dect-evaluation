@@ -39,13 +39,13 @@ class EctLayer(nn.Module):
 
     def __init__(self, config, ecc_type="points", fixed=False):
         super().__init__()
-        self.config = config
+        self.fixed = fixed
         self.lin = (
-            torch.linspace(-self.config.R, self.config.R, self.config.bump_steps)
+            torch.linspace(-config.R, config.R, config.bump_steps)
             .view(-1, 1, 1)
             .to(config.device)
         )
-        if fixed:
+        if self.fixed:
             self.v = torch.vstack(
                 [
                     torch.sin(torch.linspace(0, 2 * torch.pi, 256)),
@@ -56,7 +56,6 @@ class EctLayer(nn.Module):
             self.v = torch.nn.Parameter(
                 torch.rand(size=(config.num_features, config.num_thetas)) - 0.5
             ).to(config.device)
-            geotorch.constraints.sphere(self, "v")
 
         if ecc_type == "points":
             self.compute_ect = compute_ect_points
@@ -64,6 +63,10 @@ class EctLayer(nn.Module):
             self.compute_ect = compute_ect_edges
         elif ecc_type == "faces":
             self.compute_ect = compute_ect_faces
+
+    def __post_init__(self):
+        if self.fixed:
+            geotorch.constraints.sphere(self, "v")
 
     def forward(self, data):
         return self.compute_ect(data, self.v, self.lin)
