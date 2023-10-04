@@ -1,20 +1,6 @@
 from abc import ABC, abstractmethod
-from torch_geometric.loader import DataLoader, ImbalancedSampler
+from torch_geometric.loader import DataLoader
 from torch_geometric.data import Dataset
-import torch
-
-from typing import Protocol
-from dataclasses import dataclass
-
-
-@dataclass
-class DataModuleConfig(Protocol):
-    module: str
-    root: str = "./data"
-    num_workers: int = 0
-    batch_size: int = 64
-    pin_memory: bool = True
-    drop_last: bool = False
 
 
 class DataModule(ABC):
@@ -32,11 +18,6 @@ class DataModule(ABC):
         self.drop_last = drop_last
         self.prepare_data()
         self.setup()
-        # self.info()
-
-    @abstractmethod
-    def prepare_data(self):
-        raise NotImplementedError()
 
     @abstractmethod
     def setup(self):
@@ -74,11 +55,3 @@ class DataModule(ABC):
             pin_memory=self.pin_memory,
             # drop_last=self.drop_last,
         )
-
-    def info(self):
-        print("The train dataset contains ", len(self.train_ds), "elements.")
-        print("The validation dataset contains ", len(self.val_ds), "elements.")
-        print("The test dataset contains ", len(self.test_ds), "elements.")
-        print("The number of classes", self.entire_ds.num_classes)
-        print("The shape of the node features is", self.train_ds.shape)
-        print("An element of the train dataset:", self.train_ds[0])

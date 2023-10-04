@@ -1,62 +1,20 @@
-import torch
-
-from datasets.base_dataset import DataModule, DataModuleConfig
-
-# from base_dataset import DataModule
 from torch_geometric.datasets import TUDataset
-from dataclasses import dataclass
+
 from torch.utils.data import random_split
+
 from torch_geometric import transforms
-from loaders.factory import register
 from torch_geometric.transforms import OneHotDegree
-from torch_geometric.utils import degree
-from torch_geometric.utils import degree
 
-#  ╭──────────────────────────────────────────────────────────╮
-#  │ Transforms                                               │
-#  ╰──────────────────────────────────────────────────────────╯
+from datasets.config import DataModuleConfig
+from datasets.base_dataset import DataModule
+from datasets.transforms import (
+    CenterTransform,
+    NormalizedDegree,
+    NCI109Transform,
+)
 
-"""
-Add all the required transforms in this section, or use imports.
-"""
-
-
-class CenterTransform(object):
-    def __call__(self, data):
-        data.x -= data.x.mean()
-        data.x /= data.x.pow(2).sum(axis=1).sqrt().max()
-        return data
-
-
-class Normalize(object):
-    def __call__(self, data):
-        mean = data.x.mean()
-        std = data.x.std()
-        data.x = (data.x - mean) / std
-        return data
-
-
-class NormalizedDegree(object):
-    def __init__(self, mean, std):
-        self.mean = mean
-        self.std = std
-
-    def __call__(self, data):
-        deg = degree(data.edge_index[0], dtype=torch.float)
-        deg = (deg - self.mean) / self.std
-        data.x = deg.view(-1, 1)
-        return data
-
-
-class NCI109Transform(object):
-    def __call__(self, data):
-        deg = degree(data.edge_index[0], dtype=torch.float).unsqueeze(0).T
-        atom_number = torch.argmax(data.x, dim=-1, keepdim=True)
-        data.x = torch.hstack([deg, atom_number])
-        # print(deg)
-        # print(atom_number)
-        # print()
-        return data
+from dataclasses import dataclass
+from loaders.factory import register
 
 
 transforms_dict = {
@@ -251,9 +209,6 @@ class TUDataModule(DataModule):
             config.num_workers,
             drop_last=self.config.drop_last,
         )
-
-    def prepare_data(self):
-        pass
 
     def setup(self):
         self.entire_ds = TUDataset(

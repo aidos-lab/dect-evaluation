@@ -3,6 +3,7 @@ import torch_geometric
 from torch_geometric.data import Dataset, Data
 import matplotlib.pyplot as plt
 import open3d as o3d
+import torchvision
 
 
 def plot_batch(data):
@@ -53,16 +54,83 @@ class SimplifyMesh:
         )
 
 
+class ThresholdTransform(object):
+    def __call__(self, data):
+        data.x = torch.hstack([data.pos, data.x])
+        return data
+
+
 class CenterTransform(object):
-    """
-    This transform subtracts the mean per axis and scales the pointcloud to
-    have unit radius.
-    """
+    def __call__(self, data):
+        data.x -= data.x.mean()
+        data.x /= data.x.pow(2).sum(axis=1).sqrt().max()
+        return data
+
+
+class Normalize(object):
+    def __call__(self, data):
+        mean = data.x.mean()
+        std = data.x.std()
+        data.x = (data.x - mean) / std
+        return data
+
+
+class NormalizedDegree(object):
+    def __init__(self, mean, std):
+        self.mean = mean
+        self.std = std
 
     def __call__(self, data):
-        data.x -= compute_mean(data)
-        data.x /= compute_radius(data)
+        deg = degree(data.edge_index[0], dtype=torch.float)
+        deg = (deg - self.mean) / self.std
+        data.x = deg.view(-1, 1)
         return data
+
+
+class NCI109Transform(object):
+    def __call__(self, data):
+        deg = degree(data.edge_index[0], dtype=torch.float).unsqueeze(0).T
+        atom_number = torch.argmax(data.x, dim=-1, keepdim=True)
+        data.x = torch.hstack([deg, atom_number])
+        # print(deg)
+        # print(atom_number)
+        # print()
+        return data
+
+
+class ModelNetTransform(object):
+    def __call__(self, data):
+        data.x = data.pos
+        data.pos = None
+        return data
+
+
+class FloatTransform(object):
+    def __call__(self, data):
+        data.x = data.x.to(torch.float64)
+        return data
+
+
+class Rotate(object):
+    def __call__(self, batch):
+        theta = (torch.rand(1) - 0.5) * torch.pi / 5
+        rot = torch.tensor(
+            [
+                [torch.cos(theta), -torch.sin(theta), 0],
+                [torch.sin(theta), torch.cos(theta), 0],
+                [0, 0, 1],
+            ]
+        )
+        batch.x = batch.x @ rot
+        # scaling
+        return batch
+
+
+class Project(object):
+    def __call__(self, batch):
+        batch.x = batch.x[:, :2]
+        # scaling
+        return batch
 
 
 # class Standardize(object):
@@ -81,6 +149,30 @@ class CenterTransform(object):
 #         normalized = (z - mean) / std
 #         data.x = normalized
 #         return data
+
+
+class MnistTransform:
+    def __init__(self):
+        xcoords = torch.linspace(-0.5, 0.5, 28)
+        ycoords = torch.linspace(-0.5, 0.5, 28)
+        self.X, self.Y = torch.meshgrid(xcoords, ycoords)
+        self.tr = torchvision.transforms.ToTensor()
+
+    def __call__(self, data: tuple) -> Data:
+        img, y = data
+        img = self.tr(img)
+        idx = torch.nonzero(img.squeeze(), as_tuple=True)
+        gp = torch.vstack([self.X[idx], self.Y[idx]]).T
+        dly = vedo.delaunay2d(gp, mode="xy", alpha=0.03).c("w").lc("o").lw(1)
+        # print(torch.tensor(dly.edges()).T.shape)
+        # print(torch.tensor(dly.faces()).T.shape)
+        # print(torch.tensor(dly.points()).shape)
+
+        return Data(
+            x=torch.tensor(dly.points()),
+            face=torch.tensor(dly.faces(), dtype=torch.long).T,
+            y=torch.tensor(y, dtype=torch.long),
+        )
 
 
 if __name__ == "__main__":
