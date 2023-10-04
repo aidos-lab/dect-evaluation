@@ -1,0 +1,9 @@
+2 0.8182 with std 0.0529
+4 0.9311 with std 0.0168
+6 0.9356 with std 0.0196
+8 0.9360 with std 0.0060
+10 0.9582 with std 0.0140
+12 0.9524 with std 0.0046
+14 0.9520 with std 0.0056
+16 0.9560 with std 0.0085
+18 0.9480 with std 0.0145

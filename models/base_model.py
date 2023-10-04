@@ -11,8 +11,9 @@ class BaseModel(nn.Module):
 @dataclass(frozen=True)
 class ECTModelConfig:
     module: str
-    num_thetas: int = 32
-    bump_steps: int = 32
+    num_phis: int = 12
+    num_thetas: int = 13
+    bump_steps: int = 14
     batch_size: int = 128
     R: float = 1.1
     num_features: int = 3

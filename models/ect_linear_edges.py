@@ -22,7 +22,7 @@ class ECTLinearEdgesModel(BaseModel):
     def __init__(self, config):
         super().__init__(config)
         self.ectlayer = EctEdgesLayer(config)
-        geotorch.constraints.sphere(self.ectlayer, "v")
+        # geotorch.constraints.sphere(self.ectlayer, "v")
         self.linear1 = torch.nn.Linear(
             config.num_thetas * config.bump_steps, config.hidden
         )

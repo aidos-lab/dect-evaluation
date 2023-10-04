@@ -19,8 +19,11 @@ class ECTLinearPointsModel(BaseModel):
         self.linear3 = nn.Linear(config.hidden, config.num_classes)
 
     def forward(self, batch):
-        x = self.ectlayer(batch).reshape(
-            -1, self.config.num_thetas * self.config.bump_steps
+        x = (
+            self.ectlayer(batch).reshape(
+                -1, self.config.num_thetas * self.config.bump_steps
+            )
+            / 1000
         )
         """ x = x / x.max(dim=1)[0].unsqueeze(1) """
         x = self.linear1(x)

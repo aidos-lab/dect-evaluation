@@ -7,6 +7,7 @@ from torch_geometric.data import Data
 
 from loaders.factory import register
 from dataclasses import dataclass
+from datasets.transforms import CenterTransform
 
 
 @dataclass
@@ -22,15 +23,7 @@ class GNNBenchmarkDataModuleConfig(DataModuleConfig):
 
 class ThresholdTransform(object):
     def __call__(self, data):
-        x = torch.hstack([data.pos, data.x])
-        new_data = Data(x=x, edge_index=data.edge_index, y=data.y)
-        return new_data
-
-
-class CenterTransform(object):
-    def __call__(self, data):
-        data.x -= data.x.mean()
-        data.x /= data.x.pow(2).sum(axis=1).sqrt().max()
+        data.x = torch.hstack([data.pos, data.x])
         return data
 
 
