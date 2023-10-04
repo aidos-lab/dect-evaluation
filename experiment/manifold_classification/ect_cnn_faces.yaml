@@ -12,13 +12,15 @@ data:
   drop_last: false
   num_samples: 100
 model:
-  module: models.ect_linear_edges
-  num_phis: 12
-  num_thetas: 8
-  bump_steps: 8
-  batch_size: 128
-  R: 1.1
-  num_features: 3
+  module: models.ect_linear
+  ectconfig:
+    num_thetas: 8
+    bump_steps: 8
+    batch_size: 128
+    R: 1.1
+    num_features: 3
+    device: cuda
+    ecc_type: faces
   num_classes: 10
   hidden: 10
 trainer:

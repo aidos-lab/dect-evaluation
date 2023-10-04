@@ -15,13 +15,12 @@ data:
 model:
   module: models.ect_cnn
   ectconfig:
-    num_thetas: 17
-    bump_steps: 17
+    num_thetas: 16
+    bump_steps: 16
     R: 1.1
     ecc_type: edges
     device: cuda
     num_features: 2
-  num_features: 2
   num_classes: 15
   hidden: 25
 trainer:

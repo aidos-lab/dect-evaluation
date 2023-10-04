@@ -7,17 +7,18 @@ data:
   module: datasets.manifold
   root: ./data
   num_workers: 0
-  batch_size: 32
   pin_memory: true
   drop_last: false
   num_samples: 100
 model:
-  module: models.ect_linear_faces
-  num_phis: 16
-  bump_steps: 16
-  R: 1.1
-  num_features: 3
-  num_classes: 3
+  module: models.ect_linear
+  ectconfig:
+    bump_steps: 16
+    R: 1.1
+    num_features: 3
+    num_classes: 3
+    device: cuda
+    ecc_type: faces
   hidden: 20
 trainer:
   lr: 0.001

@@ -12,12 +12,15 @@ data:
   drop_last: false
   name: MNIST
 model:
-  module: models.ect_cnn_edges
-  num_thetas: 32
-  bump_steps: 32
-  batch_size: 128
-  R: 1.1
-  num_features: 3
+  module: models.ect_cnn
+  ectconfig:
+    num_thetas: 32
+    bump_steps: 32
+    batch_size: 128
+    R: 1.1
+    num_features: 3
+    device: cuda
+    ecc_type: edges
   num_classes: 10
   hidden: 100
 trainer:
