@@ -18,9 +18,8 @@ def compute_ect_points(data, v, lin):
 def compute_ect_edges(data, v, lin):
     nh = data.x @ v
     eh, _ = nh[data.edge_index].max(dim=0)
-    return (
-        compute_ecc(nh, data.batch, lin)
-        - compute_ecc(eh, data.batch[data.edge_index[0]], lin) / 2
+    return compute_ecc(nh, data.batch, lin) - compute_ecc(
+        eh, data.batch[data.edge_index[0]], lin
     )
 
 
@@ -30,7 +29,7 @@ def compute_ect_faces(data, v, lin):
     fh, _ = nh[data.face].max(dim=0)
     return (
         compute_ecc(nh, data.batch, lin)
-        - compute_ecc(eh, data.batch[data.edge_index[0]], lin) / 2
+        - compute_ecc(eh, data.batch[data.edge_index[0]], lin)
         + compute_ecc(fh, data.batch[data.face[0]], lin)
     )
 
