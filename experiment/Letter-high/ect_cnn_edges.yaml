@@ -7,17 +7,20 @@ data:
   module: datasets.tu
   root: ./data
   num_workers: 0
-  batch_size: 32
+  batch_size: 33
   pin_memory: true
   drop_last: false
   name: Letter-high
   cleaned: false
 model:
-  module: models.ect_cnn_edges
-  num_thetas: 16
-  bump_steps: 16
-  batch_size: 128
-  R: 1.1
+  module: models.ect_cnn
+  ectconfig:
+    num_thetas: 17
+    bump_steps: 17
+    R: 1.1
+    ecc_type: edges
+    device: cuda
+    num_features: 2
   num_features: 2
   num_classes: 15
   hidden: 25

@@ -1,14 +1,9 @@
-import vedo
 import torch
 from torchvision.datasets import MNIST
 import torchvision.transforms as transforms
-import torchvision
 from torch_geometric.transforms import FaceToEdge
-import numpy as np
 from datasets.base_dataset import DataModule, DataModuleConfig
 from dataclasses import dataclass
-from torch_geometric.data import Dataset, Data
-import torch.functional as F
 from torch.utils.data import random_split
 from datasets.transforms import CenterTransform
 import torch
@@ -16,34 +11,8 @@ from torch_geometric.data import InMemoryDataset, download_url
 from loaders.factory import register
 
 
-class MnistTransform:
-    def __init__(self):
-        xcoords = torch.linspace(-0.5, 0.5, 28)
-        ycoords = torch.linspace(-0.5, 0.5, 28)
-        self.X, self.Y = torch.meshgrid(xcoords, ycoords)
-        self.tr = torchvision.transforms.ToTensor()
-
-    def __call__(self, data: tuple) -> Data:
-        img, y = data
-        img = self.tr(img)
-        idx = torch.nonzero(img.squeeze(), as_tuple=True)
-        gp = torch.vstack([self.X[idx], self.Y[idx]]).T
-        dly = vedo.delaunay2d(gp, mode="xy", alpha=0.03).c("w").lc("o").lw(1)
-        # print(torch.tensor(dly.edges()).T.shape)
-        # print(torch.tensor(dly.faces()).T.shape)
-        # print(torch.tensor(dly.points()).shape)
-
-        return Data(
-            x=torch.tensor(dly.points()),
-            face=torch.tensor(dly.faces(), dtype=torch.long).T,
-            y=torch.tensor(y, dtype=torch.long),
-        )
-
-
-@dataclass
-class MnistDataModuleConfig(DataModuleConfig):
-    root: str = "./data/MNIST"
-    module: str = "datasets.mnist"
+from datasets.transforms import MnistTransform
+from datasets.config import MnistDataModuleConfig
 
 
 class MnistDataModule(DataModule):
@@ -56,7 +25,7 @@ class MnistDataModule(DataModule):
             config.root, config.batch_size, config.num_workers, config.pin_memory
         )
 
-    def prepare_data(self):
+    def setup(self):
         self.entire_ds = MnistDataset(
             root=self.config.root, pre_transform=self.transform, train=True
         )
@@ -71,9 +40,6 @@ class MnistDataModule(DataModule):
         self.test_ds = MnistDataset(
             root=self.config.root, pre_transform=self.transform, train=False
         )
-
-    def setup(self):
-        pass
 
 
 class MnistDataset(InMemoryDataset):
