@@ -5,21 +5,24 @@ import geotorch
 from models.config import EctConfig
 
 
-def compute_ecc(nh, index, lin):
+def compute_ecc(nh, index, lin, dim_size):
     ecc = torch.nn.functional.sigmoid(200 * torch.sub(lin, nh))
-    return segment_coo(ecc, index.view(1, -1), reduce="sum").movedim(0, 1)
+    # print(segment_coo(ecc, index.view(1, -1), reduce="sum").movedim(0, 1).shape)
+    return segment_coo(ecc, index.view(1, -1), dim_size=dim_size, reduce="sum").movedim(
+        0, 1
+    )
 
 
 def compute_ect_points(data, v, lin):
     nh = data.x @ v
-    return compute_ecc(nh, data.batch, lin)
+    return compute_ecc(nh, data.batch, lin, dim_size=data.num_graphs)
 
 
 def compute_ect_edges(data, v, lin):
     nh = data.x @ v
     eh, _ = nh[data.edge_index].max(dim=0)
-    return compute_ecc(nh, data.batch, lin) - compute_ecc(
-        eh, data.batch[data.edge_index[0]], lin
+    return compute_ecc(nh, data.batch, lin, dim_size=data.num_graphs) - compute_ecc(
+        eh, data.batch[data.edge_index[0]], lin, dim_size=data.num_graphs
     )
 
 
@@ -28,9 +31,9 @@ def compute_ect_faces(data, v, lin):
     eh, _ = nh[data.edge_index].max(dim=0)
     fh, _ = nh[data.face].max(dim=0)
     return (
-        compute_ecc(nh, data.batch, lin)
-        - compute_ecc(eh, data.batch[data.edge_index[0]], lin)
-        + compute_ecc(fh, data.batch[data.face[0]], lin)
+        compute_ecc(nh, data.batch, lin, dim_size=data.num_graphs)
+        - compute_ecc(eh, data.batch[data.edge_index[0]], lin, dim_size=data.num_graphs)
+        + compute_ecc(fh, data.batch[data.face[0]], lin, dim_size=data.num_graphs)
     )
 
 
