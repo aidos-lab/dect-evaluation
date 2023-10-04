@@ -1,12 +1,14 @@
 import torch
 import geotorch
-import torch
 import torch.nn as nn
 import functools
 import operator
-from models.base_model import BaseModel
 
-from models.layers.layers import EctPointsLayer
+
+from models.layers.layers import EctLayer
+from models.config import ModelConfig
+from loaders.factory import register
+from models.base_model import BaseModel
 
 from dataclasses import dataclass
 
@@ -21,10 +23,9 @@ from dataclasses import dataclass
 
 
 class ECTCNNPointsModel(BaseModel):
-    def __init__(self, config):
+    def __init__(self, config: ModelConfig):
         super().__init__(config)
-        self.ectlayer = EctPointsLayer(config)
-        geotorch.constraints.sphere(self.ectlayer, "v")
+        self.ectlayer = EctLayer(config.ectconfig, ecc_type="points")
         self.conv1 = nn.Sequential(
             nn.Conv2d(1, 8, kernel_size=3),
             nn.MaxPool2d(2),
@@ -51,9 +52,6 @@ class ECTCNNPointsModel(BaseModel):
         x = nn.functional.relu(x)
         x = self.linear3(x)
         return x
-
-
-from loaders.factory import register
 
 
 def initialize():

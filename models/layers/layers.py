@@ -1,8 +1,7 @@
 import torch
 import torch.nn as nn
-from torch_geometric.data import Batch
-import sys
 from torch_scatter import segment_coo
+import geotorch
 
 
 def compute_ecc(nh, index, lin):
@@ -38,7 +37,7 @@ def compute_ect_faces(data, v, lin):
 class EctLayer(nn.Module):
     """docstring for EctLayer."""
 
-    def __init__(self, config, ecc_type="points"):
+    def __init__(self, config, ecc_type="points", fixed=False):
         super().__init__()
         self.config = config
         self.lin = (
@@ -46,12 +45,18 @@ class EctLayer(nn.Module):
             .view(-1, 1, 1)
             .to(config.device)
         )
-        self.v = torch.vstack(
-            [
-                torch.sin(torch.linspace(0, 2 * torch.pi, 256)),
-                torch.cos(torch.linspace(0, 2 * torch.pi, 256)),
-            ]
-        ).to(config.device)
+        if fixed:
+            self.v = torch.vstack(
+                [
+                    torch.sin(torch.linspace(0, 2 * torch.pi, 256)),
+                    torch.cos(torch.linspace(0, 2 * torch.pi, 256)),
+                ]
+            ).to(config.device)
+        else:
+            self.v = torch.nn.Parameter(
+                torch.rand(size=(config.num_features, config.num_thetas)) - 0.5
+            ).to(config.device)
+            geotorch.constraints.sphere(self, "v")
 
         if ecc_type == "points":
             self.compute_ect = compute_ect_points
