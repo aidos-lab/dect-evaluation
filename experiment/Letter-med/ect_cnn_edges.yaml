@@ -13,12 +13,15 @@ data:
   name: Letter-med
   cleaned: false
 model:
-  module: models.ect_cnn_edges
-  num_thetas: 16
-  bump_steps: 16
-  batch_size: 128
-  R: 1.1
-  num_features: 2
+  module: models.ect_cnn
+  ectconfig:
+    num_thetas: 16
+    bump_steps: 16
+    batch_size: 128
+    R: 1.1
+    num_features: 2
+    device: cuda
+    ecc_type: edges
   num_classes: 15
   hidden: 25
 trainer:

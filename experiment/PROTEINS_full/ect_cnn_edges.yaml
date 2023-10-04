@@ -14,12 +14,15 @@ data:
   cleaned: false
   use_node_attr: true
 model:
-  module: models.ect_cnn_edges
-  num_thetas: 32
-  bump_steps: 32
-  batch_size: 128
-  R: 1.1
-  num_features: 32
+  module: models.ect_cnn
+  ectconfig:
+    num_thetas: 32
+    bump_steps: 32
+    batch_size: 128
+    R: 1.1
+    num_features: 32
+    device: cuda
+    ecc_type: edges
   num_classes: 2
   hidden: 50
 trainer:
