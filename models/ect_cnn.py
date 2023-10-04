@@ -23,7 +23,7 @@ class EctCnnModel(BaseModel):
         num_features = functools.reduce(
             operator.mul,
             list(
-                self.conv1(
+                self.conv(
                     torch.rand(
                         1, config.ectconfig.bump_steps, config.ectconfig.num_thetas
                     )
