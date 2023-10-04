@@ -1,8 +1,7 @@
 import torch
-import torch_geometric
-from torch_geometric.data import Dataset, Data
+from torch_geometric.utils import degree
+from torch_geometric.data import Data
 import matplotlib.pyplot as plt
-import open3d as o3d
 import torchvision
 
 
@@ -25,33 +24,6 @@ def plot_batch(data):
     ax.set_ylim([-1, 1])
     ax.set_zlim([-1, 1])
     plt.show()
-
-
-def compute_mean(data: Data) -> torch.Tensor:
-    return data.x.mean(axis=0)
-
-
-def compute_radius(data: Data) -> torch.Tensor:
-    return data.x.pow(2).sum(axis=1).sqrt().max()
-
-
-class SimplifyMesh:
-    def __call__(self, data):
-        mesh_in = o3d.geometry.TriangleMesh()
-        mesh_in.triangles = o3d.utility.Vector3iVector(data.face.numpy().T)
-        mesh_in.vertices = o3d.utility.Vector3dVector(data.pos.numpy())
-        mesh_in.compute_vertex_normals()
-        voxel_size = max(mesh_in.get_max_bound() - mesh_in.get_min_bound()) / 64
-        mesh_smp = mesh_in.simplify_vertex_clustering(
-            voxel_size=voxel_size,
-            contraction=o3d.geometry.SimplificationContraction.Average,
-        )
-        print(torch.tensor(mesh_smp.triangles, dtype=torch.long).shape)
-        return Data(
-            x=torch.tensor(mesh_smp.vertices, dtype=torch.float32),
-            face=torch.tensor(mesh_smp.triangles, dtype=torch.long).T,
-            y=data.y,
-        )
 
 
 class ThresholdTransform(object):
@@ -92,9 +64,6 @@ class NCI109Transform(object):
         deg = degree(data.edge_index[0], dtype=torch.float).unsqueeze(0).T
         atom_number = torch.argmax(data.x, dim=-1, keepdim=True)
         data.x = torch.hstack([deg, atom_number])
-        # print(deg)
-        # print(atom_number)
-        # print()
         return data
 
 
@@ -105,50 +74,11 @@ class ModelNetTransform(object):
         return data
 
 
-class FloatTransform(object):
-    def __call__(self, data):
-        data.x = data.x.to(torch.float64)
-        return data
-
-
-class Rotate(object):
-    def __call__(self, batch):
-        theta = (torch.rand(1) - 0.5) * torch.pi / 5
-        rot = torch.tensor(
-            [
-                [torch.cos(theta), -torch.sin(theta), 0],
-                [torch.sin(theta), torch.cos(theta), 0],
-                [0, 0, 1],
-            ]
-        )
-        batch.x = batch.x @ rot
-        # scaling
-        return batch
-
-
 class Project(object):
     def __call__(self, batch):
         batch.x = batch.x[:, :2]
         # scaling
         return batch
-
-
-# class Standardize(object):
-#     """
-#     NOT TESTED SHOULD BE CHECKED!!!
-#     """
-
-#     def __init__(self, samplepoints):
-#         self.samplepoints = samplepoints
-
-#     def __call__(self, data):
-#         clipper = torch.mean(torch.abs(x))
-#         z = torch.clip(x, -100 * clipper, 100 * clipper)
-#         mean = torch.mean(z)
-#         std = torch.std(z)
-#         normalized = (z - mean) / std
-#         data.x = normalized
-#         return data
 
 
 class MnistTransform:

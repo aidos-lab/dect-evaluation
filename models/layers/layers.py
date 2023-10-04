@@ -3,19 +3,21 @@ import torch.nn as nn
 from torch_scatter import segment_coo
 import geotorch
 from models.config import EctConfig
+from torch_geometric.data import Data
+
+from typing import Protocol
+from dataclasses import dataclass
 
 
 def compute_ecc(nh, index, lin, dim_size):
     ecc = torch.nn.functional.sigmoid(200 * torch.sub(lin, nh))
     # print(segment_coo(ecc, index.view(1, -1), reduce="sum").movedim(0, 1).shape)
-    return segment_coo(ecc, index.view(1, -1), dim_size=dim_size, reduce="sum").movedim(
-        0, 1
-    )
+    return segment_coo(ecc, index.view(1, -1), dim_size=dim_size).movedim(0, 1)
 
 
 def compute_ect_points(data, v, lin):
     nh = data.x @ v
-    return compute_ecc(nh, data.batch, lin, dim_size=data.num_graphs)
+    return compute_ecc(nh, data.batch, lin, data.num_graphs)
 
 
 def compute_ect_edges(data, v, lin):

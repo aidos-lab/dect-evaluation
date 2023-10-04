@@ -5,7 +5,7 @@ from torch.utils.data import random_split
 import torch
 
 from torch_geometric.transforms import FaceToEdge
-from datasets.transforms import CenterTransform, SimplifyMesh, ModelNetTransform
+from datasets.transforms import CenterTransform, ModelNetTransform
 
 from loaders.factory import register
 

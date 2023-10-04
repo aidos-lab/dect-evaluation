@@ -1,18 +1,17 @@
 import torch
+from torch.utils.data import random_split
+
 from torchvision.datasets import MNIST
 import torchvision.transforms as transforms
+
+from torch_geometric.data import InMemoryDataset
 from torch_geometric.transforms import FaceToEdge
-from datasets.base_dataset import DataModule, DataModuleConfig
-from dataclasses import dataclass
-from torch.utils.data import random_split
+
 from datasets.transforms import CenterTransform
-import torch
-from torch_geometric.data import InMemoryDataset, download_url
-from loaders.factory import register
-
-
+from datasets.base_dataset import DataModule
 from datasets.transforms import MnistTransform
-from datasets.config import MnistDataModuleConfig
+
+from loaders.factory import register
 
 
 class MnistDataModule(DataModule):
