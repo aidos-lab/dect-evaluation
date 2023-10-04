@@ -4,7 +4,7 @@ import torch.nn as nn
 import functools
 import operator
 from models.base_model import BaseModel
-from models.layers.layers import Ect2DPointsLayer, EctPointsLayer, EctNodeHeightLayer
+from models.layers.layers import EctPointsLayer
 from loaders.factory import register
 from models.deepsets import PermEqui2_mean
 
@@ -20,8 +20,6 @@ class TestModel(BaseModel):
             nn.ELU(inplace=True),
             # nn.Linear(self.d_dim, self.d_dim),
             # nn.ELU(inplace=True),
-            # nn.Linear(self.d_dim, self.d_dim),
-            # nn.ELU(inplace=True),
         )
         self.ro = nn.Sequential(
             nn.Dropout(p=0.5),
@@ -32,9 +30,9 @@ class TestModel(BaseModel):
         )
 
     def forward(self, batch):
-        x = self.ectlayer(batch)
-        x /= 500
+        x = self.ectlayer(batch).transpose(-1, -2)
         x -= 1
+        x /= 50
         x, _ = self.phi(x).max(1)
         # print(x.shape)
         # raise "hello"

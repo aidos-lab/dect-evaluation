@@ -17,7 +17,7 @@ class ECTCNNFacesModel(BaseModel):
     def __init__(self, config):
         super().__init__(config)
         self.ectlayer = EctFacesLayer(config)
-        geotorch.constraints.sphere(self.ectlayer, "v")
+        # geotorch.constraints.sphere(self.ectlayer, "v")
         self.conv1 = nn.Sequential(
             nn.Conv2d(1, 8, kernel_size=3),
             nn.MaxPool2d(2),

@@ -6,6 +6,7 @@ from logger import Logger, timing
 from metrics.metrics import compute_confusion, compute_acc
 import loaders.factory as loader
 import time
+<<<<<<< HEAD
 
 import torchmetrics
 
@@ -77,7 +78,7 @@ class Experiment:
         #     self.optimizer, mode="min", factor=0.2, patience=10, verbose=True
         # )
         self.scheduler = torch.optim.lr_scheduler.MultiStepLR(
-            self.optimizer, milestones=[150, 200], gamma=0.1
+            self.optimizer, milestones=[500], gamma=0.1
         )
 
         self.early_stopper = EarlyStopper()
@@ -135,6 +136,7 @@ class Experiment:
             loss.backward()
             clip_grad(self.model, 5)
             self.optimizer.step()
+            # raise "hello"
 
         val_loss, _, _ = compute_acc(
             self.model, self.dm.val_dataloader(), self.config.model.num_classes
@@ -166,7 +168,7 @@ def compute_avg(acc: torch.Tensor):
     print(acc)
     # Log statements
     mylogger.log(
-        f"Final accuracy {final_acc_mean:.3f} with std {final_acc_std:.3f}.",
+        f"Final accuracy {final_acc_mean:.4f} with std {final_acc_std:.4f}.",
     )
 
 
@@ -175,7 +177,7 @@ def main():
         # "DD",
         # "ENZYMES",
         # "IMDB-BINARY",
-        # "Letter-high",
+        "Letter-high",
         # "Letter-med",
         # "Letter-low",
         # "gnn_mnist_classification",
@@ -185,7 +187,7 @@ def main():
         # "OGB-MOLHIV"
         # "dhfr",
         # "bzr",
-        "cox2"
+        # "cox2"
     ]
 
     for experiment in experiments:
@@ -201,3 +203,124 @@ def main():
 
 if __name__ == "__main__":
     main()
+=======
+import os
+
+torch.cuda.empty_cache()
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
+from sklearn.metrics import confusion_matrix
+
+
+def compute_confusion(model, loader):
+    y_true = []
+    y_pred = []
+    with torch.no_grad():
+        for batch in loader:
+            batch_gpu, y_gpu = batch.to(device), batch.y.to(device)
+            y_pred.append(model(batch_gpu))
+            y_true.append(y_gpu)
+
+        y_true = torch.cat(y_true)
+        y_pred = torch.cat(y_pred).max(axis=1)[1]
+        cfm = confusion_matrix(
+            y_true.cpu().detach().numpy(), y_pred.cpu().detach().numpy()
+        )
+    return cfm
+
+
+def compute_acc(model, loader, loss_fn):
+    correct = 0
+    total = 0
+    loss = 0
+    y_true = []
+    y_pred = []
+    with torch.no_grad():
+        for batch in loader:
+            batch_gpu, y_gpu = batch.to(device), batch.y.to(device)
+            y_pred.append(model(batch_gpu))
+            y_true.append(y_gpu)
+        y_true = torch.cat(y_true)
+        y_pred = torch.cat(y_pred)
+        loss = torch.sqrt(loss_fn(y_pred, y_true))
+        y_pred = y_pred.max(axis=1)[1]
+        correct = (y_pred == y_true).float().sum()
+        acc = correct / len(y_true)
+    return loss, acc
+
+
+def count_parameters(model):
+    return sum(p.numel() for p in model.parameters() if p.requires_grad)
+
+
+def train_model(config, run=None):
+    dm = load_datamodule(name=config.data.name, config=config.data.config)
+    """ dm.info() """
+    model = load_model(name=config.model.name, config=config.model.config)
+    log_msg(f"{config.model.name} has {count_parameters(model)} trainable parameters")
+    model = model.to(device)
+    loss_fn = torch.nn.CrossEntropyLoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=config.trainer.lr)
+
+    start = time.time()
+    loss = torch.empty(0)
+    for epoch in range(config.trainer.num_epochs):
+        for batch in dm.train_dataloader():
+            batch_gpu, y_gpu = batch.to(device), batch.y.to(device)
+            optimizer.zero_grad(set_to_none=True)
+            pred = model(batch_gpu)
+            loss = loss_fn(pred, y_gpu)
+            loss.backward()
+            optimizer.step()
+        if run:
+            run.log({"epoch": epoch, "train_loss": loss.item()})
+        if epoch % 10 == 0:
+            end = time.time()
+            loss, acc = compute_acc(model, dm.val_dataloader(), loss_fn)
+            log_msg(
+                f"epoch {epoch} | train loss {loss.item():.2f} | Accuracy {acc:.2f} | time {start-end:.2f}"
+            )
+            if run:
+                run.log({"epoch": epoch, "val_loss": loss.item()})
+                run.log({"epoch": epoch, "val_acc": acc})
+            start = time.time()
+
+    loss, acc = compute_acc(model, dm.test_dataloader(), loss_fn)
+    cfm = compute_confusion(model, dm.test_dataloader())
+    log_msg(f"Test accuracy {acc:.2f}")
+    print(cfm)
+    if run:
+        run.log({"thetas": config.model.config.num_thetas, "test_acc": acc})  # type: ignore
+        run.log({"test_loss": loss})  # type: ignore
+    return run
+
+
+def run_experiment(experiment, dev=False):
+    files = glob.glob(f"./experiment/{experiment}/*")
+
+    for file in files:
+        config = OmegaConf.load(file)
+        log_msg(f"\n{OmegaConf.to_yaml(config, resolve=True)}")  # type: ignore
+
+        tags = [config.model.name, config.data.name]
+        if not dev:
+            run = wandb.init(
+                project="desct-test" if dev else "desct-final",
+                name=experiment,
+                tags=tags,
+                reinit=True,
+                config=OmegaConf.to_container(config, resolve=True),  # type: ignore
+            )
+            run = train_model(config, run)
+            run.join()  # type: ignore
+        else:
+            run = train_model(config, run=None)
+
+
+if __name__ == "__main__":
+    experiments = os.listdir("./experiment")
+    experiments = ["letter_high_classification"]
+    for experiment in experiments:
+        print("Running experiment", experiment)
+        run_experiment(experiment, dev=True)
+>>>>>>> main
