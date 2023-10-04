@@ -6,6 +6,7 @@ class EctConfig:
     num_thetas: int = 32
     bump_steps: int = 32
     R: float = 1.1
+    ect_type: str = "points"
 
 
 @dataclass(frozen=True)

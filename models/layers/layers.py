@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 from torch_scatter import segment_coo
 import geotorch
+from models.config import EctConfig
 
 
 def compute_ecc(nh, index, lin):
@@ -37,7 +38,7 @@ def compute_ect_faces(data, v, lin):
 class EctLayer(nn.Module):
     """docstring for EctLayer."""
 
-    def __init__(self, config, ecc_type="points", fixed=False):
+    def __init__(self, config: EctConfig, fixed=False):
         super().__init__()
         self.fixed = fixed
         self.lin = (
@@ -57,11 +58,11 @@ class EctLayer(nn.Module):
                 torch.rand(size=(config.num_features, config.num_thetas)) - 0.5
             ).to(config.device)
 
-        if ecc_type == "points":
+        if config.ecc_type == "points":
             self.compute_ect = compute_ect_points
-        elif ecc_type == "edges":
+        elif config.ecc_type == "edges":
             self.compute_ect = compute_ect_edges
-        elif ecc_type == "faces":
+        elif config.ecc_type == "faces":
             self.compute_ect = compute_ect_faces
 
     def __post_init__(self):
