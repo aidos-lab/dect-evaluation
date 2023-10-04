@@ -77,7 +77,7 @@ class Experiment:
         #     self.optimizer, mode="min", factor=0.2, patience=10, verbose=True
         # )
         self.scheduler = torch.optim.lr_scheduler.MultiStepLR(
-            self.optimizer, milestones=[150, 200], gamma=0.1
+            self.optimizer, milestones=[500], gamma=0.1
         )
 
         self.early_stopper = EarlyStopper()
@@ -135,6 +135,7 @@ class Experiment:
             loss.backward()
             clip_grad(self.model, 5)
             self.optimizer.step()
+            # raise "hello"
 
         val_loss, _, _ = compute_acc(
             self.model, self.dm.val_dataloader(), self.config.model.num_classes
@@ -166,7 +167,7 @@ def compute_avg(acc: torch.Tensor):
     print(acc)
     # Log statements
     mylogger.log(
-        f"Final accuracy {final_acc_mean:.3f} with std {final_acc_std:.3f}.",
+        f"Final accuracy {final_acc_mean:.4f} with std {final_acc_std:.4f}.",
     )
 
 
@@ -175,7 +176,7 @@ def main():
         # "DD",
         # "ENZYMES",
         # "IMDB-BINARY",
-        # "Letter-high",
+        "Letter-high",
         # "Letter-med",
         # "Letter-low",
         # "gnn_mnist_classification",
@@ -185,7 +186,7 @@ def main():
         # "OGB-MOLHIV"
         # "dhfr",
         # "bzr",
-        "cox2"
+        # "cox2"
     ]
 
     for experiment in experiments:

@@ -22,12 +22,12 @@ class ECTLinearFacesModel(BaseModel):
     def __init__(self, config):
         super().__init__(config)
         self.ectlayer = EctFacesLayer(config)
-        geotorch.constraints.sphere(self.ectlayer, "v")
+        # geotorch.constraints.sphere(self.ectlayer, "v")
         self.linear1 = torch.nn.Linear(
             config.num_thetas * config.bump_steps, config.hidden
         )
-        self.linear2 = torch.nn.Linear(config.hidden, 100)
-        self.linear3 = nn.Linear(100, config.num_classes)
+        self.linear2 = torch.nn.Linear(config.hidden, config.hidden)
+        self.linear3 = nn.Linear(config.hidden, config.num_classes)
 
     def forward(self, batch):
         x = self.ectlayer(batch).reshape(

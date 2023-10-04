@@ -12,7 +12,6 @@ from torch_geometric.transforms import OneHotDegree
 from torch_geometric.utils import degree
 from torch_geometric.utils import degree
 
-
 #  ╭──────────────────────────────────────────────────────────╮
 #  │ Transforms                                               │
 #  ╰──────────────────────────────────────────────────────────╯

@@ -15,14 +15,14 @@ data:
   use_node_attr: true
 model:
   module: models.ect_cnn_edges
-  num_thetas: 32
-  bump_steps: 32
+  num_thetas: 16
+  bump_steps: 16
   batch_size: 128
   R: 1.1
   num_features: 38
   num_classes: 2
-  hidden: 50
+  hidden: 25
 trainer:
   lr: 0.001
-  num_epochs: 200
+  num_epochs: 100
   num_reruns: 5

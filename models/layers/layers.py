@@ -173,8 +173,9 @@ class EctEdgesLayer(EctPointsLayer):
             dtype=torch.float32,
             device=self.device,
         )
-        return rel(nh, data.batch, out, self.lin) - rel(
-            eh, data.batch[data.edge_index[0]], out, self.lin
+        return (
+            rel(nh, data.batch, out, self.lin)
+            - rel(eh, data.batch[data.edge_index[0]], out, self.lin) / 2
         )
 
 
@@ -187,7 +188,7 @@ class EctFacesLayer(EctPointsLayer):
     def forward(self, data):
         nh = data.x @ self.v.T
         eh, _ = nh[data.edge_index].max(dim=0)
-        fh, _ = nh[data.face_index].max(dim=0)
+        fh, _ = nh[data.face].max(dim=0)
         out = torch.zeros(
             self.bump_steps,
             data.batch.max() + 1,
@@ -197,6 +198,6 @@ class EctFacesLayer(EctPointsLayer):
         )
         return (
             rel(nh, data.batch, out, self.lin)
-            - rel(eh, data.batch[data.edge_index[0]], out, self.lin)
-            + rel(fh, data.batch[data.face_index[0]], out, self.lin)
+            - rel(eh, data.batch[data.edge_index[0]], out, self.lin) / 2
+            + rel(fh, data.batch[data.face[0]], out, self.lin)
         )

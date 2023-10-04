@@ -8,7 +8,7 @@ import torch_geometric
 import os
 import torch
 from torch_geometric.data import Dataset, Data
-from torch_geometric.transforms import FaceToEdge
+from torch_geometric.transforms import FaceToEdge, RandomRotate
 import shutil
 import torchvision.transforms as transforms
 from loaders.factory import register
@@ -18,6 +18,8 @@ import trimesh
 
 class CenterTransform(object):
     def __call__(self, data):
+        data.x = data.pos
+        data.pos = None
         data.x -= data.x.mean()
         data.x /= data.x.pow(2).sum(axis=1).sqrt().max()
         return data
@@ -34,13 +36,15 @@ def read_ply(path):
     pos = torch.from_numpy(mesh.vertices).to(torch.float)
     edge = torch.from_numpy(mesh.edges).to(torch.long).t()
     face = torch.from_numpy(mesh.faces).to(torch.long).t()
-    return Data(pos=pos, edge_index=edge, face_index=face)
+    return Data(pos=pos, edge_index=edge, face=face)
 
 
 class ManifoldDataModule(DataModule):
     def __init__(self, config):
         self.config = config
-        self.transform = transforms.Compose([FaceToEdge(), CenterTransform()])
+        self.transform = transforms.Compose(
+            [RandomRotate(0.7), FaceToEdge(remove_faces=False), CenterTransform()]
+        )
         super().__init__(
             config.root, config.batch_size, config.num_workers, config.pin_memory
         )
@@ -98,8 +102,6 @@ class ManifoldDataset(Dataset):
         file_name = self.file_frame.iloc[index, 0]
         y = self.file_frame.iloc[index, 1]
         data = read_ply(file_name)
-        data.x = data.pos
-        data.pos = None
         data.y = torch.tensor([y])
         return data
 
@@ -109,7 +111,7 @@ class ManifoldDataset(Dataset):
 
     def create_spheres(self, noise=None):
         if not noise:
-            noise = 0.1
+            noise = 0.3
 
         for i in range(self.config.num_samples):
             base_mesh = o3d.geometry.TriangleMesh.create_sphere()
@@ -125,7 +127,7 @@ class ManifoldDataset(Dataset):
 
     def create_mobius(self, noise=None):
         if not noise:
-            noise = 0.1
+            noise = 0.3
         for i in range(self.config.num_samples):
             base_mesh = o3d.geometry.TriangleMesh.create_mobius()
             vertices = np.asarray(base_mesh.vertices)
@@ -140,7 +142,7 @@ class ManifoldDataset(Dataset):
 
     def create_torus(self, noise=None):
         if not noise:
-            noise = 0.1
+            noise = 0.3
 
         for i in range(self.config.num_samples):
             base_mesh = o3d.geometry.TriangleMesh.create_torus()
