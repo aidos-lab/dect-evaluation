@@ -4,7 +4,6 @@ import shutil
 from datasets.gnn_benchmark import GNNBenchmarkDataModuleConfig
 from datasets.modelnet import ModelNetDataModuleConfig
 from datasets.manifold import ManifoldDataModuleConfig
-from datasets.ogb import MOLHIVDataModuleConfig, OGBDataModule
 from datasets.tu import (
     TUDataModule,
     TUEnzymesConfig,
