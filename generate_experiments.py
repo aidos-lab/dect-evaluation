@@ -260,31 +260,6 @@ def tu_nci109(experiment_folder="experiment", trainer=None, meta=None) -> None:
         )
 
 
-def ogb_mol(experiment_folder="experiment", trainer=None, meta=None) -> None:
-    experiment = f"./{experiment_folder}/OGB-MOLHIV"
-    create_experiment_folder(experiment)
-
-    modules = [
-        # "models.ect_cnn_points",
-        "models.ect_cnn_edges",
-        # "models.ect_linear_points",
-        # "models.ect_linear_edges",
-    ]
-
-    # Create the dataset config.
-    data = MOLHIVDataModuleConfig()
-
-    for module in modules:
-        modelconfig = ECTModelConfig(
-            module=module, num_features=9, num_classes=2, num_thetas=32, bump_steps=32
-        )
-
-        config = Config(meta, data, modelconfig, trainer)
-        save_config(
-            config, os.path.join(experiment, f"{module.split(sep='.')[1]}.yaml")
-        )
-
-
 def tu_reddit_b(experiment_folder="experiment", trainer=None, meta=None) -> None:
     experiment = f"./{experiment_folder}/REDDIT-BINARY"
     create_experiment_folder(experiment)
