@@ -1,4 +1,4 @@
-Copyright (c) 2022 Julius von Rohrscheidt and Bastian Rieck
+Copyright (c) 2022 Ernst Roell
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
