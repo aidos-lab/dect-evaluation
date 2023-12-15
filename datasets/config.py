@@ -22,6 +22,12 @@ class MnistDataModuleConfig(DataModuleConfig):
     root: str = "./data/MNIST"
     module: str = "datasets.mnist"
 
+    
+@dataclass
+class WeightedMnistDataModuleConfig(DataModuleConfig):
+    root: str = "./data/WMNIST"
+    module: str = "datasets.weighted_mnist"
+
 
 @dataclass
 class ModelNetDataModuleConfig(DataModuleConfig):

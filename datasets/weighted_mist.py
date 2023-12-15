@@ -25,20 +25,27 @@ class WeightedMnistDataModule(DataModule):
         )
 
     def setup(self):
-        self.entire_ds = WeightedMnistDataset(
-            root=self.config.root, pre_transform=self.transform, train=True
-        )
-        self.train_ds, self.val_ds = random_split(
+        self.entire_ds = torch.utils.data.ConcatDataset(
+                [
+                WeightedMnistDataset( root=self.config.root, pre_transform=self.transform, train=True),
+                WeightedMnistDataset( root=self.config.root, pre_transform=self.transform, train=False )
+                ]
+            )
+        self.train_ds, self.test_ds = random_split(
             self.entire_ds,
             [
                 int(0.9 * len(self.entire_ds)),
                 len(self.entire_ds) - int(0.9 * len(self.entire_ds)),
             ],
         )  # type: ignore
-
-        self.test_ds = WeightedMnistDataset(
-            root=self.config.root, pre_transform=self.transform, train=False
-        )
+        
+        self.train_ds, self.val_ds = random_split(
+            self.train_ds,
+            [
+                int(0.9 * len(self.train_ds)),
+                len(self.train_ds) - int(0.9 * len(self.train_ds)),
+            ],
+        )  # type: ignore 
 
 
 class WeightedMnistDataset(InMemoryDataset):
