@@ -1,6 +1,5 @@
-# DECT - Differentiable Euler Chararcteristic Transform
+# DECT - Differentiable Euler Characteristic Transform
 Differentiable Euler Characteristic Transform
-
 
 
 ## Installation
