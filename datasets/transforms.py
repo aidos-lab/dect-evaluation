@@ -101,3 +101,21 @@ class MnistTransform:
             face=torch.tensor(dly.faces(), dtype=torch.long).T,
             y=torch.tensor(y, dtype=torch.long),
         )
+
+
+class WeightedMnistTransform:
+    def __init__(self):
+        self.grid = torch.load("./datasets/grid.pt")
+        self.tr = torchvision.transforms.ToTensor()
+
+    def __call__(self, data: tuple) -> Data:
+        img, y = data
+        img = self.tr(img)
+
+        return Data(
+            x=self.grid.x,
+            node_weights = img.view(-1,1),
+            edge_index=self.grid.edge_index,
+            face=self.grid.face,
+            y=torch.tensor(y, dtype=torch.long),
+        )
