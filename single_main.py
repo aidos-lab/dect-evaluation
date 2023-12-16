@@ -9,10 +9,10 @@ mylogger = Logger()
 
 def main():
     accs = []
-    for _ in range(5):
+    for _ in range(1):
         print("Running experiment", "ect_cnn_best.yaml")
         exp = Experiment(
-            "./experiment/Letter-high/ect_cnn_edges.yaml", logger=mylogger, dev=True
+            "./experiment/weighted_mnist/wect.yaml", logger=mylogger, dev=True
         )
         # exp = Experiment(
         #     "./experiment/manifold_classification/ect_cnn_faces.yaml",

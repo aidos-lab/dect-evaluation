@@ -1,24 +1,23 @@
 meta:
-  name: desct-test-new
-  project: desct
+  name: wect-mnist-classification
+  project: dect
   tags: ['dev']
   experiment_folder: experiment
 data:
-  module: datasets.tu
-  root: ./data
+  module: datasets.weighted_mnist
+  root: ./data/wect
   num_workers: 0
-  batch_size: 33
+  batch_size: 64
   pin_memory: true
   drop_last: false
-  name: Letter-high
   cleaned: false
 model:
-  module: models.ect_cnn
+  module: models.wect_cnn
   ectconfig:
     num_thetas: 16
     bump_steps: 16
     R: 1.1
-    ecc_type: edges
+    ecc_type: faces
     device: cuda
     num_features: 2
   num_classes: 15

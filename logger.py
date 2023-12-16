@@ -8,7 +8,7 @@ import wandb
 
 
 class Logger:
-    def __init__(self, dev: bool = True):
+    def __init__(self, dev: bool = True, wandb_logger: bool = True):
         self.dev = dev
         self.wandb = None
 
@@ -30,13 +30,10 @@ class Logger:
         self.logger.addHandler(fh)
 
     def wandb_init(self, config):
-        if self.dev:
-            self.wandb = None
-        else:
             self.wandb = wandb.init(
                 project=config.project,
                 name=config.name,
-                tags=config.tags,
+                tags=config.tags + ["dev"],
             )
 
     def log(self, msg: str | None = None, params: dict[str, str] | None = None) -> None:
