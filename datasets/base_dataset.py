@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from torch_geometric.loader import DataLoader
 from torch_geometric.data import Dataset
-
+from torch_geometric.loader import ImbalancedSampler
 
 class DataModule(ABC):
     train_ds: Dataset
@@ -39,7 +39,7 @@ class DataModule(ABC):
             batch_size=self.batch_size,
             num_workers=self.num_workers,
             # sampler=ImbalancedSampler(self.val_ds),
-            shuffle=False,
+            # shuffle=False,
             pin_memory=self.pin_memory,
             # drop_last=self.drop_last,
         )

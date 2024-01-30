@@ -9,6 +9,22 @@ from datasets.transforms import CenterTransform, ModelNetTransform
 
 from loaders.factory import register
 
+class CenterTransformNew(object):
+    def __call__(self, data):
+        data.x -= data.x.mean(axis=0)
+        data.x /= data.x.pow(2).sum(axis=1).sqrt().max()
+        return data
+
+
+
+
+
+class Normalize(object):
+    def __call__(self, data):
+        mean = data.x.mean(axis=0)
+        std = data.x.std(axis=0)
+        data.x = (data.x - mean) / std
+        return data
 
 class ModelNetDataModule(DataModule):
     def __init__(self, config):
@@ -18,13 +34,13 @@ class ModelNetDataModule(DataModule):
                 transforms.SamplePoints(self.config.samplepoints),
                 ModelNetTransform(),
                 CenterTransform(),
+                # Normalize(),
             ]
         )
         super().__init__(
             config.root, config.batch_size, config.num_workers, config.pin_memory
         )
 
-        self.prepare_data()
         self.setup()
 
     def setup(self):

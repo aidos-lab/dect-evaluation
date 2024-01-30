@@ -176,7 +176,7 @@ def main():
         # "DD",
         # "ENZYMES",
         # "IMDB-BINARY",
-        "Letter-high",
+        # "Letter-high",
         # "Letter-med",
         # "Letter-low",
         # "gnn_mnist_classification",
@@ -186,7 +186,8 @@ def main():
         # "OGB-MOLHIV"
         # "dhfr",
         # "bzr",
-        # "cox2"
+        # "cox2",
+        "lrgb"
     ]
 
     for experiment in experiments:

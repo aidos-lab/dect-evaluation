@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 import torchvision.transforms as transforms
 from torch_geometric.transforms import BaseTransform
-from torch_geometric.datasets import MoleculeNet
+from torch_geometric.datasets import LRGBDataset
 
 from datasets.transforms import CenterTransform
 from datasets.base_dataset import DataModule
@@ -12,13 +12,11 @@ from loaders.factory import register
 from datasets.config import DataModuleConfig
 
 
-
 @dataclass
-class MoleculeNetDataModuleConfig(DataModuleConfig):
-    root: str = "./data/moleculenet"
-    module: str = "datasets.moleculenet"
-    name: str = "HIV"
-
+class LRGBDataModuleConfig(DataModuleConfig):
+    root: str = "./data/lrgb"
+    module: str = "datasets.lrgb"
+    name: str = "Peptides-func"
 
 
 class ConvertToFloat(BaseTransform):
@@ -48,7 +46,7 @@ class OneHotDecoding(BaseTransform):
         return data
 
 
-class MoleculeNetDataModule(DataModule):
+class LrgbDataModule(DataModule):
     def __init__(self, config):
         self.config = config
         self.transform = transforms.Compose(
@@ -59,9 +57,29 @@ class MoleculeNetDataModule(DataModule):
         )
 
     def setup(self):
-        self.entire_ds = MoleculeNet(
-            root=self.config.root, pre_transform=self.transform, name=self.config.name
-        )
+        self.entire_ds = torch.utils.data.ConcatDataset(
+                [
+                LRGBDataset(
+                   root=self.config.root, 
+                    pre_transform=self.transform, 
+                    name=self.config.name,
+                    split="train"
+                    ),
+                LRGBDataset(
+                   root=self.config.root, 
+                    pre_transform=self.transform, 
+                    name=self.config.name,
+                    split="test"
+                    ),
+                LRGBDataset(
+                   root=self.config.root, 
+                    pre_transform=self.transform, 
+                    name=self.config.name,
+                    split="val"
+                    )
+                ]
+            )
+        
         self.train_ds, self.test_ds = random_split(
             self.entire_ds,
             [
@@ -77,7 +95,7 @@ class MoleculeNetDataModule(DataModule):
                 len(self.train_ds) - int(0.9 * len(self.train_ds)),
             ],
         )  # type: ignore 
-        
+
 
 def initialize():
-    register("dataset", MoleculeNetDataModule)
+    register("dataset", LrgbDataModule)

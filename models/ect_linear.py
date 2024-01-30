@@ -12,7 +12,7 @@ class EctLinearModel(BaseModel):
         self.ectlayer = EctLayer(config.ectconfig)
 
         self.linear = nn.Sequential(
-            nn.Linear(self.config.num_thetas * self.config.bump_steps, config.hidden),
+            nn.Linear(self.config.ectconfig.num_thetas * self.config.ectconfig.bump_steps, config.hidden),
             nn.ReLU(),
             nn.Linear(config.hidden, config.hidden),
             nn.ReLU(),
@@ -21,7 +21,7 @@ class EctLinearModel(BaseModel):
 
     def forward(self, batch):
         x = self.ectlayer(batch).reshape(
-            -1, self.config.num_thetas * self.config.bump_steps
+            -1, self.config.ectconfig.num_thetas * self.config.ectconfig.bump_steps
         )
         x = self.linear(x)
         return x

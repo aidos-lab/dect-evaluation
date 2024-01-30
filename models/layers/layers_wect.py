@@ -56,6 +56,7 @@ def compute_wect_faces(data, v, lin, out):
 class WectLayer(nn.Module):
     def __init__(self, config: EctConfig, fixed=False):
         super().__init__()
+        self.config = config
         self.fixed = fixed
         self.lin = (
             torch.linspace(-config.R, config.R, config.bump_steps)
@@ -86,7 +87,14 @@ class WectLayer(nn.Module):
             geotorch.constraints.sphere(self, "v")
 
     def forward(self, data):
-        return self.compute_wect(data, self.v, self.lin)
+        out = torch.zeros(
+            self.config.bump_steps,
+            data.batch.max() + 1,
+            self.config.num_thetas,
+            dtype=torch.float32,
+            device=self.config.device,
+        )
+        return self.compute_wect(data, self.v, self.lin, out)
 
 
 

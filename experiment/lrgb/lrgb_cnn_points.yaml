@@ -1,0 +1,28 @@
+meta:
+  name: dect-lrgb-test
+  project: dect
+  tags: ['dev','cnn','points']
+  experiment_folder: experiment
+data:
+  module: datasets.lrgb
+  root: ./data
+  num_workers: 0
+  batch_size: 64
+  pin_memory: true
+  drop_last: false
+  name: Peptides-func
+model:
+  module: models.ect_cnn
+  ectconfig:
+    num_thetas: 16
+    bump_steps: 16
+    R: 1.1
+    ecc_type: points
+    device: cuda
+    num_features: 9
+  num_classes: 10
+  hidden: 25
+trainer:
+  lr: 0.001
+  num_epochs: 100
+  num_reruns: 5

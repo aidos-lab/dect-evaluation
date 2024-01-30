@@ -7,22 +7,22 @@ data:
   module: datasets.weighted_mnist
   root: ./data/wect
   num_workers: 0
-  batch_size: 64
+  batch_size: 128
   pin_memory: true
   drop_last: false
   cleaned: false
 model:
-  module: models.wect_cnn
+  module: models.wect_linear
   ectconfig:
-    num_thetas: 16
-    bump_steps: 16
+    num_thetas: 32
+    bump_steps: 32
     R: 1.1
     ecc_type: faces
     device: cuda
     num_features: 2
-  num_classes: 15
+  num_classes: 10
   hidden: 25
 trainer:
   lr: 0.001
   num_epochs: 100
-  num_reruns: 5
+  num_reruns: 1
