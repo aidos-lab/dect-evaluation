@@ -1,6 +1,16 @@
 # DECT - Differentiable Euler Characteristic Transform
 Differentiable Euler Characteristic Transform
 
+Please use the following citation for our work:
+
+```bibtex
+@inproceedings{Roell24a,
+  title         = {Differentiable Euler Characteristic Transforms for Shape Classification},
+  author        = {Ernst R{\"o}ell and Bastian Rieck},
+  year          = 2024,
+  url           = {https://openreview.net/forum?id=MO632iPq3I},
+}
+```
 
 ## Installation
 Our code has been developed using python 3.10 and using pytorch 2.0.1 installed 
