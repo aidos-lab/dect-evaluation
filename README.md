@@ -1,5 +1,12 @@
 # DECT - Differentiable Euler Characteristic Transform
-Differentiable Euler Characteristic Transform
+[![arXiv](https://img.shields.io/badge/arXiv-2310.07630-b31b1b.svg)](https://arxiv.org/abs/2310.07630) ![GitHub contributors](https://img.shields.io/github/contributors/aidos-lab/DECT) ![GitHub](https://img.shields.io/github/license/aidos-lab/DECT)
+
+This is the official repository for the ICLR 2024 paper: [Differentiable Euler Characteristic Transforms for Shape Classification](https://arxiv.org/abs/2310.07630).
+
+**Abstract** The Euler Characteristic Transform (ECT) has proven to be a powerful representation, combining geometrical and topological characteristics of shapes and graphs. However, the ECT was hitherto unable to learn task-specific representations. We overcome this issue and develop a novel computational layer that enables learning the ECT in an end-to-end fashion. Our method, the Differentiable Euler Characteristic Transform (DECT), is fast and computationally efficient, while exhibiting performance on a par with more complex models in both graph and point cloud classification tasks. Moreover, we show that this seemingly simple statistic provides the same topological expressivity as more complex topological deep learning layers.
+
+![Animated-ECT](figures/basic_animation.gif)
+
 
 Please use the following citation for our work:
 
