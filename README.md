@@ -5,7 +5,7 @@ This is the official repository for the ICLR 2024 paper: [Differentiable Euler C
 
 **Abstract** The Euler Characteristic Transform (ECT) has proven to be a powerful representation, combining geometrical and topological characteristics of shapes and graphs. However, the ECT was hitherto unable to learn task-specific representations. We overcome this issue and develop a novel computational layer that enables learning the ECT in an end-to-end fashion. Our method, the Differentiable Euler Characteristic Transform (DECT), is fast and computationally efficient, while exhibiting performance on a par with more complex models in both graph and point cloud classification tasks. Moreover, we show that this seemingly simple statistic provides the same topological expressivity as more complex topological deep learning layers.
 
-![Animated-ECT](figures/basic_animation.gif)
+![Animated-ECT](figures/ect_animation.gif)
 
 
 Please use the following citation for our work:

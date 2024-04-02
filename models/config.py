@@ -7,7 +7,7 @@ class EctConfig:
     bump_steps: int = 64
     R: float = 1.1
     ect_type: str = "points"
-    device: str = 'cpu'
+    device: str = 'cuda:0'
     num_features: int = 3
 
 

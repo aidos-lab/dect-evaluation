@@ -27,8 +27,8 @@ class DataModule(ABC):
             self.train_ds,
             batch_size=self.batch_size,
             num_workers=self.num_workers,
-            # sampler=ImbalancedSampler(self.train_ds),
-            shuffle=True,
+            sampler=ImbalancedSampler(self.train_ds),
+            # shuffle=True,
             pin_memory=self.pin_memory,
             # drop_last=self.drop_last,
         )

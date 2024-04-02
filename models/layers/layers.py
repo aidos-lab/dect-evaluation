@@ -52,9 +52,8 @@ class EctLayer(nn.Module):
         if self.fixed:
             self.v = torch.vstack(
                 [
-                    torch.sin(torch.linspace(0, 2 * torch.pi, 256)),
-                    torch.cos(torch.linspace(0, 2 * torch.pi, 256)),
-                    torch.zeros_like(torch.linspace(0, 2 * torch.pi, 256))
+                    torch.sin(torch.linspace(0, 2 * torch.pi, config.num_thetas)),
+                    torch.cos(torch.linspace(0, 2 * torch.pi, config.num_thetas)),
                 ]
             ).to(config.device)
         else:
