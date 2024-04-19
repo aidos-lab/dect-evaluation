@@ -49,6 +49,18 @@ All datasets will be downloaded and preprocessed when first ran via the
 The TU Datasets are small and run fast, so for testing purposes it is recommended
 to run these first.
 
+Alternatively, for research purposes the ECT is installable as a python package. 
+To install DECT, run the following in the terminal
+
+```{bash}
+pip install "git+https://github.com/aidos-lab/DECT/#subdirectory=dect"
+```
+
+For example usage, we provide the `example.ipynb` file and the code therein reproduces the 
+ECT of the gif of this readme. 
+The code is provided on an as is basis. You are cordially invited to both contribute and 
+provide feedback. Do not hesitate to contact us.
+
 ## Examples 
 
 The core of our method, the differentiable computation of the Euler Characteristic 
