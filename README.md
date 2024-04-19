@@ -15,6 +15,11 @@ Please use the following citation for our work:
   title         = {Differentiable Euler Characteristic Transforms for Shape Classification},
   author        = {Ernst R{\"o}ell and Bastian Rieck},
   year          = 2024,
+  booktitle     = {International Conference on Learning Representations},
+  eprint        = {2310.07630},
+  archiveprefix = {arXiv},
+  primaryclass  = {cs.LG},
+  repository    = {https://github.com/aidos-lab/DECT},
   url           = {https://openreview.net/forum?id=MO632iPq3I},
 }
 ```
